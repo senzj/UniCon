@@ -15,6 +15,8 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('about') ? 'active' : '' }}" href="/about">About</a>
                 </li>
+
+                {{-- checks if user is logged in or not --}}
                 @if (Auth::check())
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('profile') ? 'active' : '' }}" href="/profile">Profile</a>
@@ -27,6 +29,7 @@
                         <a class="nav-link {{ Request::is('login') ? 'active' : '' }}" href="/login">Login</a>
                     </li>
                 @endif
+                
             </ul>
 
             <span class="navbar-text">

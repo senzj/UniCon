@@ -4,24 +4,12 @@
 
     <!-- Display error messages -->
     <div class="mt-5">
-            
-        @if ($errors->any())
-            <div class="col-12">
-                @foreach ($errors->all() as $error)
-                    <div class="alert alert-danger">
-                        {{ $error }}
-                    </div>
-                @endforeach
-            </div>
-        @endif
-
         @if(session()->has('error'))
             <div class="alert alert-danger">
                 {{ session()->get('error') }}
             </div>
-        @endif
 
-        @if(session()->has('success'))
+        @elseif(session()->has('success'))
             <div class="alert alert-success">
                 {{ session('success')}}
             </div>
@@ -53,7 +41,7 @@
                     <label class="form-check-label" for="remember">Remember Me</label>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Log In</button>
+                <button type="submit" class="btn btn-primary" id="loginBtn">Log In</button>
                 <p><span>Don't have an account? <a href="/signup">Sign up!</a></span></p>
             </div>
         </div>

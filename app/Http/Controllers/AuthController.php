@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
-// for user model
-use App\Models\User;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
-    public function showLogin(){
+    public function showLogin()
+    {
         return view('auth.login');
     }
 
-    public function showSignup(){
+    public function showSignup()
+    {
         return view('auth.signup');
     }
 
@@ -27,19 +28,20 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Extract the credentials and map to the new structure
-        // $credentials = [
-        //     'email' => $data->input('Email'),
-        //     'password' => $data->input('Password'),
-        // ];
-        $credentials = $data->only('email', 'password'); // this is the same as above, but no mapping is done
+        $credentials = $request->only('email', 'password');
         
-        // Debug the credentials being passed to Auth::attempt()
-        dd($credentials);
+        // debug the password
+        // $user = User::where('email', $request->email)->first();
+        // dd($user->password);
 
-        // check if the user exists in the database
-        $auth = Auth::attempt($credentials);
-        if ($auth) {
+        // if (Hash::check($request->password, $user->password)) {
+        //     dd('Password matches');
+        // } else {
+        //     dd('Password does not match');
+        // }
+
+        // if the user is exist in the database
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended(route('home'))->with('success', 'You are logged in');
         }
@@ -48,56 +50,78 @@ class AuthController extends Controller
         return redirect(route('login'))->with('error', 'Incorrect email or password.');
     }
 
-    // signup logic
     public function signupPost(Request $request)
     {
+        // no password validation
+        // $request->validate([
+        //     'FName' => 'required',
+        //     'LName' => 'required',
+        //     'Email' => 'required|email|unique:users',
+        //     'Password' => 'required',
+        //     'CPassword' => 'required|same:Password',
+        // ], [
+        //     'FName.required' => 'Please enter your first name.',
+        //     'LName.required' => 'Please enter your last name.',
+        //     'Email.required' => 'Please enter your email address.',
+        //     'Email.email' => 'Please enter a valid email address.',
+        //     'Email.unique' => 'This email address is already taken.',
+        //     'Password.required' => 'A password is required.',
+        //     'CPassword.required' => 'Please confirm your password.',
+        //     'CPassword.same' => 'The confirmation password does not match the password.',
+        // ]);
+
+        // Password validation
         $request->validate([
             'FName' => 'required',
             'LName' => 'required',
             'Email' => 'required|email|unique:users',
-            'Password' => 'required',
+            'Password' => [
+                'required',
+                'string',
+                'min:8', // At least 8 characters
+                'regex:/[a-z]/', // At least one lowercase letter
+                'regex:/[A-Z]/', // At least one uppercase letter
+                'regex:/[0-9]/', // At least one digit
+                'regex:/[@$!%*?&#]/' // At least one special character
+            ],
             'CPassword' => 'required|same:Password',
-        ],
-        [ // custom error messages
+        ], [
             'FName.required' => 'Please enter your first name.',
             'LName.required' => 'Please enter your last name.',
             'Email.required' => 'Please enter your email address.',
             'Email.email' => 'Please enter a valid email address.',
             'Email.unique' => 'This email address is already taken.',
             'Password.required' => 'A password is required.',
+            'Password.min' => 'Password must be at least 8 characters long.',
+            'Password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
             'CPassword.required' => 'Please confirm your password.',
             'CPassword.same' => 'The confirmation password does not match the password.',
         ]);
 
-        // Prepare data for user creation
         $data = [
-            'first_name' => $request->FName,
-            'last_name' => $request->LName,
+            'first_name' => ucwords($request->FName),
+            'last_name' => ucwords($request->LName),
             'email' => $request->Email,
-            'password' => Hash::make($request->password),  // hash the password
-            'role' => 'student',  // set a default role if needed
+            'password' => Hash::make($request->Password),  // hash the password
+            'role' => 'student',
         ];
 
-        // Debug the credentials being passed to Auth::attempt()
-        // dd('debug', $data);
+        // dd($data['password']);  // This will output the hashed password to check its correctness
 
-        // creates user
         $user = User::create($data);
 
-        // if user is not created
-        if (!$user){
+        if (!$user) {
             return redirect(route('signup'))->with('error', 'Something went wrong. Please try again.');
-        } 
-        // if user is created
+        }
+
         return redirect(route('login'))->with('success', 'You are registered successfully!');
-    
     }
 
-    function logout(){
+    function logout()
+    {
         // $request->session()->flush();
         Session::flush();
         Auth::logout();
         return redirect(route('login'));
     }
-
 }
