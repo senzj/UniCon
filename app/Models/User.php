@@ -12,16 +12,23 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    // if sometimes table doesn't exist in the database, we can define the table name here, to avoid any error
+    protected $table = 'users'; // user table
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
+        'role',  // optional, depending on how you handle roles
     ];
+
+    public $timestamps = false; // Disable timestamps
 
     /**
      * The attributes that should be hidden for serialization.
@@ -41,7 +48,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            // 'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
