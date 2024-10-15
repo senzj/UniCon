@@ -16,7 +16,7 @@
         @endif
     </div>
 
-    <form action="{{ route('signup.post') }}" method="POST">
+    <form action="{{ route('signup@post') }}" method="POST">
         @csrf <!-- CSRF Protection -->
         <div class="form-container">
             <h1>Sign Up</h1>

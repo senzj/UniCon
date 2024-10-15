@@ -16,7 +16,7 @@
         @endif
     </div>
 
-    <form action="{{ route('login.post') }}" method="POST">  <!--Use the name of the route to identify-->
+    <form action="{{ route('login@post') }}" method="POST">  <!--Use the name of the route to identify-->
         @csrf <!--Cross-Site Request Forgery - a security token feature in Laravel to execute form-->
         <div class="form-container">
             <h1>Login</h1>
