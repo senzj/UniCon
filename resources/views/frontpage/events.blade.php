@@ -1,4 +1,4 @@
-@extends('layout.main')
+@extends('templates.main')
 @section('title', 'Welcome')
 @section('content')
 
