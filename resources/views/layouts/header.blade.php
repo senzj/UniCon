@@ -2,8 +2,7 @@
     <div class="container-fluid flex-column align-items-center">
         <!-- Navbar Brand - Centered Above the Collapse -->
         <a class="navbar-brand" href="/">
-            <img src="https://i.ibb.co/XydNNvZ/Logo-Maker-Ca-1728976782332-Copy.png" alt="Logo" style="height: 100px;">
-            {{-- <img src="{{ assets(images/) }}" alt="Logo" style="height: 100px;"> --}}
+            <img src="{{ asset('assets/images/unicon_logo.png') }}" alt="Logo" style="height: 100px;">
         </a>
 
         <!-- Navbar Toggler (Visible on smaller screens) -->
