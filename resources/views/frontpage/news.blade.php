@@ -1,5 +1,5 @@
 @extends('templates.main')
-@section('title', 'About')
+@section('title', 'News')
 @section('content')
     
     <h1>Welcome to the News Page!</h1>

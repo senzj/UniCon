@@ -29,6 +29,14 @@
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('profile') ? 'active' : '' }}" href="/profile">Profile</a>
                     </li>
+
+                    {{-- checks if the user role is admin --}}
+                    @if (Auth::user()->role == 'admin')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Request::is('admin') ? 'active' : '' }}" href="/admin">Dashboard</a>
+                        </li>
+                    @endif
+
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">Logout</a>
                     </li>

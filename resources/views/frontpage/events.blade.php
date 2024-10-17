@@ -1,5 +1,5 @@
 @extends('templates.main')
-@section('title', 'Welcome')
+@section('title', 'Events')
 @section('content')
 
     <h1>Welcome!</h1>
