@@ -14,14 +14,14 @@ return new class extends Migration
         // Create users table
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
+            // $table->increments('id');
+            $table->string('first_name')->unique();
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->nullable();
-            $table->timestamps('created_at');
-            $table->timestamp('updated_at')->nullable(); // or use ->useCurrent() if you want it to default to the current timestamp
-            $table->rememberToken();
+            $table->string('role');
+            $table->timestamps();
+            // $table->rememberToken()
         });
 
 
