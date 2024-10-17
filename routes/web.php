@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 // Import the Custom Controllers
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AdminController;
 
 //  ================================================================| Notes |===========================================================================
 // name serve as identifier for the route like ID
@@ -50,6 +52,7 @@ Route::get('/publications', function () {
 })->name('publications')->middleware('auth');
 
 // profile page
+Route::get('/profile', [HomeController::class, 'showProfile'])->name('profile')->middleware('auth');
 
 
 //file upload page
@@ -57,4 +60,4 @@ Route::get('/publications', function () {
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');
 
 // Admin page
-// Route::get('/admin', [AdminController::class, 'admin'])->name('admin')->middleware('admin');
+Route::get('/admin', [AdminController::class, 'dashboard'])->name('dashboard')->middleware(['auth', 'admin']); // only admin and those who are authenticated can access this route
