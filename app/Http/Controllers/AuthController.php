@@ -43,11 +43,11 @@ class AuthController extends Controller
         // if the user is exist in the database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('home'))->with('success', 'You are logged in');
+            return redirect()->intended(route('home'))->with('success', 'Successfully logged in!');
         }
 
         // if the user is not exist in the database
-        return redirect(route('login'))->with('error', 'Incorrect email or password.');
+        return redirect(route('login'))->with('error', 'Incorrect Email or Password.');
     }
 
     public function signupPost(Request $request)
@@ -111,10 +111,10 @@ class AuthController extends Controller
         $user = User::create($data);
 
         if (!$user) {
-            return redirect(route('signup'))->with('error', 'Something went wrong. Please try again.');
+            return back()->with('error', 'Something went wrong. Please try again.');
         }
-
-        return redirect(route('login'))->with('success', 'You are registered successfully!');
+        
+        return redirect(route('login'))->with('success', 'Registered successfully!');
     }
 
     function logout()
@@ -122,6 +122,6 @@ class AuthController extends Controller
         // $request->session()->flush();
         Session::flush();
         Auth::logout();
-        return redirect(route('events'));
+        return redirect(route('events'))->with("success", "Successfully logged out!");
     }
 }

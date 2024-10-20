@@ -2,20 +2,6 @@
 @section('title', 'Signup')
 @section('content')
 
-    <!-- Display error messages -->
-    <div class="mt-5">
-        @if(session()->has('error'))
-            <div class="alert alert-danger">
-                {{ session()->get('error') }}
-            </div>
-
-        @elseif(session()->has('success'))
-            <div class="alert alert-success">
-                {{ session('success')}}
-            </div>
-        @endif
-    </div>
-
     <form action="{{ route('signup@post') }}" method="POST">
         @csrf <!-- CSRF Protection -->
         <div class="form-container">
@@ -65,6 +51,5 @@
             </div>
         </div>
     </form>
-
     
 @endsection

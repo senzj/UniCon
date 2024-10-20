@@ -2,44 +2,6 @@
 @section('title', 'Login')
 @section('content')
 
-    <!-- Display error messages -->
-    @if (@session()->has('error'))
-    <div class="alert">
-        <div class="alert-container">
-            <div class="alert-content alert-danger">
-                <div class="alert-header">
-                    <span class="alert-message">{{ session()->get('error') }}</span>
-                    <span class="btn btn-close"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-    @elseif (session()->has('success'))
-    <div class="alert">
-        <div class="alert-container">
-            <div class="alert-content alert-success">
-                <div class="alert-header">
-                    <span class="alert-message">{{ session()->get('success') }}</span>
-                    <span class="btn btn-close"></span>
-                </div>
-            </div>
-        </div>
-    </div> 
-    @endif
-
-    {{-- <div class="mt-5">
-        @if(session()->has('error'))
-            <div class="alert alert-danger">
-                {{ session()->get('error') }}
-            </div>
-
-        @elseif(session()->has('success'))
-            <div class="alert alert-success">
-                {{ session('success')}}
-            </div>
-        @endif
-    </div> --}}
-
     <form action="{{ route('login@post') }}" method="POST">  <!--Use the name of the route to identify-->
         @csrf <!--Cross-Site Request Forgery - a security token feature in Laravel to execute form-->
         <div class="form-container">
