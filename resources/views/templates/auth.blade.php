@@ -8,20 +8,22 @@
         <!-- CSS here -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        {{-- Custom css file from public folder --}}
+
+        {{-- Custom CSS file from public folder --}}
         <link rel="stylesheet" href="{{ asset('assets/css/auth.css') }}">
 
         <!-- JS here -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="{{ asset('assets/js/app.js') }}"></script>
+        {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+        <script src="{{ asset('assets/js/auth.js') }}"></script>
     </head>
     
     <body>
         <!-- Header template here-->
         @include('layouts.header')
 
-        <!-- Main content will be displayed here -->
+        <!-- Main content here -->
         <div class="container">
             @yield('content')
         </div>

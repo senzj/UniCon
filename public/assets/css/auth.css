@@ -1,8 +1,14 @@
+/* container */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 /* form css */
 form{
     margin-left: 25%;
     margin-right: 25%;
-    margin-top: 25px;
     border:1px solid #ccc;
     padding: 1em;
     box-shadow: 0 4px 6px rgba(122, 119, 119, 0.1);
@@ -30,4 +36,131 @@ h1{
     text-align: center;
     margin-top: 10px;
     margin-bottom: 25px;
+}
+
+button:hover{
+    opacity: 0.8;
+}
+button:active{
+    transform: scale(0.95);
+}
+
+/* Alert Banner */
+.alert{
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    z-index: 1000;
+    height: 100px;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    animation: fadeInOut 0.5s ease;
+}
+.alert-container{
+    position: relative;
+    top: 0;
+    right: 0;
+    max-width: 40vh;
+    margin: 5px auto;
+    margin-bottom: 0;
+    box-shadow: 0 0px 5px 1px rgba(0, 0, 0, 0.3);
+}
+.alert-content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: inherit;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.3em;
+    outline: 0;
+}
+.alert-header{
+    display:flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #dee3e6;
+    background-color: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Alert Styles */
+/* Success */
+.alert-success{
+    background-color: #bcf6ca;
+    color: black;
+    padding-left: 4rem;
+}
+.alert-success::before{
+    font: var(--fa-font-solid); /* fontawesome */
+    content: '\f058'; /* fontawesome checkmark */
+    position: absolute;
+    left: 15px;
+    top: 13px;
+    font-size: 2rem;
+    color: green;
+}
+
+/* Error */
+.alert-danger{
+    background-color: #f8d7da;
+    color: black;
+    padding-left: 4rem;
+}
+.alert-danger::before{
+    font: var(--fa-font-solid); /* fontawesome */
+    content: '\f057'; /* fontawesome checkmark */
+    position: absolute;
+    left: 15px;
+    top: 13px;
+    font-size: 2rem;
+    color: #85030e;
+}
+
+/* warning */
+.alert-warning{
+    background-color: #ffc107;
+    color: black;
+    padding-left: 4rem;
+}
+.alert-warning::before{
+    font: var(--fa-font-solid); /* fontawesome */
+    content: '\f071'; /* fontawesome checkmark */
+    position: absolute;
+    left: 15px;
+    top: 13px;
+    font-size: 2rem;
+}
+
+/* info */
+.alert-info{
+    background-color: #54a4fa;
+    color: black;
+    padding-left: 4rem;
+}
+.alert-info::before{
+    font: var(--fa-font-solid); /* fontawesome */
+    content: '\f05a'; /* fontawesome checkmark */
+    position: absolute;
+    left: 15px;
+    top: 13px;
+    font-size: 2rem;
+}
+
+/* animation */
+@keyframes fadeInOut{
+    0%{
+        transform: translateX(200px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateX(0px);
+        opacity: 1;
+    }
 }
