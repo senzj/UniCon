@@ -18,15 +18,12 @@ use App\Http\Controllers\Controller;
 // Routes
 
 // not logged in users pages
-// events page
-Route::get('/events', function () {
-    return view('frontpage.events'); // this route returns the view 'frontpage(folder).welcome(file)'
-})->name('events'); // this route is named 'welcome'
-
-// news page
-Route::get('/news', function () {
-    return view('frontpage.news');
-});
+// home page (default page)
+Route::get('/', function () {
+    return view('contents.home');
+})->name('home') // this route is named 'home'
+    //->middleware('auth'); //only authenticated users can access this route(logged in users)
+    ->middleware('guest'); //only guest users can access this route(logged in users)
 
 // Login page
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -38,18 +35,8 @@ Route::post('/signup', [AuthController::class, 'signupPost'])->name('signup@post
 
 
 // logged in users pages view
-// home page (default page)
-Route::get('/', function () {
-    return view('contents.home');
-})->name('home') // this route is named 'home'
-    //->middleware('auth'); //only authenticated users can access this route(logged in users)
-    ->middleware('guest'); //only guest users can access this route(logged in users)
-
 //lougout
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
-
-// profile page
-Route::get('/profile', [HomeController::class, 'showProfile'])->name('profile')->middleware('auth');
 
 // custom middleware routes are located in bootstrap/app.php
 // Admin page

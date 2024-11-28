@@ -30,7 +30,7 @@ class AuthController extends Controller
         ]);
 
         $credentials = $request->only('email', 'password');
-        
+
         // debug the password
         // $user = User::where('email', $request->email)->first();
         // dd($user->password);
@@ -44,10 +44,10 @@ class AuthController extends Controller
         // if the user is exist in the database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             // Redirect based on user role
             $user = Auth::user();
-    
+
             if ($user->role === 'admin') {
                 return redirect()->route('dashboard'); // Admin route
             } elseif ($user->role === 'teacher') {
@@ -55,7 +55,7 @@ class AuthController extends Controller
             } elseif ($user->role === 'student') {
                 return redirect()->route('student'); // Student route
             }
-    
+
             // Fallback in case role is undefined
             return redirect()->route('home')->with('success', 'Successfully logged in!');
         }
@@ -132,7 +132,7 @@ class AuthController extends Controller
         if (!$user) {
             return back()->with('error', 'Something went wrong. Please try again.');
         }
-        
+
         return redirect(route('login'))->with('success', 'Registered successfully!');
     }
 
@@ -141,6 +141,6 @@ class AuthController extends Controller
         // $request->session()->flush();
         Session::flush();
         Auth::logout();
-        return redirect(route('events'))->with("success", "Successfully logged out!");
+        return redirect(route('home'))->with("success", "Successfully logged out!");
     }
 }
