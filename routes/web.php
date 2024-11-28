@@ -51,6 +51,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middle
 // profile page
 Route::get('/profile', [HomeController::class, 'showProfile'])->name('profile')->middleware('auth');
 
+// custom middleware routes are located in bootstrap/app.php
 // Admin page
 Route::get('/admin', [AdminController::class, 'dashboard'])
     ->name('dashboard')
