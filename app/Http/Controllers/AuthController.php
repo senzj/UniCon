@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Validator; //for validate import
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,7 +75,12 @@ class AuthController extends Controller
         $request->validate([
             'FName' => 'required',
             'LName' => 'required',
-            'Email' => 'required|email|unique:users',
+            'Email' => [
+                'required',
+                'email',
+                'unique:users',
+                'max:255'
+            ],
             'Password' => [
                 'required',
                 'string',
