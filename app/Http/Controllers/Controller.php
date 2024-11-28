@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-abstract class Controller
+class Controller
 {
     // route controller for teachers home page
     public function teacher()
@@ -15,5 +15,5 @@ abstract class Controller
     {
         return view('student.home');
     }
-    
+
 }

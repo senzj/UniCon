@@ -44,7 +44,20 @@ class AuthController extends Controller
         // if the user is exist in the database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('home'))->with('success', 'Successfully logged in!');
+    
+            // Redirect based on user role
+            $user = Auth::user();
+    
+            if ($user->role === 'admin') {
+                return redirect()->route('dashboard'); // Admin route
+            } elseif ($user->role === 'teacher') {
+                return redirect()->route('teacher'); // Teacher route
+            } elseif ($user->role === 'student') {
+                return redirect()->route('student'); // Student route
+            }
+    
+            // Fallback in case role is undefined
+            return redirect()->route('home')->with('success', 'Successfully logged in!');
         }
 
         // if the user is not exist in the database

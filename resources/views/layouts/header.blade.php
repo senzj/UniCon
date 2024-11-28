@@ -19,17 +19,16 @@
                         <!-- Add admin-specific links here -->
                     @endif
 
-                @endif
-            </ul>
-
-            <!-- Align logout to the right -->
-            @if (Auth::check())
-                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">Log out</a>
                     </li>
-                </ul>
-            @endif
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('login') ? 'active' : '' }}" href="/login">Login</a>
+                    </li>
+
+                @endif
+            </ul>
         </div>
     </div>
 </nav>

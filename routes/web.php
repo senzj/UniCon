@@ -52,13 +52,19 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middle
 Route::get('/profile', [HomeController::class, 'showProfile'])->name('profile')->middleware('auth');
 
 // Admin page
-Route::get('/admin', [AdminController::class, 'dashboard'])->name('dashboard')->middleware(['auth', 'admin']);
+Route::get('/admin', [AdminController::class, 'dashboard'])
+    ->name('dashboard')
+    ->middleware(['auth', 'admin']);
 
 //teacher page
-Route::get('/teacher', [Controller::class, 'teacher'])->name('teacher')->middleware(['auth', 'teacher']);
+Route::get('/teacher', [Controller::class, 'teacher'])
+    ->name('teacher')
+    ->middleware(['auth', 'teacher']);
 
 //student page
-Route::get('/student', [Controller::class, 'student'])->name('student')->middleware(['auth', 'student']);
+Route::get('/student', [Controller::class, 'student'])
+    ->name('student')
+    ->middleware(['auth', 'student']);
 
 
 //file upload page

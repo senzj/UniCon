@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class Admin
+class AdminMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,11 +16,18 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->role == 'admin') {
+        // Check if the user is authenticated and has the 'admin' role
+        if (Auth::check() && Auth::user()->role === 'admin') {
             return $next($request);
         }
 
-        // abort(403);
-        return redirect(route('home'));
+        // Redirect or abort for unauthorized access
+        // abort(403, 'Unauthorized access denied.');
+        // abort(redirect()->route('home'));
+
+        // Return a 404 Not Found error
+        abort(404); // Makes it look like the page doesn't exist
+        
+        return $next($request);
     }
 }
