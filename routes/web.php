@@ -54,7 +54,8 @@ Route::get('/student', [Controller::class, 'student'])
     ->name('student')
     ->middleware(['auth', 'student']);
 
-
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('admin.updateRole');
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');
