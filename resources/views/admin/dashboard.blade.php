@@ -5,12 +5,6 @@
 <h1>Welcome to the Admin Dashboard Page!</h1>
 
 <div class="container mt-4">
-    {{-- @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif --}}
-
     <h2>User Overview</h2>
     <table class="table table-bordered">
         <thead>
@@ -20,7 +14,7 @@
                 <th>Last Name</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Change Role</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -44,7 +38,10 @@
                         </select>
                     </td>
                     <td>
-                        <button type="submit" class="btn btn-primary mt-2">Update Role</button>
+                        <div class="form-button">
+                            <button type="submit" class="btn btn-primary mt-2 frm-btn">Update Role</button>
+                        </div>
+                        
                     </td>
                 </form>
             </tr>

@@ -34,20 +34,29 @@ class AuthController extends Controller
         // if the user is exist in the database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
+        
             // Redirect based on user role
             $user = Auth::user();
+        
+            switch ($user->role) {
+                // Admin route
+                case 'admin':
+                    return redirect()->route('dashboard')->with('success', "Wecome to Admin dashboard!");
 
-            if ($user->role === 'admin') {
-                return redirect()->route('dashboard'); // Admin route
-            } elseif ($user->role === 'teacher') {
-                return redirect()->route('teacher'); // Teacher route
-            } elseif ($user->role === 'student') {
-                return redirect()->route('student'); // Student route
+                // Teacher route
+                case 'teacher':
+                    return redirect()->route('teacher')->with('success', "Welcome to Teacher dashboard!");
+
+                // Student route;
+                case 'student':
+                    return redirect()->route('student')->with('success', "Welcome to Student dashboard!");
+
+                // Undefined roles 
+                default:
+                    
+                    Auth::logout();
+                    return redirect()->route('login')->with('error', 'Invalid role!');
             }
-
-            // Fallback in case role is undefined
-            return redirect()->route('home')->with('success', 'Successfully logged in!');
         }
 
         // if the user is not exist in the database

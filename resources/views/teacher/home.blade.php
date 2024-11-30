@@ -24,7 +24,7 @@
                     <h5>FRONT END - DONE</h5>
                     <span>11/05/24</span>
                 </div>
-                <p>ETO PO YUNG PROJECT NAMIN GAWA NG AI BLABLABLABLABLABLABLABLAB...</p>
+                <p>Message: ETO PO YUNG PROJECT NAMIN GAWA NG AI BLABLABLABLABLABLABLABLAB...</p>
                 <div class="d-flex justify-content-start gap-3">
                     <button class="btn btn-outline-primary btn-sm">Add Comment</button>
                     <button class="btn btn-outline-success btn-sm">Add Grade</button>
