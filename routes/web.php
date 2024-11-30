@@ -45,20 +45,20 @@ Route::get('/admin', [AdminController::class, 'dashboard'])
     ->name('dashboard')
     ->middleware(['auth', 'admin']);
 
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('updateRole');
+
 //teacher page
 Route::get('/teacher', [Controller::class, 'teacher'])
     ->name('teacher')
     ->middleware(['auth', 'teacher']);
 
+Route::post('/teacher/upload-profile', [TeacherController::class, 'uploadProfile'])->name('teacher.uploadProfile');
+
 //student page
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
     ->middleware(['auth', 'student']);
-
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('admin.updateRole');
-
-Route::post('/teacher/upload-profile', [TeacherController::class, 'uploadProfile'])->name('teacher.uploadProfile');
 
 
 //file upload page

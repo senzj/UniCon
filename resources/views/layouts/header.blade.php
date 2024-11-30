@@ -26,7 +26,6 @@
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('login') ? 'active' : '' }}" href="/login">Login</a>
                     </li>
-
                 @endif
             </ul>
         </div>

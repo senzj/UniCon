@@ -31,16 +31,6 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        // debug the password
-        // $user = User::where('email', $request->email)->first();
-        // dd($user->password);
-
-        // if (Hash::check($request->password, $user->password)) {
-        //     dd('Password matches');
-        // } else {
-        //     dd('Password does not match');
-        // }
-
         // if the user is exist in the database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
@@ -66,24 +56,6 @@ class AuthController extends Controller
 
     public function signupPost(Request $request)
     {
-        // no password validation
-        // $request->validate([
-        //     'FName' => 'required',
-        //     'LName' => 'required',
-        //     'Email' => 'required|email|unique:users',
-        //     'Password' => 'required',
-        //     'CPassword' => 'required|same:Password',
-        // ], [
-        //     'FName.required' => 'Please enter your first name.',
-        //     'LName.required' => 'Please enter your last name.',
-        //     'Email.required' => 'Please enter your email address.',
-        //     'Email.email' => 'Please enter a valid email address.',
-        //     'Email.unique' => 'This email address is already taken.',
-        //     'Password.required' => 'A password is required.',
-        //     'CPassword.required' => 'Please confirm your password.',
-        //     'CPassword.same' => 'The confirmation password does not match the password.',
-        // ]);
-
         // Password validation
         $request->validate([
             'FName' => 'required',

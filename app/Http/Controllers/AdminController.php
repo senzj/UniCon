@@ -12,7 +12,8 @@ class AdminController extends Controller
         // Fetch all users
         $users = User::all();
         return view('admin.dashboard', compact('users'));
-
+        // echo'<pre>';
+        // print_r($users);
     }
 
     public function updateRole(Request $request, $id)
@@ -27,6 +28,7 @@ class AdminController extends Controller
         $user->role = $request->role;
         $user->save();
 
+        //
         return redirect()->back()->with('success', 'User role updated successfully!');
     }
 }

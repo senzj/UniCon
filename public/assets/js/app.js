@@ -24,5 +24,5 @@ function configureToastr() {
 // Call the function only when a toast is needed
 if (typeof toastr !== 'undefined') {
   configureToastr();
-  console.log('Toastr is ready');
+  console.log('Toastr is ready, appjs');
 }
