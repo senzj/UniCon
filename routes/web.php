@@ -9,6 +9,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\TeacherController;
 
 //  ================================================================| Notes |===========================================================================
 // name serve as identifier for the route like ID
@@ -56,6 +57,10 @@ Route::get('/student', [Controller::class, 'student'])
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('admin.updateRole');
+
+Route::post('/teacher/upload-profile', [TeacherController::class, 'uploadProfile'])->name('teacher.uploadProfile');
+
+
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');
