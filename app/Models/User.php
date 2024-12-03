@@ -20,7 +20,7 @@ class User extends Authenticatable
         'role',
     ];
 
-    public $timestamps = true; // Disable timestamps
+    public $timestamps = false; // Disable timestamps
 
     /**
      * The attributes that should be hidden for serialization.
