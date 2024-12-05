@@ -88,10 +88,10 @@ class TeacherController extends Controller
         $groupChatModel->members()->attach($userId); // Use $groupChatModel instead of $groupChat
 
         // Return a response (you can customize this as needed)
-        // return back()->with('success', 'Group chat created successfully!');
+        return back()->with('success', 'Group chat created successfully!');
 
         // for debugging use
-        return response()->json($request);
+        // return response()->json($request);
         // dd($data);
     }
 

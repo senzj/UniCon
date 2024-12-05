@@ -19,7 +19,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form action="{{ route('teacher@createGroup') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('teacher@createGroup') }}" method="POST" enctype="multipart/form-data" data-ajax="false">
                     @csrf
                     <div class="modal-body">
                         <!-- Group Name -->
@@ -51,6 +51,7 @@
                             <label for="groupLogo" class="form-label">Group Logo</label>
                             <input type="file" class="form-control" id="groupLogo" name="group_logo" accept="image/*" required>
                         </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -195,7 +196,7 @@
 </div>
 
 {{-- script to handle sending messages --}}
-<script>
+{{-- <script>
 $(document).ready(function() {
     $('form').on('submit', function(e) {
         e.preventDefault();
@@ -223,6 +224,6 @@ $(document).ready(function() {
         });
     });
 });
-</script>
+</script> --}}
 
 @endsection
