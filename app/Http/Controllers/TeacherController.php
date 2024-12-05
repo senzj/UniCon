@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GroupChat; // Ensure this class exists
 use App\Models\Submission; // Ensure this class exists
+use App\Models\GetGroupChat; // Ensure this class exists
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +16,13 @@ class TeacherController extends Controller
     // teacher dashboard view
     public function index()
     {
-        // Fetch all group chats for the home view
-        $groupChats = GroupChat::all(); // Fetch all group chats
-        return view('teacher.home', compact('groupChats')); // Return the home view with group chats
+        // Fetch all group chats for the current user
+        $groupChats = GetGroupChat::forCurrentUser ();
+
+        // return view('teacher.home', compact('groupChats')); // Return the home view with group chats
+       
+        // for debugging use
+        return response()->json($groupChats);
     }
 
     // creates groupchat
@@ -73,90 +78,17 @@ class TeacherController extends Controller
         $groupChatModel->members()->attach($userId); // Use $groupChatModel instead of $groupChat
 
         // Return a response (you can customize this as needed)
-        return back()->with('success', 'Group chat created successfully!');
+        return view('teacher.home')->with('success', 'Group chat created successfully!');
 
         // for debugging use
         // return response()->json($data);
     }
 
-    public function getGroupchats()
-    {
-        try {
-            // Fetch group chats where the current user is a member
-            $groupChats = Auth::user()->groupChats()->with([
-                'members', 
-                'creator'
-            ])
-            ->latest()
-            ->paginate(10);
-
-            return view('your-view-path', [
-                'groupChats' => $groupChats
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Group Chats Fetch Error', [
-                'message' => $e->getMessage(),
-                'user_id' => Auth::id()
-            ]);
-
-            return back()->with('error', 'Unable to retrieve group chats');
-        }
-    }
-
 
     // add member to group chat
-    public function addMember(Request $request, $groupChatId)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
+    // public function addMember(Request $request, $groupChatId)
+    // {
 
-        $groupChat = GroupChat::findOrFail($groupChatId);
-        $user = User::where('email', $request->input('email'))->firstOrFail();
+    // }
 
-        $groupChat->members()->attach($user);
-
-        return back()->with('success', 'Member added successfully!');
-    }
-
-    // group chat view
-    public function groupChat($id)
-    {
-        $groupChat = GroupChat::with(['members', 'submissions'])->findOrFail($id);
-        $groupChats = GroupChat::all();
-        $submissions = $groupChat->submissions;
-
-        return view('teachers.home', compact('groupChats', 'groupChat', 'submissions'));
-    }
-
-    public function gradeSubmission(Request $request, $submissionId)
-    {
-        $request->validate([
-            'grade' => 'required|numeric|min:0|max:100',
-            'comment' => 'nullable|string|max:255',
-        ]);
-
-        $submission = Submission::findOrFail($submissionId);
-
-        $submission->update([
-            'grade' => $request->input('grade'),
-            'comment' => $request->input('comment'),
-        ]);
-
-        return back()->with('success', 'Grade and comment added successfully!');
-    }
-
-    public function showHome($groupChatId)
-    {
-        // Fetch the specific group chat
-        $groupChat = GroupChat::with(['members', 'submissions'])->find($groupChatId);
-
-        // Fetch all group chats for the left section
-        $groupChats = GroupChat::all();
-
-        // Fetch submissions for the specific group chat
-        $submissions = $groupChat ? $groupChat->submissions : collect(); // Use an empty collection if $groupChat is null
-
-        return view('home', compact('groupChats', 'groupChat', 'submissions'));
-    }
 }

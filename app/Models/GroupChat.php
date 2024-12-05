@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+// Groupchat model
 class Groupchat extends Model
 {
     use HasFactory;
@@ -47,16 +48,9 @@ class Groupchat extends Model
         ->withTimestamps();        // Automatically manage created_at and updated_at in pivot table
     }
 
-    // Additional helpful relationship methods
-    public function creator()
+    public function users()
     {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function admin()
-    {
-        return $this->belongsToMany(User::class, 'group_members')
-            ->wherePivot('role', 'admin');
+        return $this->belongsToMany(User::class);
     }
 
     // Relationship with submissions

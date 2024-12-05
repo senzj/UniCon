@@ -77,9 +77,9 @@
                 </div>
 
                 <div class="card-body">
-                    {{-- <ul class="list-group">
-                        @if(isset($Groupchats) && count($Groupchats) > 0)
-                            @foreach ($Groupchats as $group)
+                    <ul class="list-group">
+                        @if(isset($groupChats) && count($groupChats) > 0)
+                            @foreach ($groupChats as $group)
                                 <li class="list-group-item">
                                     <a href="{{ route('teacher@groupchat', $group->id) }}">{{ $group->name }}</a>
                                 </li>
@@ -87,7 +87,7 @@
                         @else
                             <li class="list-group-item">No group chats available.</li>
                         @endif
-                    </ul> --}}
+                    </ul>
                 </div>
 
             </div>

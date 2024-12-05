@@ -56,7 +56,7 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('adm
 Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('updateRole');
 
 //teacher page
-Route::get('/teacher', [Controller::class, 'teacher'])
+Route::get('/teacher', [Controller::class, 'index'])
     ->name('teacher')
     ->middleware(['auth', 'teacher']);
 
@@ -64,6 +64,9 @@ Route::get('/teacher', [Controller::class, 'teacher'])
     Route::middleware(['auth'])->group(function () {
         Route::post('/teacher/creategroup', [TeacherController::class, 'createGroupChat'])->name('teacher@createGroup');
     });
+
+    // route to get the specific group chat id
+    Route::get('/teacher/groupchat/{id}', [TeacherController::class, 'showGroupChat'])->name('teacher@groupchat');
 
     // route to add a member
     Route::post('/addgroupmember', [TeacherController::class, 'addMember'])->name('teacher.addMember');
