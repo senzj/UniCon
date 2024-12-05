@@ -1,101 +1,120 @@
+<!DOCTYPE html>
 @extends('templates.main')
-@section('title', 'Teacher Dashboard')
+@section('title', 'Admin Dashboard')
 @section('content')
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher's Dashboard</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header Section -->
+        <header class="mb-4">
+            <h1 class="text-center">Teacher's Dashboard</h1>
+        </header>
 
-<div class="container-fluid mt-4">
-    <!-- Main Content -->
-    <div class="row">
-        <!-- Left Sidebar: Group Chat Selection -->
-        <div class="col-md-3 bg-light p-3" style="height: 100vh; overflow-y: auto;">
-            <h5>CHATS</h5>
-            <input type="text" class="form-control mb-3" placeholder="Search">
-            <div class="list-group">
-                <div class="list-group-item">GROUP NAME <br><span class="text-muted">Chat (Parang Messenger)</span></div>
-                <div class="list-group-item">GROUP NAME <br><span class="text-muted">Chat (Parang Messenger)</span></div>
-                <div class="list-group-item">GROUP NAME <br><span class="text-muted">Chat (Parang Messenger)</span></div>
-                <div class="list-group-item">GROUP NAME <br><span class="text-muted">Chat (Parang Messenger)</span></div>
-            </div>
-        </div>
-
-        <!-- Middle Section: Chatbox and Group Information -->
-        <div class="col-md-6 p-3" style="height: 100vh; overflow-y: auto;">
-            <div class="border p-3 mb-3" style="background-color: #f9f9f9;">
-                <div class="d-flex justify-content-between">
-                    <h5>FRONT END - DONE</h5>
-                    <span>11/05/24</span>
-                </div>
-                <p>Message: ETO PO YUNG PROJECT NAMIN GAWA NG AI BLABLABLABLABLABLABLABLAB...</p>
-                <div class="d-flex justify-content-start gap-3">
-                    <button class="btn btn-outline-primary btn-sm">Add Comment</button>
-                    <button class="btn btn-outline-success btn-sm">Add Grade</button>
-                </div>
-                <div class="d-flex justify-content-end gap-3 mt-2">
-                    <button class="btn btn-outline-secondary btn-sm">ZIP</button>
-                    <button class="btn btn-outline-secondary btn-sm">Preview</button>
-                    <button class="btn btn-outline-secondary btn-sm">Graded <i class="bi bi-check-lg"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Sidebar: Information and Progress -->
-        <div class="col-md-3 bg-light p-3" style="height: 100vh; overflow-y: auto;">
-            <div class="text-center mb-4">
-                <!-- Profile Image Section -->
-                <div
-                    style="width: 100px; height: 100px; border-radius: 50%; border: 1px solid #000; margin: 0 auto; cursor: pointer;"
-                    data-bs-toggle="modal" data-bs-target="#profileImageModal">
-                    @if ($profileImage ?? false)
-                        <img src="{{ asset('storage/' . $profileImage) }}" alt="Profile Image"
-                             style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-                    @else
-                        <div style="width: 100%; height: 100%; border-radius: 50%; background-color: #e9ecef;"></div>
-                    @endif
-                </div>
-                <h5 class="mt-3">Group Name</h5>
-            </div>
-
-            <h6>Progress Bar</h6>
-            <div class="progress mb-4">
-                <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <h6>Group Members</h6>
-            <ul class="list-group mb-4">
-                <li class="list-group-item">Member 1</li>
-                <li class="list-group-item">Member 2</li>
-                <li class="list-group-item">Member 3</li>
-                <li class="list-group-item">Member 4</li>
-            </ul>
-            <h6>Task List</h6>
-            <ul class="list-group">
-                <li class="list-group-item">Front End - 11/25/24</li>
-                <li class="list-group-item">Back End - 12/01/24</li>
-                <li class="list-group-item">Lorem Ipsum - 12/10/24</li>
-                <li class="list-group-item">Lorem Ipsum - 12/17/24</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-<!-- Profile Image Modal -->
-<div class="modal fade" id="profileImageModal" tabindex="-1" aria-labelledby="profileImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="profileImageModalLabel">Upload Profile Picture</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('teacher.uploadProfile') }}" method="POST" enctype="multipart/form-data">
+        <!-- Create Group Chat Section -->
+        <div class="mb-4">
+            <h4>Create a New Group Chat</h4>
+            <form action="{{ route('teacher.createGroupChat') }}" method="POST">
                 @csrf
-                <div class="modal-body">
-                    <input type="file" name="profile_image" class="form-control" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="input-group mb-3">
+                    <input type="text" name="group_name" class="form-control" placeholder="Enter group chat name" required>
+                    <button type="submit" class="btn btn-primary">Create</button>
                 </div>
             </form>
         </div>
-    </div>
-</div>
 
-@endsection
+        <div class="row">
+            <!-- Left Section: Group Chats -->
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Group Chats</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @if(isset($Groupchats) && count($Groupchats) > 0)
+                                @foreach ($Groupchats as $group)
+                                    <li class="list-group-item">
+                                        <a href="{{ route('teacher.group_Chat', $group->id) }}">{{ $group->name }}</a>
+                                    </li>
+                                @endforeach
+                            @else
+                                <li class="list-group-item">No group chats available.</li>
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Section: Submissions -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Submissions for: {{ isset($Groupchat) ? $Groupchat->name : 'No group selected' }}</h4>
+                    </div>
+                    <div class="card-body">
+                        @if(isset($submissions) && count($submissions) > 0)
+                            @foreach ($submissions as $submission)
+                                <div class="submission mb-3 border p-3 rounded">
+                                    <p><strong>Student:</strong> {{ $submission->student_name }}</p>
+                                    <p>{{ $submission->content }}</p>
+                                    <p><strong>Grade:</strong> {{ $submission->grade ?? 'Not graded yet' }}</p>
+                                    <form action="{{ route('teacher.gradeSubmission', $submission->id) }}" method="POST">
+                                        @csrf
+                                        <div class="input-group mb-2">
+                                            <input type="number" name="grade" class="form-control" placeholder="Grade" required>
+                                            <input type="text" name="comment" class="form-control" placeholder="Comment">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endforeach
+                        @else
+                            <p>No submissions available.</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Section: Group Info -->
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Members:</h5>
+                        <ul class="list-group mb-3">
+                            @if(isset($groupChat) && $groupChat->members)
+                                @foreach ($groupChat->members as $member)
+                                    <li class="list-group-item">{{ $member->name }}</li>
+                                @endforeach
+                            @else
+                                <li class="list-group-item">No members found.</li>
+                            @endif
+                        </ul>
+                        <form action="{{ route('teacher.addMember', $groupChat->id ?? '') }}" method="POST">
+                            @csrf
+                            <div class="input-group mb-3">
+                                <input type="email" name ="email" class="form-control" placeholder="Add member by email" required>
+                                <button type="submit" class="btn btn-success">Add</button>
+                            </div>
+                        </form>
+                        <h5>Progress:</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: {{ isset($groupChat) ? $groupChat->progress : 0 }}%;" aria-valuenow="{{ isset($groupChat) ? $groupChat->progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ isset($groupChat) ? $groupChat->progress : 0 }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
