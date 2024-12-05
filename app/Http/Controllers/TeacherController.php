@@ -19,10 +19,10 @@ class TeacherController extends Controller
         // Fetch all group chats for the current user
         $groupChats = GetGroupChat::forCurrentUser ();
 
-        // return view('teacher.home', compact('groupChats')); // Return the home view with group chats
+        return view('teacher.home', compact('groupChats')); // Return the home view with group chats in key value pair object
        
         // for debugging use
-        return response()->json($groupChats);
+        // return response()->json($groupChats);
     }
 
     // creates groupchat
@@ -78,11 +78,13 @@ class TeacherController extends Controller
         $groupChatModel->members()->attach($userId); // Use $groupChatModel instead of $groupChat
 
         // Return a response (you can customize this as needed)
-        return view('teacher.home')->with('success', 'Group chat created successfully!');
+        return back()->with('success', 'Group chat created successfully!');
 
         // for debugging use
         // return response()->json($data);
     }
+
+    
 
 
     // add member to group chat

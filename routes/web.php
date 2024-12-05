@@ -56,7 +56,7 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('adm
 Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('updateRole');
 
 //teacher page
-Route::get('/teacher', [Controller::class, 'index'])
+Route::get('/teacher', [TeacherController::class, 'index'])
     ->name('teacher')
     ->middleware(['auth', 'teacher']);
 

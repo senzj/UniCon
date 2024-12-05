@@ -80,7 +80,13 @@
                     <ul class="list-group">
                         @if(isset($groupChats) && count($groupChats) > 0)
                             @foreach ($groupChats as $group)
-                                <li class="list-group-item">
+                                <li class="list-group-item d-flex align-items-center">
+                                    @if($group->logo)
+                                        <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
+                                             alt="{{ $group->name }} logo" 
+                                             class="mr-3" 
+                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                    @endif
                                     <a href="{{ route('teacher@groupchat', $group->id) }}">{{ $group->name }}</a>
                                 </li>
                             @endforeach
