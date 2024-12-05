@@ -17,6 +17,13 @@ use App\Http\Controllers\TeacherController;
 // =====================================================================================================================================================
 
 // Routes
+// Route::method('uri', [Controller::class, 'method'])->name('route.name');
+
+// usage 
+// Route::get('/home', [HomeController::class, 'index'])->name('home'); // in routes page
+// <a href="{{ route('home') }}">Go to Home</a> // in any views page
+
+// route for auth
 
 // not logged in users pages
 // home page (default page)
@@ -53,24 +60,19 @@ Route::get('/teacher', [Controller::class, 'teacher'])
     ->name('teacher')
     ->middleware(['auth', 'teacher']);
 
-Route::post('/teacher/upload-profile', [TeacherController::class, 'uploadProfile'])->name('teacher.uploadProfile');
+    //route to create a new group chat
+    Route::middleware(['auth'])->group(function () {
+        Route::post('/teacher/creategroup', [TeacherController::class, 'createGroupChat'])->name('teacher@createGroup');
+    });
+
+    // route to add a member
+    Route::post('/addgroupmember', [TeacherController::class, 'addMember'])->name('teacher.addMember');
 
 //student page
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
     ->middleware(['auth', 'student']);
 
-
-
-    Route::get('/teacher/group-chat/{id}', [TeacherController::class, 'Groupchat'])->name('teacher.Groupchat');
-    Route::post('/teacher/grade-submission/{submissionId}', [TeacherController::class, 'gradeSubmission'])->name('teacher.gradeSubmission');
-    Route::post('/teacher/add-member/{GroupchatId}', [TeacherController::class, 'addMember'])->name('teacher.addMember');
-    Route::get('/teacher/home/{GroupchatId}', [TeacherController::class, 'showHome'])->name('teacher.home');
-    Route::get('/home', [TeacherController::class, 'index'])->name('teacher.home');
-
-// Route to create a new group chat
-Route::post('/group-chat/create', [TeacherController::class, 'createGroupChat'])->name('teacher.createGroupChat');
-Route::get('/teacher/home', [TeacherController::class, 'index'])->name('teacher.home');
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');
