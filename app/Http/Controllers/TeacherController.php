@@ -74,7 +74,7 @@ class TeacherController extends Controller
         // Return a response (you can customize this as needed)
         return back()->with('success', 'Group chat created successfully!');
 
-        // If you want to return JSON for debugging, you can uncomment the following line
+        // for debugging use
         // return response()->json($data);
     }
 

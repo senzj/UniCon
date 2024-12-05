@@ -75,8 +75,9 @@
                         Create Group
                     </button>
                 </div>
+
                 <div class="card-body">
-                    <ul class="list-group">
+                    {{-- <ul class="list-group">
                         @if(isset($Groupchats) && count($Groupchats) > 0)
                             @foreach ($Groupchats as $group)
                                 <li class="list-group-item">
@@ -86,8 +87,9 @@
                         @else
                             <li class="list-group-item">No group chats available.</li>
                         @endif
-                    </ul>
+                    </ul> --}}
                 </div>
+
             </div>
         </div>
 
@@ -98,7 +100,7 @@
                     <h4>Submissions for: {{ isset($Groupchat) ? $Groupchat->name : 'No group selected' }}</h4>
                 </div>
 
-                <div class="card-body">
+                {{-- <div class="card-body">
                     @if(isset($submissions) && count($submissions) > 0)
                         @foreach ($submissions as $submission)
                             <div class="submission mb-3 border p-3 rounded">
@@ -118,7 +120,8 @@
                     @else
                         <p>No submissions available.</p>
                     @endif
-                </div>
+                </div> --}}
+
             </div>
         </div>
 
@@ -141,7 +144,7 @@
                     </form>
 
                     <h5>Members:</h5>
-                    <ul class="list-group mb-3">
+                    {{-- <ul class="list-group mb-3">
                         @if(isset($groupChat) && $groupChat->members)
                             @foreach ($groupChat->members as $member)
                                 <li class="list-group-item">{{ $member->name }}</li>
@@ -149,7 +152,7 @@
                         @else
                             <li class="list-group-item">No members found.</li>
                         @endif
-                    </ul>
+                    </ul> --}}
 
                     <h5>Progress:</h5>
                     <div class="progress mb-3">
