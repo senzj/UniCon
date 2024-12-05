@@ -22,7 +22,6 @@
                 <form action="{{ route('teacher@createGroup') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                
                         <!-- Group Name -->
                         <div class="mb-3">
                             <label for="groupName" class="form-label">Group Name</label>
@@ -49,10 +48,9 @@
                 
                         <!-- Group Logo -->
                         <div class="mb-3">
-                            <label for="groupLogo" class="form-label">Group Logo Picture</label>
+                            <label for="groupLogo" class="form-label">Group Logo</label>
                             <input type="file" class="form-control" id="groupLogo" name="group_logo" accept="image/*" required>
                         </div>
-                
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -76,6 +74,7 @@
                     </button>
                 </div>
 
+                <!-- Group Chat List -->
                 <div class="card-body">
                     <ul class="list-group">
                         @if($groupChats && $groupChats->count() > 0)
@@ -104,7 +103,6 @@
         </div>
 
         <!-- Middle Section: Submissions -->
-        <!-- Middle Section: Submissions -->
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">
@@ -132,20 +130,24 @@
                     @endif
                 </div>
                 
-                {{-- <!-- Message Input -->
+                <!-- Message Input -->
                 <div class="card-footer">
-                    <form action="{{ route('send.message', uri.segment(3) ) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="group_id" value="{{ url.segment(3) }}">
-                        <div class="input-group">
-                            <input type="text" name="content" class="form-control" 
-                                placeholder="Type your message..." required>
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">Send</button>
+                    @if(request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
+                        <form action="{{ route('send.message', request()->segment(3)) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">
+                            <div class="input-group">
+                                <input type="text" name="content" class="form-control" 
+                                    placeholder="Type your message..." required>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">Send</button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </div> --}}
+                        </form>
+                    @else
+                        <p>Please select a group chat to send a message.</p> <!-- Message when no group chat is selected -->
+                    @endif
+                </div>
 
             </div>
         </div>

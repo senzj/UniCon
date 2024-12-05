@@ -27,7 +27,7 @@ class Groupchat extends Model
     {
         return $this->belongsToMany(
             Groupchat::class, 
-            'group_members', 
+            'groupmembers', 
             'user_id', 
             'groupchat_id'
         )
@@ -40,7 +40,7 @@ class Groupchat extends Model
     {
         return $this->belongsToMany(
             User::class,           // Related Model
-            'groupmembers',        // Pivot table name (use snake_case)
+            'groupmembers',        // Pivot table name
             'groupchat_id',        // Foreign key of current model
             'user_id'              // Foreign key of related model
         )

@@ -21,8 +21,8 @@ return new class extends Migration
             $table->timestamps(); // Adds created_at and updated_at columns
 
             // Foreign key constraints
-            $table->foreign('chatroom_id')->references('id')->on('groupchat')->onDelete('cascade');
-            $table->foreign('sender')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('group_id')->references('id')->on('groupchat')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -34,6 +34,6 @@ return new class extends Migration
     public function down(): void
     {
         // drop table if exist
-        Schema::dropIfExists('chatmesasge');
+        Schema::dropIfExists('groupmessage');
     }
 };

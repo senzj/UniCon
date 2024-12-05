@@ -72,11 +72,11 @@ Route::get('/teacher', [TeacherController::class, 'index'])
     });
 
     // route to get the content of the selected group chat ID
-    Route::get('/teacher/getmessage/{id}', [TeacherController::class, 'getMessage'])
+    Route::get('/teacher/chat/{id}', [TeacherController::class, 'getMessage'])
     ->name('get.message');
 
     // route to send a message to a group chat
-    Route::post('/teacher/sendmessage/{groupId}', [TeacherController::class, 'sendMessage'])
+    Route::post('/teacher/sendmessage/{ID}', [TeacherController::class, 'sendMessage'])
     ->name('send.message');
 
     // route to add a member

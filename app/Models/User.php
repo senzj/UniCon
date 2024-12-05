@@ -48,8 +48,8 @@ class User extends Authenticatable
 
     // get the group members
     public function groupChats()
-    {
-        return $this->belongsToMany(GroupChat::class);
-    }
+{
+    return $this->belongsToMany(GroupChat::class, 'groupmembers', 'user_id', 'groupchat_id');
+}
     
 }
