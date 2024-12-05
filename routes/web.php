@@ -38,13 +38,16 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middl
 Route::post('/login', [AuthController::class, 'loginPost'])->name('login@post');
 
 // Signup page
-Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup')->middleware('guest');
-Route::post('/signup', [AuthController::class, 'signupPost'])->name('signup@post');
+Route::get('/signup', [AuthController::class, 'showSignup'])
+->name('signup')->middleware('guest');
+Route::post('/signup', [AuthController::class, 'signupPost'])
+->name('signup@post');
 
 
 // logged in users pages view
 //lougout
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('/logout', [AuthController::class, 'logout'])
+->name('logout')->middleware('auth');
 
 // custom middleware routes are located in bootstrap/app.php
 // Admin page
@@ -52,8 +55,10 @@ Route::get('/admin', [AdminController::class, 'dashboard'])
     ->name('dashboard')
     ->middleware(['auth', 'admin']);
 
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])->name('updateRole');
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
+->name('admin.dashboard');
+Route::put('/admin/update-role/{id}', [AdminController::class, 'updateRole'])
+->name('updateRole');
 
 //teacher page
 Route::get('/teacher', [TeacherController::class, 'index'])
@@ -62,14 +67,21 @@ Route::get('/teacher', [TeacherController::class, 'index'])
 
     //route to create a new group chat
     Route::middleware(['auth'])->group(function () {
-        Route::post('/teacher/creategroup', [TeacherController::class, 'createGroupChat'])->name('teacher@createGroup');
+        Route::post('/teacher/creategroup', [TeacherController::class, 'createGroupChat'])
+        ->name('teacher@createGroup');
     });
 
-    // route to get the specific group chat id
-    Route::get('/teacher/groupchat/{id}', [TeacherController::class, 'showGroupChat'])->name('teacher@groupchat');
+    // route to get the content of the selected group chat ID
+    Route::get('/teacher/getmessage/{id}', [TeacherController::class, 'getMessage'])
+    ->name('get.message');
+
+    // route to send a message to a group chat
+    Route::post('/teacher/sendmessage/{groupId}', [TeacherController::class, 'sendMessage'])
+    ->name('send.message');
 
     // route to add a member
-    Route::post('/addgroupmember', [TeacherController::class, 'addMember'])->name('teacher.addMember');
+    Route::post('/addgroupmember', [TeacherController::class, 'addMember'])
+    ->name('teacher.addMember');
 
 //student page
 Route::get('/student', [Controller::class, 'student'])

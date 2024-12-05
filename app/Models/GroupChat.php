@@ -58,4 +58,10 @@ class Groupchat extends Model
     {
         return $this->hasMany(Submission::class);
     }
+
+    // In your Groupchat model
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'group_id');
+    }
 }

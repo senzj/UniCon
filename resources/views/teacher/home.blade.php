@@ -78,16 +78,20 @@
 
                 <div class="card-body">
                     <ul class="list-group">
-                        @if(isset($groupChats) && count($groupChats) > 0)
+                        @if($groupChats && $groupChats->count() > 0)
                             @foreach ($groupChats as $group)
-                                <li class="list-group-item d-flex align-items-center">
+                                <li class="list-group-item d-flex align-items-center 
+                                    {{ request()->route('id') == $group->id ? 'active' : '' }}">
                                     @if($group->logo)
                                         <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
                                              alt="{{ $group->name }} logo" 
                                              class="mr-3" 
                                              style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
                                     @endif
-                                    <a href="{{ route('teacher@groupchat', $group->id) }}">{{ $group->name }}</a>
+                                    <a href="{{ route('get.message', ['id' => $group->id]) }}"
+                                       class="{{ request()->route('id') == $group->id ? 'text-white' : '' }}">
+                                        {{ $group->name }}
+                                    </a>
                                 </li>
                             @endforeach
                         @else
@@ -100,32 +104,47 @@
         </div>
 
         <!-- Middle Section: Submissions -->
+        <!-- Middle Section: Submissions -->
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h4>Submissions for: {{ isset($Groupchat) ? $Groupchat->name : 'No group selected' }}</h4>
+                    <h4>{{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
                 </div>
 
-                {{-- <div class="card-body">
-                    @if(isset($submissions) && count($submissions) > 0)
-                        @foreach ($submissions as $submission)
-                            <div class="submission mb-3 border p-3 rounded">
-                                <p><strong>Student:</strong> {{ $submission->student_name }}</p>
-                                <p>{{ $submission->content }}</p>
-                                <p><strong>Grade:</strong> {{ $submission->grade ?? 'Not graded yet' }}</p>
-                                <form action="{{ route('teacher.gradeSubmission', $submission->id) }}" method="POST">
-                                    @csrf
-                                    <div class="input-group mb-2">
-                                        <input type="number" name="grade" class="form-control" placeholder="Grade" required>
-                                        <input type="text" name="comment" class="form-control" placeholder="Comment">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form>
+                <div class="card-body chat-body" style="height: 400px; overflow-y: auto;">
+                    @if(isset($messages) && count($messages) > 0)
+                        @foreach ($messages as $message)
+                            <div class="message mb-3 
+                                {{ $message->user->role == 'teacher' ? 'text-right' : 'text-left' }}">
+                                <div class="message-content 
+                                    {{ $message->user->role == 'teacher' ? 'bg-primary text-white' : 'bg-light' }} 
+                                    p-2 rounded">
+                                    <strong>{{ $message->user->name }}</strong>
+                                    <p>{{ $message->message }}</p>
+                                    <small class="text-muted">
+                                        {{ $message->created_at->diffForHumans() }}
+                                    </small>
+                                </div>
                             </div>
                         @endforeach
                     @else
-                        <p>No submissions available.</p>
+                        <p class="text-center text-muted">No messages yet</p>
                     @endif
+                </div>
+                
+                {{-- <!-- Message Input -->
+                <div class="card-footer">
+                    <form action="{{ route('send.message', uri.segment(3) ) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="group_id" value="{{ url.segment(3) }}">
+                        <div class="input-group">
+                            <input type="text" name="content" class="form-control" 
+                                placeholder="Type your message..." required>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
+                    </form>
                 </div> --}}
 
             </div>
@@ -172,5 +191,36 @@
         </div>
     </div>
 </div>
+
+{{-- script to handle sending messages --}}
+<script>
+$(document).ready(function() {
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+        
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(response) {
+                // Append message to chat
+                $('.chat-body').append(`
+                    <div class="message">
+                        <strong>${response.message.user.name}</strong>
+                        <p>${response.message.content}</p>
+                        <small>${response.message.created_at}</small>
+                    </div>
+                `);
+                
+                // Clear input
+                $('input[name="content"]').val('');
+            },
+            error: function(xhr) {
+                alert('Failed to send message');
+            }
+        });
+    });
+});
+</script>
 
 @endsection

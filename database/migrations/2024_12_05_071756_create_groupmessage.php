@@ -14,10 +14,10 @@ return new class extends Migration
         // Create chatmessage table
         Schema::create('groupmessage', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('chatroom_id'); // Links to chatroom
+            $table->unsignedBigInteger('group_id'); // Links to chatroom
+            $table->unsignedBigInteger('user_id'); // Links to user
             $table->text('message')->nullable(); // Allow null for messages if only a file is sent
             $table->string('file_path')->nullable(); // Nullable for cases with no file
-            $table->unsignedBigInteger('sender'); // Links to user
             $table->timestamps(); // Adds created_at and updated_at columns
 
             // Foreign key constraints

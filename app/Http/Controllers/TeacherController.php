@@ -5,10 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\GroupChat; // Ensure this class exists
 use App\Models\Submission; // Ensure this class exists
 use App\Models\GetGroupChat; // Ensure this class exists
+use App\Models\Message; // Ensure this class exists
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+
+// debugging options:
+// return response()->json($messages);
+// dd($messages);
+// dd($groupChat);
 
 class TeacherController extends Controller
 {
@@ -84,7 +90,97 @@ class TeacherController extends Controller
         // return response()->json($data);
     }
 
+    public function getMessage($groupChatId)
+    {
+        // Fetch the group chat to ensure it exists
+        $groupChat = Groupchat::findOrFail($groupChatId);
+
+        // Fetch messages for the specific group chat
+        $messages = Message::where('group_id', $groupChatId)
+            ->with('user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Fetch ALL group chats for the current user
+        $groupChats = Auth::user()->groups ?? collect(); // Use collect() to ensure it's always a collection
+
+        // Debugging
+        Log::info('Group Chat ID: ' . $groupChatId);
+        Log::info('Messages count: ' . $messages->count());
+        Log::info('Group Chats count: ' . $groupChats->count());
+
+        // Render the view with all necessary data
+        return view('teacher.home', [
+            'groupChat' => $groupChat,
+            'messages' => $messages,
+            'groupChats' => $groupChats
+        ]);
+    }
+
+    public function showChatroom($groupId)
+    {
+        // Fetch the specific group
+        $group = Groupchat::findOrFail($groupId);
+
+        // Fetch messages for this group
+        $messages = Message::where('group_id', $groupId)
+            ->with('user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Render the chatroom view with group and messages
+        return view('teacher.chatroom', compact('group', 'messages'));
+
+        // debugging
+        // return response()->json($messages);
+    }
+
+    // send message to group chat
+    public function sendMessage(Request $request, $groupId)
+    {
+        // Validate the request
+        $validatedData = $request->validate([
+            'content' => 'required|string|max:1000',
+            // Remove group_id validation if using route parameter
+        ]);
     
+        try {
+            // Create the message
+            $message = Message::create([
+                'group_id' => $groupId, // Use route parameter
+                'user_id' => Auth::id(),
+                'content' => $validatedData['content']
+            ]);
+    
+            // Optional: Reload the message with user relationship
+            $message->load('user');
+    
+            // Return JSON response for AJAX or redirect
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => $message
+                ]);
+            }
+    
+            // Redirect back with success message
+            // return back()->with('success', 'Message sent successfully!');
+
+            // debugging
+            return response()->json($message);
+    
+        } catch (\Exception $e) {
+            // Handle any errors
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to send message'
+                ], 500);
+            }
+    
+            return back()->with('error', 'Failed to send message');
+        }
+    }
 
 
     // add member to group chat
