@@ -16,10 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('picture')->default(asset('assets/images/default_logo.png'));
-    
-            $table->string('members');
             $table->string('filename');
-            $table->timestamps(); // adds a date for 
+            $table->timestamps(); // adds a date
         });
     }
 

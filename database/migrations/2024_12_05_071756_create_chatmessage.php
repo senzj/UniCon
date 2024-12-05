@@ -11,20 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Creates chatmessage table
+        // Create chatmessage table
         Schema::create('chatmessage', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('chatroom_id');
+            $table->unsignedBigInteger('chatroom_id'); // Links to chatroom
             $table->text('message')->nullable(); // Allow null for messages if only a file is sent
-            $table->string('file_path')->nullable(); // To store the file path
-            $table->unsignedBigInteger('sender');
-            $table->timestamps();
+            $table->string('file_path')->nullable(); // Nullable for cases with no file
+            $table->unsignedBigInteger('sender'); // Links to user
+            $table->timestamps(); // Adds created_at and updated_at columns
 
-            // Foreign key constraints (optional, based on your schema)
-            $table->foreign('chatroom_id')->references('id')->on('chatroom_tbl')->onDelete('cascade');
+            // Foreign key constraints
+            $table->foreign('chatroom_id')->references('id')->on('chatroom')->onDelete('cascade');
             $table->foreign('sender')->references('id')->on('users')->onDelete('cascade');
         });
     }
+
 
 
     /**
