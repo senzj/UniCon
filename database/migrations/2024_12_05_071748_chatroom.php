@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('titlename');
             $table->string('members');
+            $table->string('filename');
             $table->timestamps();
             // $table->rememberToken();
         });
