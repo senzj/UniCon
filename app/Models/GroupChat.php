@@ -21,6 +21,19 @@ class Groupchat extends Model
         'logo',       // Added field for logo path
     ];
 
+    // get the group members
+    public function groupChats()
+    {
+        return $this->belongsToMany(
+            Groupchat::class, 
+            'group_members', 
+            'user_id', 
+            'groupchat_id'
+        )
+        ->withPivot(['role', 'joined_at'])
+        ->withTimestamps();
+    }
+
     // In Groupchat model
     public function members()
     {

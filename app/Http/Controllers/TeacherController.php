@@ -7,6 +7,7 @@ use App\Models\Submission; // Ensure this class exists
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TeacherController extends Controller
 {
@@ -78,6 +79,30 @@ class TeacherController extends Controller
         // return response()->json($data);
     }
 
+    public function getGroupchats()
+    {
+        try {
+            // Fetch group chats where the current user is a member
+            $groupChats = Auth::user()->groupChats()->with([
+                'members', 
+                'creator'
+            ])
+            ->latest()
+            ->paginate(10);
+
+            return view('your-view-path', [
+                'groupChats' => $groupChats
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Group Chats Fetch Error', [
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+
+            return back()->with('error', 'Unable to retrieve group chats');
+        }
+    }
+
 
     // add member to group chat
     public function addMember(Request $request, $groupChatId)
@@ -134,5 +159,4 @@ class TeacherController extends Controller
 
         return view('home', compact('groupChats', 'groupChat', 'submissions'));
     }
-
 }
