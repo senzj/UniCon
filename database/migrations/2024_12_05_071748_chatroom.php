@@ -14,11 +14,12 @@ return new class extends Migration
         // Create chatroom table
         Schema::create('chatroom', function (Blueprint $table) {
             $table->id();
-            $table->string('titlename');
+            $table->string('name');
+            $table->string('picture')->default(asset('assets/images/default_logo.png'));
+    
             $table->string('members');
             $table->string('filename');
-            $table->timestamps();
-            // $table->rememberToken();
+            $table->timestamps(); // adds a date for 
         });
     }
 

@@ -14,14 +14,13 @@ return new class extends Migration
         // Create users table
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            // $table->increments('id');
             $table->string('first_name')->unique();
             $table->string('last_name');
+            $table->string('picture')->nullable()->default('default_profile.png');
             $table->string('email')->unique();
             $table->string('password');
             $table->string('role');
             $table->timestamps();
-            // $table->rememberToken();
         });
 
 
