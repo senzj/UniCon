@@ -194,22 +194,47 @@ class TeacherController extends Controller
         $request->validate([
             'email' => 'required|email|exists:users,email',
         ]);
-    
+
         // Retrieve the user by their email
         $user = User::where('email', $request->input('email'))->first();
-    
+
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['error' => 'User  not found!'], 404);
         }
-    
-        // Assign the group_id to the user
-        $user->group_id = $groupId;
-        $user->save();
-    
-        return response()->json([
-            'message' => 'User added to the groupchat successfully!',
-            'user' => $user,
+
+        // Retrieve the group chat
+        $group = Groupchat::find($groupId);
+
+        // Check if the user is already a member of the group
+        if ($group->members()->where('user_id', $user->id)->exists()) {
+            return response()->json(['error' => 'User  is already a member of this group!'], 409);
+        }
+
+        // Check if the group exists
+        if (!$group) {
+            return response()->json(['error' => 'Group chat not found!'], 404);
+        }
+
+        // Save to groupmembers table
+        $group->members()->attach($user->id, [
+            'groupchat_id' => $groupId, 
+            'user_id' => $user->id, // added user's id
         ]);
+
+        return response()->json([
+            'success' => 'User added successfully!',
+            'user' => $user
+        ]);
+
+        // For debugging use
+        $data = [
+            'user' => $user,
+            'groupId' => $groupId,
+            'email' => $request->input('email'),
+            'group' => $group
+        ];
+
+        return response()->json($data);
     }
     
 
