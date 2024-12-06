@@ -133,10 +133,16 @@
                                             <!-- File Path -->
                                             <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
 
+                                            {{-- download file button --}}
                                             <p>File: {{ basename($message->file_path) }}</p>
-                                            <a href="{{ route('file.download', $filepath) }}" class="btn btn-primary btn-sm mt-2 center">
-                                                Download File
+                                            <a href="{{ route('file.download', $filepath) }}" class="btn btn-secondary btn-sm">
+                                                <i class="fas fa-download me-1"></i> Download File
                                             </a>
+                                        
+                                            {{-- grade task button --}}
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                                <i class="fas fa-grade me-1"></i> Grade
+                                            </button>
                                         </div>
                                     @endif
 
@@ -235,6 +241,7 @@
 
     // addMember to group chat script
     function addMember() {
+    
         // Get the email from the input field
         const email = document.getElementById('email').value;
 
@@ -285,6 +292,32 @@
             document.getElementById('file-name').textContent = '';
         }
     });
+
+    // toastr notification
+    axios.post(`/add-member/${groupId}`, { email: email })
+        .then(response => {
+            // Check the status in the response
+            if (response.data.status === 'success') {
+                toastr.success(response.data.message);
+                // Additional success handling (e.g., refresh member list)
+            } else {
+                toastr.error(response.data.message);
+            }
+        })
+        .catch(error => {
+            // Handle network errors or validation errors
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                toastr.error(error.response.data.message || 'An error occurred');
+            } else if (error.request) {
+                // The request was made but no response was received
+                toastr.error('No response from server');
+            } else {
+                // Something happened in setting up the request
+                toastr.error('Error: ' + error.message);
+            }
+        });
+
 </script>
 
 @endsection

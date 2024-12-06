@@ -187,55 +187,67 @@ class TeacherController extends Controller
         // return response()->json($message);
     }
 
-
+    // add member to group chat
     public function addMember(Request $request, $groupId)
     {
-        // Validate the request
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
+        try {
+            // Validate the request
+            $validatedData = $request->validate([
+                'email' => 'required|email|exists:users,email',
+            ]);
 
-        // Retrieve the user by their email
-        $user = User::where('email', $request->input('email'))->first();
+            // Retrieve the user by their email
+            $user = User::where('email', $request->input('email'))->first();
 
-        if (!$user) {
-            return response()->json(['error' => 'User  not found!'], 404);
+            // Check if user exists
+            if (!$user) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User not found!'
+                ], 404);
+            }
+
+            // Retrieve the group chat
+            $group = Groupchat::findOrFail($groupId);
+
+            // Check if the user is already a member of the group
+            if ($group->members()->where('user_id', $user->id)->exists()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User is already a member of this group!'
+                ], 409);
+            }
+
+            // Save to groupmembers table
+            $group->members()->attach($user->id, [
+                'groupchat_id' => $groupId, 
+                'user_id' => $user->id,
+                'role' => 'member', // Optional: Add a default role
+            ]);
+
+            // Return success response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User added successfully!',
+                'user' => $user
+            ]);
+
+        } catch (\Exception $e) {
+            // Handle any unexpected errors
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An unexpected error occurred: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Retrieve the group chat
-        $group = Groupchat::find($groupId);
-
-        // Check if the user is already a member of the group
-        if ($group->members()->where('user_id', $user->id)->exists()) {
-            return response()->json(['error' => 'User  is already a member of this group!'], 409);
-        }
-
-        // Check if the group exists
-        if (!$group) {
-            return response()->json(['error' => 'Group chat not found!'], 404);
-        }
-
-        // Save to groupmembers table
-        $group->members()->attach($user->id, [
-            'groupchat_id' => $groupId, 
-            'user_id' => $user->id, // added user's id
-        ]);
-
-        return response()->json([
-            'success' => 'User added successfully!',
-            'user' => $user
-        ]);
-
-        // For debugging use
-        $data = [
-            'user' => $user,
-            'groupId' => $groupId,
-            'email' => $request->input('email'),
-            'group' => $group
-        ];
-
-        return response()->json($data);
     }
     
+// For debugging use
+        // $data = [
+        //     'user' => $user,
+        //     'groupId' => $groupId,
+        //     'email' => $request->input('email'),
+        //     'group' => $group
+        // ];
 
+        // return response()->json($data);
 }
