@@ -137,7 +137,7 @@
                     <span id="file-name" class="ml-2 text-muted"></span>
 
                     @if(request()->segment(3) ) <!-- Check if the third segment (group chat ID) is present -->
-                        <form action="{{ route('send.message', request()->segment(3)) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('send.message', request()->segment(3)) }}" method="POST" enctype="multipart/form-data" data-ajax="false">
                             @csrf
                             <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">
                             <div class="input-group">
@@ -209,7 +209,7 @@
 
 {{-- Script to put file info --}}
 <script>
-    function updateFileName() {
+        function updateFileName() {
         const fileInput = document.getElementById('file-upload');
         const fileNameDisplay = document.getElementById('file-name');
 
@@ -224,6 +224,14 @@
             fileNameDisplay.textContent = '';
         }
     }
+
+    // Optional: Clear the file input when the label is clicked again
+    document.getElementById('file-upload').addEventListener('change', function() {
+        if (this.files.length === 0) {
+            // If no file is selected, clear the file name display
+            document.getElementById('file-name').textContent = '';
+        }
+    });
 </script>
 
 {{-- script to handle sending messages --}}

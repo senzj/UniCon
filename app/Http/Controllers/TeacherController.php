@@ -131,12 +131,12 @@ class TeacherController extends Controller
     public function sendMessage(Request $request, $groupId)
     {
         // Debugging: Log the request data
-        Log::info('Request Data: ', $request->all());
+        // Log::info('Request Data: ', $request->all());
 
         // Validate the request
         $validatedData = $request->validate([
-            'message' => 'required|string|max:1000',
-            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx|max:2048' // Add max size if needed
+            'content' => 'required|string',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx'
         ]);
 
         // Initialize file path variable
@@ -144,26 +144,36 @@ class TeacherController extends Controller
 
         // Handle the file upload
         if ($request->hasFile('file')) {
-            // Store the file and get the path
-            $filePath = $request->file('file')->store('uploads', 'public'); // Store in 'public/uploads'
+            // Get the original file name
+            $originalFileName = $request->file('file')->getClientOriginalName();
+            
+            // Get the group name (you may need to fetch this from your database)
+            $group = GroupChat::find($groupId); // Assuming you have a Group model
+            $groupName = $group ? $group->name : 'Undefined_group'; // Replace with actual group name retrieval logic
+
+            // Create a new file name
+            $newFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '.' . $request->file('file')->getClientOriginalExtension();
+
+            // Store the file in a folder named after the group
+            $filePath = $request->file('file')->storeAs("uploads/{$groupName}", $newFileName, 'public'); // Store in 'public/uploads/groupname'
         }
 
         // Data for the model
         $data = [
             'group_id' => $groupId,
             'user_id' => Auth::id(),
-            'message' => $validatedData['message'],
+            'message' => $validatedData['content'],
             'file_path' => $filePath // Save the file path if it exists
         ];
 
         // Pass the data to the model
-        // $message = Message::create($data);
+        $message = Message::create($data);
 
         // Return to the group chat with chat messages
-        // return redirect()->route('get.message', $groupId)->with('success', 'Message sent successfully!');
+        return redirect()->back()->with('success', 'Message sent successfully!');
 
         // For debugging use
-        return response()->json($data);
+        // return response()->json($message);
     }
 
 
