@@ -118,7 +118,13 @@
                                 <div class="message-content 
                                     {{ $message->user->role == 'teacher' ? 'bg-primary text-white' : 'bg-light' }} 
                                     p-2 rounded">
-                                    <strong>{{ $message->user->name }}</strong>
+                                    
+                                    <!-- User Profile Picture -->
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ asset( 'storage/profile/'. $message->user->picture) }}" alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" class="rounded-circle" style="width: 40px; height: 40px; margin-right: 10px;">
+                                        <strong>{{ $message->user->first_name . ' ' . $message->user->last_name }}</strong>
+                                    </div>
+                                    
                                     <p>{{ $message->message }}</p>
                                     <small class="text-muted">
                                         {{ $message->created_at->diffForHumans() }}
@@ -136,7 +142,7 @@
                     <!-- File name Upload Info -->
                     <span id="file-name" class="ml-2 text-muted"></span>
 
-                    @if(request()->segment(3) ) <!-- Check if the third segment (group chat ID) is present -->
+                    @if(request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
                         <form action="{{ route('send.message', request()->segment(3)) }}" method="POST" enctype="multipart/form-data" data-ajax="false">
                             @csrf
                             <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">

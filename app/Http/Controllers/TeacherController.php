@@ -114,6 +114,7 @@ class TeacherController extends Controller
         Log::info('Group Chat ID: ' . $groupChatId);
         Log::info('Messages count: ' . $messages->count());
         Log::info('Group Chats count: ' . $groupChats->count());
+        
 
         // Render the view with all necessary data
         return view('teacher.home', [
@@ -123,7 +124,13 @@ class TeacherController extends Controller
         ]);
 
         // for debugging use
-        // return response()->json($groupChats);
+        // $data = [
+        //     'groupChat' => $groupChat,
+        //     'messages' => $messages,
+        //     'groupChats' => $groupChats
+        // ];
+
+        // return response()->json($data);
     }
 
 
@@ -168,6 +175,8 @@ class TeacherController extends Controller
 
         // Pass the data to the model
         $message = Message::create($data);
+
+        // get user id
 
         // Return to the group chat with chat messages
         return redirect()->back()->with('success', 'Message sent successfully!');
