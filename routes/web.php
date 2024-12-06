@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\FileDownloadController;
 
 //  ================================================================| Notes |===========================================================================
 // name serve as identifier for the route like ID
@@ -87,6 +88,12 @@ Route::get('/teacher', [TeacherController::class, 'index'])
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
     ->middleware(['auth', 'student']);
+
+
+// file download route
+Route::get('/download/file/{filename}', [FileDownloadController::class, 'download'])
+    ->where('filename', '.*')  // Allow full path with slashes
+    ->name('file.download');
 
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');

@@ -125,10 +125,26 @@
                                         <strong>{{ $message->user->first_name . ' ' . $message->user->last_name }}</strong>
                                     </div>
                                     
-                                    <p>{{ $message->message }}</p>
-                                    <small class="text-muted">
+                                    <!-- Message Content -->
+                                    <p style="margin-top: 1rem">{{ $message->message }}</p>
+
+                                    @if($message->file_path)
+                                        <div class="col-12">
+                                            <!-- File Path -->
+                                            <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
+
+                                            <p>File: {{ basename($message->file_path) }}</p>
+                                            <a href="{{ route('file.download', $filepath) }}" class="btn btn-primary btn-sm mt-2 center">
+                                                Download File
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    <!-- Message Timestamp -->
+                                    <small class="text-muted mt-2" style="margin-top: 1rem;">
                                         {{ $message->created_at->diffForHumans() }}
                                     </small>
+
                                 </div>
                             </div>
                         @endforeach
