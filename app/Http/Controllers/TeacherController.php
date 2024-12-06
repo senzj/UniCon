@@ -222,7 +222,6 @@ class TeacherController extends Controller
             $group->members()->attach($user->id, [
                 'groupchat_id' => $groupId, 
                 'user_id' => $user->id,
-                'role' => 'member', // Optional: Add a default role
             ]);
 
             // Return success response
