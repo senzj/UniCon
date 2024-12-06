@@ -41,6 +41,23 @@
                                         <div class="d-flex justify-content-end w-100 mb-1">
                                             <p class="text-right" style="margin-right: 3.5rem">{{ $message->message }}</p>
                                         </div>
+                                    
+                                        {{-- if user has attached file --}}
+                                        @if($message->file_path)
+                                            <div class="d-flex flex-column align-items-end w-100">
+                                                
+                                                {{-- download file button --}}
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </a>
+
+                                            </div>
+                                        @endif
+                                    
                                         <div class="d-flex justify-content-end w-100">
                                             <small class="text-muted">
                                                 {{ $message->created_at->format('F d, Y h:i A') }}
@@ -59,6 +76,25 @@
                                             <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
                                         </div>
                                         <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
+
+                                        {{-- if user has attached file --}}
+                                        @if($message->file_path)
+                                            <div class="col-12">
+                                                <!-- File Path -->
+                                                <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
+
+                                                {{-- download file button --}}
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </a>
+
+                                            </div>
+                                        @endif
+
                                         <small class="text-muted">
                                             {{ $message->created_at->format('F d, Y h:i A') }}
                                         </small>
@@ -72,14 +108,29 @@
 
                 <!-- Message Input -->
                 <div class="card-footer">
-                    <form action="{{ route('student.sendMessage') }}" method="POST">
+                    {{-- file input text display--}}
+                    <span id="file-name" class="ml-2 text-muted"></span>
+                
+                    <form action="{{ route('send.Message', $groupChat->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="group_id" value="{{ $groupChat->id }}">
                         <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
+                        
                         <div class="d-flex justify-content-end mt-2">
-                            <button class="btn btn-primary btn-sm" {{ isset($groupChat) ? '' : 'disabled' }}>Send</button>
+                            <!-- Hidden File Upload Input -->
+                            <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" onchange="updateFileName()">
+                            
+                            <!-- Custom File Upload Button -->
+                            <label for="file-upload" class="btn btn-secondary mr-2" style="cursor: pointer;">
+                                Upload File
+                            </label>
+                    
+                            <!-- Send Button -->
+                            <button type="submit" class="btn btn-primary" {{ isset($groupChat) ? '' : 'disabled' }}>Send</button>
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
 
@@ -142,4 +193,26 @@
         </div>
     </div>
 </div>
+
+<!-- Custom JavaScript -->
+<script>
+    // Update the file name in the file upload button
+    // Function to update the file name display
+    function updateFileName() {
+        const fileInput = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        // Check if a file is selected
+        if (fileInput.files.length > 0) {
+            // Get the name of the selected file
+            const fileName = fileInput.files[0].name;
+            // Display the file name
+            fileNameDisplay.textContent = `File: ${fileName}`;
+        } else {
+            // Clear the file name display if no file is selected
+            fileNameDisplay.textContent = '';
+        }
+    }
+</script>
+
 @endsection

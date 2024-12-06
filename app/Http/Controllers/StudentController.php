@@ -42,20 +42,36 @@ class StudentController extends Controller
         // dd($data);
     }
 
-    public function sendMessage(Request $request)
+    // Send message to group chat
+    public function sendMessage(Request $request, $groupId)
     {
         // Validate the incoming request
         $validated = $request->validate([
             'message' => 'required|string|max:500',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240'
         ]);
 
         try {
-            // Get the user's first group chat
-            $groupChat = Auth::user()->groupChats->first();
+            // Find the group chat
+            $groupChat = GroupChat::findOrFail($groupId);
 
-            // Check if user belongs to a group chat
-            if (!$groupChat) {
-                return redirect()->back()->with('error', 'You are not part of any group chat.');
+            // Initialize file path variable
+            $filePath = null;
+
+            // Handle file upload if a file is present
+            if ($request->hasFile('file')) {
+                // Get the original file name
+                $originalFileName = $request->file('file')->getClientOriginalName();
+                
+                // Get the group name (you may need to fetch this from your database)
+                $group = GroupChat::find($groupId); // Assuming you have a Group model
+                $groupName = $group ? $group->name : 'Undefined_group'; // Replace with actual group name retrieval logic
+
+                // Create a new file name
+                $newFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '.' . $request->file('file')->getClientOriginalExtension();
+
+                // Store the file in a folder named after the group
+                $filePath = $request->file('file')->storeAs("uploads/{$groupName}", $newFileName, 'public'); // Store in 'public/uploads/groupname'
             }
 
             // Create the message
@@ -63,10 +79,8 @@ class StudentController extends Controller
                 'group_id' => $groupChat->id,
                 'user_id' => Auth::id(),
                 'message' => $validated['message'],
+                'file_path' => $filePath, // Store the file path in the database
             ]);
-
-            // Optional: Add additional logic like broadcasting or notifications
-            // event(new MessageSent($message));
 
             return redirect()->back()->with('success', 'Message sent successfully!');
 
@@ -76,5 +90,16 @@ class StudentController extends Controller
 
             return redirect()->back()->with('error', 'Failed to send message. Please try again.');
         }
+
+        // for debugging use
+        $data = [
+            'message' => $message,
+            // 'request' => $request,
+            // 'validated' => $validated,
+        ];
+        return response()->json($data);
     }
+
+    
+    
 }

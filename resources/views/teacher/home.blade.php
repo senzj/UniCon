@@ -133,6 +133,23 @@
                                         <div class="d-flex justify-content-end w-100 mb-1">
                                             <p class="text-right" style="margin-right: 3.5rem">{{ $message->message }}</p>
                                         </div>
+                                    
+                                        {{-- if user has attached file --}}
+                                        @if($message->file_path)
+                                            <div class="d-flex flex-column align-items-end w-100">
+                                                
+                                                {{-- download file button --}}
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </a>
+
+                                            </div>
+                                        @endif
+                                    
                                         <div class="d-flex justify-content-end w-100">
                                             <small class="text-muted">
                                                 {{ $message->created_at->format('F d, Y h:i A') }}
@@ -151,6 +168,29 @@
                                             <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
                                         </div>
                                         <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
+
+                                        {{-- if user has attached file --}}
+                                        @if($message->file_path)
+                                            <div class="col-12">
+                                                <!-- File Path -->
+                                                <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
+
+                                                {{-- download file button --}}
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                    <i class=""></i> Download
+                                                </a>
+                                            
+                                                {{-- grade task button --}}
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" style="margin-bottom: 1rem;">
+                                                    <i></i> Grade
+                                                </button>
+                                            </div>
+                                        @endif
+
                                         <small class="text-muted">
                                             {{ $message->created_at->format('F d, Y h:i A') }}
                                         </small>
@@ -176,7 +216,6 @@
                                 
                                 <!-- Hidden File Upload Input -->
                                 <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf" onchange="updateFileName()">
-                        
                                 <!-- Custom File Upload Button -->
                                 <label for="file-upload" class="btn btn-secondary" style="margin-left: 10px; cursor: pointer;">
                                     Upload File

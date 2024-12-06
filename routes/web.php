@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\FileDownloadController;
 
 //  ================================================================| Notes |===========================================================================
@@ -88,8 +89,14 @@ Route::get('/teacher', [TeacherController::class, 'index'])
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
     ->middleware(['auth', 'student']);
-    Route::post('/groupchats/{groupId}/add-member', [TeacherController::class, 'addMember']);
-Route::get('/home', [TeacherController::class, 'showHome'])->name('teacher.home');
+
+Route::get('/student', [StudentController::class, 'index'])
+    ->name('student')
+    ->middleware(['auth', 'student']);
+
+    Route::post('/send-message/{groupId}', [StudentController::class, 'sendMessage'])
+    ->name('send.Message');
+
 
 
 // file download route
@@ -97,14 +104,7 @@ Route::get('/download/file/{filename}', [FileDownloadController::class, 'downloa
     ->where('filename', '.*')  // Allow full path with slashes
     ->name('file.download');
 
-    Route::get('/student', [App\Http\Controllers\StudentController::class, 'index'])
-    ->name('student')
-    ->middleware(['auth', 'student']);
-
-    Route::post('/student/send-message', [App\Http\Controllers\StudentController::class, 'sendMessage'])
-    ->name('student.sendMessage')
-    ->middleware(['auth', 'student']);
-
+    
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');
