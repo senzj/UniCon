@@ -25,6 +25,15 @@ class StudentController extends Controller
             'groupChat' => $groupChat,
             'messages' => $messages
         ]);
+
+        // for debugging use
+        // $data = [
+        //     'userGroupChats' => $userGroupChats,
+        //     'groupChat' => $groupChat,
+        //     'messages' => $messages
+        // ];
+        // return response()->json($data);
+        // dd($data);
     }
 
     public function sendMessage(Request $request)
