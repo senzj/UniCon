@@ -10,7 +10,7 @@
         <h1 class="text-center">Teacher's Dashboard</h1>
     </header>
 
-    <!-- Modal -->
+    <!-- Modal for create group chat -->
     <div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
