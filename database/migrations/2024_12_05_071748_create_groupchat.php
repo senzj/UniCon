@@ -12,12 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         // Create chatroom table
-        Schema::create('chatroom', function (Blueprint $table) {
+        Schema::create('groupchat', function (Blueprint $table) {
             $table->id();
-            $table->string('titlename');
-            $table->string('members');
-            $table->timestamps();
-            // $table->rememberToken();
+            $table->string('name');
+            $table->string('section');
+            $table->string('specialization');
+            $table->string('adviser');
+            $table->string('logo')->default(asset('assets/images/default_logo.png'));
+            $table->timestamps(); // adds a date
         });
     }
 
@@ -27,6 +29,6 @@ return new class extends Migration
     public function down(): void
     {
         // drop table if exist
-        Schema::dropIfExists('chatmesasge');
+        Schema::dropIfExists('groupchat');
     }
 };

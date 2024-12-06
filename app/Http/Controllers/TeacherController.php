@@ -4,85 +4,213 @@ namespace App\Http\Controllers;
 
 use App\Models\GroupChat; // Ensure this class exists
 use App\Models\Submission; // Ensure this class exists
+use App\Models\GetGroupChat; // Ensure this class exists
+use App\Models\Message; // Ensure this class exists
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
+
+// debugging options:
+// return response()->json($messages);
+// dd($messages);
+// dd($groupChat);
 
 class TeacherController extends Controller
 {
-    public function groupChat($id)
+
+    // teacher dashboard view
+    public function index()
     {
-        $groupChat = GroupChat::with(['members', 'submissions'])->findOrFail($id);
-        $groupChats = GroupChat::all();
-        $submissions = $groupChat->submissions;
+        // Fetch all group chats for the current user
+        $groupChats = GetGroupChat::forCurrentUser();
 
-        return view('teachers.home', compact('groupChats', 'groupChat', 'submissions'));
+        return view('teacher.home', compact('groupChats')); // Return the home view with group chats in key value pair object
+
+        // for debugging use
+        // return response()->json($groupChats);
     }
+    
 
-    public function gradeSubmission(Request $request, $submissionId)
-    {
-        $request->validate([
-            'grade' => 'required|numeric|min:0|max:100',
-            'comment' => 'nullable|string|max:255',
-        ]);
-
-        $submission = Submission::findOrFail($submissionId);
-
-        $submission->update([
-            'grade' => $request->input('grade'),
-            'comment' => $request->input('comment'),
-        ]);
-
-        return back()->with('success', 'Grade and comment added successfully!');
-    }
-
-    public function addMember(Request $request, $groupChatId)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        $groupChat = GroupChat::findOrFail($groupChatId);
-        $user = User::where('email', $request->input('email'))->firstOrFail();
-
-        $groupChat->members()->attach($user);
-
-        return back()->with('success', 'Member added successfully!');
-    }
-
-    public function showHome($groupChatId)
-    {
-        // Fetch the specific group chat
-        $groupChat = GroupChat::with(['members', 'submissions'])->find($groupChatId);
-
-        // Fetch all group chats for the left section
-        $groupChats = GroupChat::all();
-
-        // Fetch submissions for the specific group chat
-        $submissions = $groupChat ? $groupChat->submissions : collect(); // Use an empty collection if $groupChat is null
-
-        return view('home', compact('groupChats', 'groupChat', 'submissions'));
-    }
-
+    // creates groupchat
     public function createGroupChat(Request $request)
     {
         // Validate the request
         $request->validate([
-            'group_name' => 'required|string|max:255',
+            'group_name' => 'required|string|max:255', // Ensure the group name is unique
+            'group_section' => 'required|string|max:255',
+            'group_specialization' => 'required|string|max:255',
+            'group_adviser' => 'required|string|max:255',
+            'group_logo' => 'image|mimes:jpeg,png,jpg,gif,svg', // File validation
         ]);
 
-        // Create a new group chat
-        $groupChat = new GroupChat();
-        $groupChat->name = $request->group_name;
-        $groupChat->save();
+        // Get the validated data excluding the file
+        $groupChatDetails = $request->only(['group_name', 'group_section', 'group_specialization', 'group_adviser']);
 
-        // Redirect back to the home page with a success message
-        return redirect()->route('teacher.home')->with('success', 'Group chat created successfully!');
+        // Handle the file upload
+        // Initialize group_logo_path to null
+        $groupChatDetails['group_logo_path'] = null;
+
+        // Handle the file upload
+        if ($request->hasFile('group_logo') && $request->file('group_logo')->isValid()) {
+            // Get the file extension
+            $fileExtension = $request->file('group_logo')->getClientOriginalExtension();
+
+            // Create a custom filename based on group name
+            $fileName = strtolower(str_replace(' ', '_', $groupChatDetails['group_name'])) . '_logo.' . $fileExtension;
+
+            // Store the file in the public folder (adjust path as needed)
+            $filePath = $request->file('group_logo')->storeAs('group_logos', $fileName, 'public');
+
+            // Add the file path to the group chat details
+            $groupChatDetails['group_logo_path'] = $filePath; // Store the path for later use
+        }
+
+        // Prepare the data for the model
+        $data = [
+            'name' => $groupChatDetails['group_name'],
+            'section' => $groupChatDetails['group_section'],
+            'specialization' => $groupChatDetails['group_specialization'],
+            'adviser' => $groupChatDetails['group_adviser'],
+            'logo' => $groupChatDetails['group_logo_path'] ?? '' // Use null if not set
+        ];
+
+        // Pass the data to the model
+        $groupChatModel = Groupchat::create($data); // Ensure you are using the correct model name
+
+        // get user id
+        if (Auth::check()) {
+            $userId = Auth::id();
+        } else {
+            return response()->json(['error' => 'Not authenticated'], 401);
+        }
+
+        // Attach the user as the first member of the group chat
+        $groupChatModel->members()->attach($userId); // Use $groupChatModel instead of $groupChat
+
+        // Return a response (you can customize this as needed)
+        return back()->with('success', 'Group chat created successfully!');
+
+        // for debugging use
+        // return response()->json($request);
+        // dd($data);
     }
 
-    public function index()
+    public function getMessage($groupChatId)
     {
-        // Fetch all group chats for the home view
-        $groupChats = GroupChat::all(); // Fetch all group chats
-        return view('teacher.home', compact('groupChats')); // Return the home view with group chats
+        // Fetch the specific group chat to ensure it exists
+        $groupChat = Groupchat::findOrFail($groupChatId);
+
+        // Fetch messages for the specific group chat
+        $messages = Message::where('group_id', $groupChatId)
+            ->with('user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Fetch ALL group chats for the current user
+        $user = Auth::user();
+        $groupChats = $user->groupChats; // This should now return the user's group chats
+
+        // Debugging
+        Log::info('Group Chat ID: ' . $groupChatId);
+        Log::info('Messages count: ' . $messages->count());
+        Log::info('Group Chats count: ' . $groupChats->count());
+        
+
+        // Render the view with all necessary data
+        return view('teacher.home', [
+            'groupChat' => $groupChat, // Pass the specific group chat
+            'messages' => $messages,
+            'groupChats' => $groupChats // Pass all group chats
+        ]);
+
+        // for debugging use
+        // $data = [
+        //     'groupChat' => $groupChat,
+        //     'messages' => $messages,
+        //     'groupChats' => $groupChats
+        // ];
+
+        // return response()->json($data);
     }
+
+
+    // send message to group chat
+    public function sendMessage(Request $request, $groupId)
+    {
+        // Debugging: Log the request data
+        // Log::info('Request Data: ', $request->all());
+
+        // Validate the request
+        $validatedData = $request->validate([
+            'content' => 'required|string',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx'
+        ]);
+
+        // Initialize file path variable
+        $filePath = null;
+
+        // Handle the file upload
+        if ($request->hasFile('file')) {
+            // Get the original file name
+            $originalFileName = $request->file('file')->getClientOriginalName();
+            
+            // Get the group name (you may need to fetch this from your database)
+            $group = GroupChat::find($groupId); // Assuming you have a Group model
+            $groupName = $group ? $group->name : 'Undefined_group'; // Replace with actual group name retrieval logic
+
+            // Create a new file name
+            $newFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '.' . $request->file('file')->getClientOriginalExtension();
+
+            // Store the file in a folder named after the group
+            $filePath = $request->file('file')->storeAs("uploads/{$groupName}", $newFileName, 'public'); // Store in 'public/uploads/groupname'
+        }
+
+        // Data for the model
+        $data = [
+            'group_id' => $groupId,
+            'user_id' => Auth::id(),
+            'message' => $validatedData['content'],
+            'file_path' => $filePath // Save the file path if it exists
+        ];
+
+        // Pass the data to the model
+        $message = Message::create($data);
+
+        // get user id
+
+        // Return to the group chat with chat messages
+        return redirect()->back()->with('success', 'Message sent successfully!');
+
+        // For debugging use
+        // return response()->json($message);
+    }
+
+
+    public function addMember(Request $request, $groupId)
+    {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+    
+        // Retrieve the user by their email
+        $user = User::where('email', $request->input('email'))->first();
+    
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+    
+        // Assign the group_id to the user
+        $user->group_id = $groupId;
+        $user->save();
+    
+        return response()->json([
+            'message' => 'User added to the groupchat successfully!',
+            'user' => $user,
+        ]);
+    }
+    
+
 }

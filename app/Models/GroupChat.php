@@ -4,24 +4,55 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
+// Groupchat model
 class Groupchat extends Model
 {
     use HasFactory;
 
     // Specify the table name
-    protected $table = 'group_chats';
+    protected $table = 'groupchat';
 
     // Define fillable fields
-    protected $fillable = ['name', 'progress'];
+    protected $fillable = [
+        'name',            // Updated to match your previous code
+        'section',         // Added field for group section
+        'specialization',  // Added field for group specialization
+        'adviser',         // Added field for group adviser
+        'logo',       // Added field for logo path
+    ];
 
-    // Relationship with members (users)
+    // get the group members
+    public function groupChats()
+    {
+        return $this->belongsToMany(
+            Groupchat::class, 
+            'groupmembers', 
+            'user_id', 
+            'groupchat_id'
+        )
+        ->withPivot(['role', 'joined_at'])
+        ->withTimestamps();
+    }
+
+    // In Groupchat model
     public function members()
     {
-        return $this->belongsToMany(User::class, 'group_chat_user', 'group_chat_id', 'user_id');
+        return $this->belongsToMany(
+            User::class,           // Related Model
+            'groupmembers',        // Pivot table name
+            'groupchat_id',        // Foreign key of current model
+            'user_id'              // Foreign key of related model
+            
+        )
+        ->withPivot(['role', 'joined_at']) // Optional: Add additional pivot table columns
+        ->withTimestamps();        // Automatically manage created_at and updated_at in pivot table
+        
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'groupmembers', 'groupchat_id', 'user_id');
     }
 
     // Relationship with submissions
@@ -29,4 +60,11 @@ class Groupchat extends Model
     {
         return $this->hasMany(Submission::class);
     }
+
+    // In your Groupchat model
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'group_id');
+    }
+    
 }

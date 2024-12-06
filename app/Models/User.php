@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+// user model
 class User extends Authenticatable
 {
     use Notifiable;
@@ -44,4 +45,11 @@ class User extends Authenticatable
     //         'password' => 'hashed',
     //     ];
     // }
+
+    // get the group members
+    public function groupChats()
+{
+    return $this->belongsToMany(GroupChat::class, 'groupmembers', 'user_id', 'groupchat_id');
+}
+    
 }
