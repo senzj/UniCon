@@ -112,6 +112,7 @@
                 <div class="card-body chat-body" style="height: 400px; overflow-y: auto;">
                     @if(isset($messages) && count($messages) > 0)
                         @foreach ($messages as $message)
+                        
                             <div class="message mb-3 
                                 {{ $message->user->role == 'teacher' ? 'text-right' : 'text-left' }}">
                                 <div class="message-content 
