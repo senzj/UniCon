@@ -133,52 +133,37 @@ class TeacherController extends Controller
         // Debugging: Log the request data
         Log::info('Request Data: ', $request->all());
 
-
         // Validate the request
         $validatedData = $request->validate([
-            'content' => 'required|string|max:1000',
-            // Remove group_id validation if using route parameter
+            'message' => 'required|string|max:1000',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx|max:2048' // Add max size if needed
         ]);
 
-        // try {
-        //     // Create the message
-        //     $message = Message::create([
-        //         'group_id' => $groupId, // Use route parameter
-        //         'user_id' => Auth::id(),
-        //         'content' => $validatedData['content']
-        //     ]);
+        // Initialize file path variable
+        $filePath = null;
 
-        //     // Optional: Reload the message with user relationship
-        //     $message->load('user');
+        // Handle the file upload
+        if ($request->hasFile('file')) {
+            // Store the file and get the path
+            $filePath = $request->file('file')->store('uploads', 'public'); // Store in 'public/uploads'
+        }
 
-        //     // Return JSON response for AJAX or redirect
-        //     if ($request->ajax()) {
-        //         return response()->json([
-        //             'status' => 'success',
-        //             'message' => $message
-        //         ]);
-        //     }
+        // Data for the model
+        $data = [
+            'group_id' => $groupId,
+            'user_id' => Auth::id(),
+            'message' => $validatedData['message'],
+            'file_path' => $filePath // Save the file path if it exists
+        ];
 
-        //     // Redirect back with success message
-        //     // return back()->with('success', 'Message sent successfully!');
+        // Pass the data to the model
+        // $message = Message::create($data);
 
-        //     // debugging
-        //     return response()->json($message);
+        // Return to the group chat with chat messages
+        // return redirect()->route('get.message', $groupId)->with('success', 'Message sent successfully!');
 
-        // } catch (\Exception $e) {
-        //     // Handle any errors
-        //     if ($request->ajax()) {
-        //         return response()->json([
-        //             'status' => 'error',
-        //             'message' => 'Failed to send message'
-        //         ], 500);
-        //     }
-
-        //     return back()->with('error', 'Failed to send message');
-        // }
-
-        // for debugging use
-        return response()->json($request);
+        // For debugging use
+        return response()->json($data);
     }
 
 

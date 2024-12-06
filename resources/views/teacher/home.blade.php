@@ -133,13 +133,25 @@
                 
                 <!-- Message Input -->
                 <div class="card-footer">
-                    @if(request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
-                        <form action="{{ route('send.message', request()->segment(3)) }}" method="POST">
+                    <!-- File name Upload Info -->
+                    <span id="file-name" class="ml-2 text-muted"></span>
+
+                    @if(request()->segment(3) ) <!-- Check if the third segment (group chat ID) is present -->
+                        <form action="{{ route('send.message', request()->segment(3)) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">
                             <div class="input-group">
                                 <input type="text" name="content" class="form-control" 
                                     placeholder="Type your message..." required>
+                                
+                                <!-- Hidden File Upload Input -->
+                                <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf" onchange="updateFileName()">
+                        
+                                <!-- Custom File Upload Button -->
+                                <label for="file-upload" class="btn btn-secondary" style="margin-left: 10px; cursor: pointer;">
+                                    Upload File
+                                </label>
+                        
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-primary">Send</button>
                                 </div>
@@ -194,6 +206,25 @@
         </div>
     </div>
 </div>
+
+{{-- Script to put file info --}}
+<script>
+    function updateFileName() {
+        const fileInput = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        // Check if a file is selected
+        if (fileInput.files.length > 0) {
+            // Get the name of the selected file
+            const fileName = fileInput.files[0].name;
+            // Display the file name
+            fileNameDisplay.textContent = `File: ${fileName}`;
+        } else {
+            // Clear the file name display if no file is selected
+            fileNameDisplay.textContent = '';
+        }
+    }
+</script>
 
 {{-- script to handle sending messages --}}
 {{-- <script>
