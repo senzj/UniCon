@@ -97,6 +97,11 @@ Route::get('/download/file/{filename}', [FileDownloadController::class, 'downloa
     ->where('filename', '.*')  // Allow full path with slashes
     ->name('file.download');
 
+    Route::get('/student', [App\Http\Controllers\StudentController::class, 'index'])
+    ->name('student')
+    ->middleware(['auth', 'student']);
+
+
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');

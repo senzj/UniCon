@@ -3,25 +3,24 @@
 
 @section('content')
 <div class="container-fluid p-4">
-
     <div class="row g-4">
         <!-- Main Section (Middle) -->
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="mb-0">Front-End Development - Completed</h5>
-                        <small class="text-muted">Completion Date: 11/05/2024</small>
-                    </div>
-                    <p class="mt-3 text-secondary">
-                        This is the front-end implementation of our project, showcasing the design and user interface functionalities.
-                    </p>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-primary btn-sm">Download ZIP</button>
-                        <button class="btn btn-outline-primary btn-sm">Preview</button>
-                    </div>
-                    <div class="mt-3">
-                        <span class="badge bg-success">Status</span>
+                    <h5 class="mb-3">{{ $groupChat ? $groupChat->name : 'No Group Joined' }}</h5>
+                    <div class="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                        @if($messages->isEmpty())
+                            <p class="text-muted">No messages available.</p>
+                        @else
+                            @foreach($messages as $message)
+                                <div class="mb-2">
+                                    <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}:</strong>
+                                    <p class="mb-1">{{ $message->message }}</p>
+                                    <small class="text-muted">{{ $message->created_at->format('F d, Y h:i A') }}</small>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
@@ -29,12 +28,13 @@
             <!-- Chat Input -->
             <div class="card shadow-sm mt-4">
                 <div class="card-body">
-                    <div class="chat-input">
-                        <input type="text" class="form-control" placeholder="Type your message here...">
+                    <form action="{{ route('send.message', ['ID' => $groupChat->id ?? 0]) }}" method="POST">
+                        @csrf
+                        <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
                         <div class="d-flex justify-content-end mt-2">
-                            <button class="btn btn-primary btn-sm">Send</button>
+                            <button class="btn btn-primary btn-sm" {{ $groupChat ? '' : 'disabled' }}>Send</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -49,37 +49,6 @@
                         <div class="progress-bar bg-primary" style="width: 60%;"></div>
                         <small class="position-absolute top-50 start-50 translate-middle text-white">60%</small>
                     </div>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mt-4">
-                <div class="card-body">
-                    <h6 class="text-primary">Group Name</h6>
-                    <ul class="list-unstyled mb-4">
-                        <li>Riin Valena</li>
-                        <li>Reignald Cheng</li>
-                        <li>Vince Sandoval</li>
-                        <li>Erica Sanguyo</li>
-                        <li>Jansen Lee</li>
-                    </ul>
-                    <h6 class="text-primary">Task List</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <span class="text-success">✔</span> Lorem Ipsum - Completed (11/05/2024)
-                        </li>
-                        <li class="mb-2">
-                            <span class="text-warning">⚠</span> Back-End Development - Due (12/01/2024)
-                        </li>
-                        <li class="mb-2">
-                            <span class="text-warning">⚠</span> API Integration - Due (12/10/2024)
-                        </li>
-                        <li class="mb-2">
-                            <span class="text-warning">⚠</span> Testing & Debugging - Due (12/17/2024)
-                        </li>
-                        <li class="mb-2">
-                            <span class="text-warning">⚠</span> Final Presentation - Due (12/25/2024)
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>

@@ -53,6 +53,7 @@ class Groupchat extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'groupmembers', 'groupchat_id', 'user_id');
+        
     }
 
     // Relationship with submissions
