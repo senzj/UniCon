@@ -21,14 +21,19 @@ class StudentController extends Controller
         // Fetch messages for the group chat
         $messages = $groupChat ? $groupChat->messages : collect();
 
+        // fetch user who are part of the group chat
+        $groupChatUsers = $groupChat ? $groupChat->users : collect();
+
         return view('student.home', [
             // 'userGroupChats' => $userGroupChats,
             'groupChat' => $groupChat,
-            'messages' => $messages
+            'messages' => $messages,
+            'members' => $groupChatUsers
         ]);
 
         // for debugging use
         // $data = [
+        //     'members' => $groupChatUsers,
         //     'userGroupChats' => $userGroupChats,
         //     'groupChat' => $groupChat,
         //     'messages' => $messages
