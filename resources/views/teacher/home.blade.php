@@ -188,49 +188,53 @@
         </div>
 
         <!-- Right Section: Group Info -->
-        <div class="col-md-3">
-            <div class="card mb-4">
+        @if (request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
+            <div class="col-md-3">
+                <div class="card mb-4">
 
-                <div class="card-header">
-                    <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
-                </div>
-
-                <div class="card-body">
-
-                    <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
-                        <input type="email" id="email" placeholder="Enter student email" required>
-                        <button type="submit">Add</button>
-                    </form>
-
-                    <h5>Members:</h5>
-<ul class="list-group mb-3">
-    @if(isset($members) && $members->count() > 0)
-        @foreach ($members as $member)
-            <li class="list-group-item">{{ $member->first_name }} {{ $member->last_name }}</li>
-        @endforeach
-    @else
-        <li class="list-group-item">No members found.</li>
-    @endif
-</ul>
-
-<meta name="csrf-token" content="{{ csrf_token() }}">
-                    <h5>Progress:</h5>
-                    <div class="progress mb-3">
-                        <div class="progress-bar" role="progressbar" style="width: {{ isset($groupChat) ? $groupChat->progress : 0 }}%;" aria-valuenow="{{ isset($groupChat) ? $groupChat->progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
-                            {{ isset($groupChat) ? $groupChat->progress : 0 }}%
-                        </div>
+                    <div class="card-header">
+                        <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
                     </div>
 
+                    <div class="card-body">
+
+                        <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
+                            <input type="email" id="email" placeholder="Enter student email" required>
+                            <button type="submit">Add</button>
+                        </form>
+
+                        <h5>Members:</h5>
+                        <ul class="list-group mb-3">
+                            @if(isset($members) && $members->count() > 0)
+                                @foreach ($members as $member)
+                                    <li class="list-group-item">{{ $member->first_name }} {{ $member->last_name }}</li>
+                                @endforeach
+                            @else
+                                <li class="list-group-item">No members found.</li>
+                            @endif
+                        </ul>
+
+                        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+                        <h5>Progress:</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: {{ isset($groupChat) ? $groupChat->progress : 0 }}%;" aria-valuenow="{{ isset($groupChat) ? $groupChat->progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ isset($groupChat) ? $groupChat->progress : 0 }}%
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>
 
 {{-- Script to put file info --}}
 <script>
 
-function addMember() {
+    // addMember to group chat script
+    function addMember() {
         // Get the email from the input field
         const email = document.getElementById('email').value;
 
@@ -257,7 +261,8 @@ function addMember() {
             .catch(error => console.error('Error:', error));
     }
 
-        function updateFileName() {
+    // Function to update the file name display
+    function updateFileName() {
         const fileInput = document.getElementById('file-upload');
         const fileNameDisplay = document.getElementById('file-name');
 
@@ -281,36 +286,5 @@ function addMember() {
         }
     });
 </script>
-
-{{-- script to handle sending messages --}}
-{{-- <script>
-$(document).ready(function() {
-    $('form').on('submit', function(e) {
-        e.preventDefault();
-        
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
-            success: function(response) {
-                // Append message to chat
-                $('.chat-body').append(`
-                    <div class="message">
-                        <strong>${response.message.user.name}</strong>
-                        <p>${response.message.content}</p>
-                        <small>${response.message.created_at}</small>
-                    </div>
-                `);
-                
-                // Clear input
-                $('input[name="content"]').val('');
-            },
-            error: function(xhr) {
-                alert('Failed to send message');
-            }
-        });
-    });
-});
-</script> --}}
 
 @endsection
