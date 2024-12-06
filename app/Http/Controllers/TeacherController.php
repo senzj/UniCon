@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
+
 // debugging options:
 // return response()->json($messages);
 // dd($messages);
@@ -30,6 +31,7 @@ class TeacherController extends Controller
         // for debugging use
         // return response()->json($groupChats);
     }
+    
 
     // creates groupchat
     public function createGroupChat(Request $request)
@@ -186,10 +188,29 @@ class TeacherController extends Controller
     }
 
 
-    // add member to group chat
-    // public function addMember(Request $request, $groupChatId)
-    // {
-
-    // }
+    public function addMember(Request $request, $groupId)
+    {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+    
+        // Retrieve the user by their email
+        $user = User::where('email', $request->input('email'))->first();
+    
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+    
+        // Assign the group_id to the user
+        $user->group_id = $groupId;
+        $user->save();
+    
+        return response()->json([
+            'message' => 'User added to the groupchat successfully!',
+            'user' => $user,
+        ]);
+    }
+    
 
 }

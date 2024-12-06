@@ -43,14 +43,16 @@ class Groupchat extends Model
             'groupmembers',        // Pivot table name
             'groupchat_id',        // Foreign key of current model
             'user_id'              // Foreign key of related model
+            
         )
         ->withPivot(['role', 'joined_at']) // Optional: Add additional pivot table columns
         ->withTimestamps();        // Automatically manage created_at and updated_at in pivot table
+        
     }
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'groupmembers', 'groupchat_id', 'user_id');
     }
 
     // Relationship with submissions
@@ -64,4 +66,5 @@ class Groupchat extends Model
     {
         return $this->hasMany(Message::class, 'group_id');
     }
+    
 }

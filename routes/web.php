@@ -87,6 +87,8 @@ Route::get('/teacher', [TeacherController::class, 'index'])
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
     ->middleware(['auth', 'student']);
+    Route::post('/groupchats/{groupId}/add-member', [TeacherController::class, 'addMember']);
+Route::get('/home', [TeacherController::class, 'showHome'])->name('teacher.home');
 
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
