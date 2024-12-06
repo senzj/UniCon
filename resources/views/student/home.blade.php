@@ -28,13 +28,14 @@
             <!-- Chat Input -->
             <div class="card shadow-sm mt-4">
                 <div class="card-body">
-                    <form action="{{ route('send.message', ['ID' => $groupChat->id ?? 0]) }}" method="POST">
+                    <form action="{{ route('student.sendMessage') }}" method="POST">
                         @csrf
                         <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
                         <div class="d-flex justify-content-end mt-2">
                             <button class="btn btn-primary btn-sm" {{ $groupChat ? '' : 'disabled' }}>Send</button>
                         </div>
                     </form>
+                                        
                 </div>
             </div>
         </div>
