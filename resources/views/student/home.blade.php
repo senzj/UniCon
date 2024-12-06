@@ -22,16 +22,50 @@
                         <p class="text-center text-muted">No messages available.</p>
                     @else
                         @foreach($messages as $message)
-                            <div class="message mb-3 
-                                {{ $message->user->role == 'student' ? 'text-left' : 'text-right' }}">
-                                <div class="message-content 
-                                    {{ $message->user->role == 'student' ? 'bg-light' : 'bg-primary text-white' }} 
-                                    p-2 rounded">
-                                    <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}:</strong>
-                                    <p class="mb-1">{{ $message->message }}</p>
-                                    <small class="text-muted">{{ $message->created_at->format('F d, Y h:i A') }}</small>
-                                </div>
+                        <div class="flex w-full mb-3 
+                            {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
+                            <div class="message-content max-w-[40%] 
+                                {{ $message->user_id == Auth::id() ? 'bg-primary text-white sender-message' : 'bg-light receiver-message' }} 
+                                p-2 rounded">
+
+                                {{-- if message is from the user --}}
+                                @if($message->user_id == Auth::id())
+                                    <div class="d-flex flex-column align-items-end w-100">
+                                        <div class="d-flex align-items-center justify-content-end mb-1 w-100">
+                                            <strong class="mr-2" style="margin-right: 0.5rem">{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
+                                            <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
+                                                alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
+                                                class="rounded-circle message-profile" 
+                                                style="width: 40px; height: 40px; object-fit: cover;">
+                                        </div>
+                                        <div class="d-flex justify-content-end w-100 mb-1">
+                                            <p class="text-right" style="margin-right: 3.5rem">{{ $message->message }}</p>
+                                        </div>
+                                        <div class="d-flex justify-content-end w-100">
+                                            <small class="text-muted">
+                                                {{ $message->created_at->format('F d, Y h:i A') }}
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                {{-- if message is from other users --}}
+                                @else
+                                    <div class="flex flex-col items-start">
+                                        <div class="flex items-center mb-1">
+                                            <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
+                                                 alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
+                                                 class="rounded-circle message-profile mr-2" 
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                            <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
+                                        </div>
+                                        <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
+                                        <small class="text-muted">
+                                            {{ $message->created_at->format('F d, Y h:i A') }}
+                                        </small>
+                                    </div>
+                                @endif
                             </div>
+                        </div>
                         @endforeach
                     @endif
                 </div>

@@ -16,6 +16,21 @@ th {
     background-color: rgb(42, 150, 0);
 }
 
+/* message css */
+.sender-message {
+    align-self: flex-end;
+}
+
+.receiver-message {
+    align-self: flex-start;
+}
+
+.message-profile {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
 /* TEACHER CSS */
 /* group chat list css */
 .group-lists{
@@ -42,3 +57,9 @@ th {
 
 
 /* STUDENT CSS PART */
+/* chat message */
+.message-profile{
+    width: 40px; 
+    height: 40px; 
+    margin-right: 10px;
+}
