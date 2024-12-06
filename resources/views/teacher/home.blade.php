@@ -10,7 +10,7 @@
         <h1 class="text-center">Teacher's Dashboard</h1>
     </header>
 
-    <!-- Modal -->
+    <!-- Modal for create group chat -->
     <div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -80,19 +80,18 @@
                     <ul class="list-group">
                         @if($groupChats && $groupChats->count() > 0)
                             @foreach ($groupChats as $group)
-                                <li class="list-group-item d-flex align-items-center 
-                                    {{ request()->route('id') == $group->id ? 'active' : '' }}">
-                                    @if($group->logo)
-                                        <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
-                                             alt="{{ $group->name }} logo" 
-                                             class="mr-3" 
-                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                    @endif
-                                    <a href="{{ route('get.message', ['id' => $group->id]) }}"
-                                       class="{{ request()->route('id') == $group->id ? 'text-white' : '' }}">
-                                        {{ $group->name }}
-                                    </a>
-                                </li>
+                            <li class="list-group-item d-flex align-items-center list-group-logo
+                                        {{ request()->route('id') == $group->id ? 'active' : '' }}"
+                                onclick="window.location.href='{{ route('get.message', ['id' => $group->id]) }}'">
+                                @if($group->logo)
+                                    <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
+                                        alt="{{ $group->name }} logo" 
+                                        class="mr-3 group-lists-img">
+                                @endif
+                                <span class="group-lists {{ request()->route('id') == $group->id ? 'text-white' : '' }}">
+                                    {{ $group->name }}
+                                </span>
+                            </li>
                             @endforeach
                         @else
                             <li class="list-group-item">No group chats available.</li>
@@ -111,45 +110,95 @@
                 </div>
 
                 <div class="card-body chat-body" style="height: 400px; overflow-y: auto;">
-                    @if(isset($messages) && count($messages) > 0)
-                        @foreach ($messages as $message)
-                            <div class="message mb-3 
-                                {{ $message->user->role == 'teacher' ? 'text-right' : 'text-left' }}">
-                                <div class="message-content 
-                                    {{ $message->user->role == 'teacher' ? 'bg-primary text-white' : 'bg-light' }} 
-                                    p-2 rounded">
-                                    
-                                    <!-- User Profile Picture -->
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ asset( 'storage/profile/'. $message->user->picture) }}" alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" class="rounded-circle" style="width: 40px; height: 40px; margin-right: 10px;">
-                                        <strong>{{ $message->user->first_name . ' ' . $message->user->last_name }}</strong>
-                                    </div>
-                                    
-                                    <!-- Message Content -->
-                                    <p style="margin-top: 1rem">{{ $message->message }}</p>
-
-                                    @if($message->file_path)
-                                        <div class="col-12">
-                                            <!-- File Path -->
-                                            <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
-
-                                            <p>File: {{ basename($message->file_path) }}</p>
-                                            <a href="{{ route('file.download', $filepath) }}" class="btn btn-primary btn-sm mt-2 center">
-                                                Download File
-                                            </a>
-                                        </div>
-                                    @endif
-
-                                    <!-- Message Timestamp -->
-                                    <small class="text-muted mt-2" style="margin-top: 1rem;">
-                                        {{ $message->created_at->diffForHumans() }}
-                                    </small>
-
-                                </div>
-                            </div>
-                        @endforeach
+                    @if($messages->isEmpty())
+                        <p class="text-center text-muted">No messages available.</p>
                     @else
-                        <p class="text-center text-muted">No messages yet</p>
+                        @foreach($messages as $message)
+                        <div class="flex w-full mb-3 
+                            {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
+                            <div class="message-content max-w-[40%] 
+                                {{ $message->user_id == Auth::id() ? 'bg-primary text-white sender-message' : 'bg-light receiver-message' }} 
+                                p-2 rounded">
+
+                                {{-- if message is from the user --}}
+                                @if($message->user_id == Auth::id())
+                                    <div class="d-flex flex-column align-items-end w-100">
+                                        <div class="d-flex align-items-center justify-content-end mb-1 w-100">
+                                            <strong class="mr-2" style="margin-right: 0.5rem">{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
+                                            <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
+                                                alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
+                                                class="rounded-circle message-profile" 
+                                                style="width: 40px; height: 40px; object-fit: cover;">
+                                        </div>
+                                        <div class="d-flex justify-content-end w-100 mb-1">
+                                            <p class="text-right" style="margin-right: 3.5rem">{{ $message->message }}</p>
+                                        </div>
+                                    
+                                        {{-- if user has attached file --}}
+                                        @if($message->file_path)
+                                            <div class="d-flex flex-column align-items-end w-100">
+                                                
+                                                {{-- download file button --}}
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </a>
+
+                                            </div>
+                                        @endif
+                                    
+                                        <div class="d-flex justify-content-end w-100">
+                                            <small class="text-muted">
+                                                {{ $message->created_at->format('F d, Y h:i A') }}
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                {{-- if message is from other users --}}
+                                @else
+                                    <div class="flex flex-col items-start">
+                                        <div class="flex items-center mb-1">
+                                            <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
+                                                 alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
+                                                 class="rounded-circle message-profile mr-2" 
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                            <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
+                                        </div>
+                                        <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
+
+                                        {{-- if user has attached file --}}
+                                        @if($message->file_path)
+                                            <div class="col-12">
+                                                <!-- File Path -->
+                                                <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
+
+                                                {{-- download file button --}}
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                    <i class=""></i> Download
+                                                </a>
+                                            
+                                                {{-- grade task button --}}
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" style="margin-bottom: 1rem;">
+                                                    <i></i> Grade
+                                                </button>
+                                            </div>
+                                        @endif
+
+                                        <small class="text-muted">
+                                            {{ $message->created_at->format('F d, Y h:i A') }}
+                                        </small>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
                     @endif
                 </div>
                 
@@ -163,12 +212,10 @@
                             @csrf
                             <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">
                             <div class="input-group">
-                                <input type="text" name="content" class="form-control" 
-                                    placeholder="Type your message..." required>
+                                <input type="text" name="content" class="form-control" placeholder="Type your message..." required>
                                 
                                 <!-- Hidden File Upload Input -->
                                 <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf" onchange="updateFileName()">
-                        
                                 <!-- Custom File Upload Button -->
                                 <label for="file-upload" class="btn btn-secondary" style="margin-left: 10px; cursor: pointer;">
                                     Upload File
@@ -203,23 +250,58 @@
                             <button type="submit">Add</button>
                         </form>
 
-                        <h5>Members:</h5>
-                        <ul class="list-group mb-3">
-                            @if(isset($members) && $members->count() > 0)
-                                @foreach ($members as $member)
-                                    <li class="list-group-item">{{ $member->first_name }} {{ $member->last_name }}</li>
-                                @endforeach
-                            @else
-                                <li class="list-group-item">No members found.</li>
-                            @endif
-                        </ul>
-
                         <meta name="csrf-token" content="{{ csrf_token() }}">
 
                         <h5>Progress:</h5>
                         <div class="progress mb-3">
                             <div class="progress-bar" role="progressbar" style="width: {{ isset($groupChat) ? $groupChat->progress : 0 }}%;" aria-valuenow="{{ isset($groupChat) ? $groupChat->progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
                                 {{ isset($groupChat) ? $groupChat->progress : 0 }}%
+                            </div>
+                        </div>
+
+                        <h5>Tasks:</h5>
+                        <ul>
+                        </ul>
+
+                        <h5>Members:</h5>
+                        <div class="card">
+                            <div class="card-header" id="membersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#membersList" aria-expanded="false" aria-controls="membersList" style="cursor: pointer;">
+                                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                    Members ({{ isset($members) ? $members->count() : 0 }})
+                                    <i class="fas fa-chevron-down toggle-icon"></i>
+                                </h5>
+                            </div>
+                        
+                            <div id="membersList" class="collapse" aria-labelledby="membersHeading">
+                                <div class="card-body">
+                                    @if(isset($members) && $members->count() > 0)
+                                        <ul class="list-group">
+                                            @foreach ($members as $member)
+                                                <li class="list-group-item d-flex align-items-center list-group-memebers">
+                                                    <img 
+                                                        src="{{ asset('storage/profile/' . $member->picture) }}" 
+                                                        alt="{{ $member->first_name .' ' . $member->last_name }}" 
+                                                        class="rounded-circle me-3" 
+                                                        style="width: 50px; height: 50px; object-fit: cover;"
+                                                    >
+                                                    <div class="d-flex flex-column align-items-start">
+                                                        <h6 class="mb-1">{{ $member->first_name . ' ' . $member->last_name }}</h6>
+                                                        {{-- <a href="mailto:{{ $member->email }}"  --}}
+                                                        <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{ $member->email }}" 
+                                                           class="text-muted small text-decoration-none" 
+                                                           title="Send email to {{ $member->first_name }}"
+                                                           target="_blank">
+                                                            {{ $member->email }}
+                                                            <i class="fas fa-envelope ms-2 text-primary" style="font-size: 0.8rem;"></i>
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <div class="alert alert-info">No members found.</div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
@@ -250,15 +332,28 @@
             },
             body: JSON.stringify({ email }),
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error); // Show error message if something goes wrong
-                } else {
-                    alert(data.message); // Show success message
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        .then(response => {
+            // Log full response for debugging
+            // console.log('Full Response:', response);
+            // console.log('Response Status:', response.status);
+            return response.json();
+        })
+        // Uses toastr to display a alert messages to the user
+        .then(data => {
+            // Log parsed data
+            // console.log('Parsed Data:', data);
+
+            if (data.status === 'error') {
+                toastr.error(data.message, 'Error!');
+
+            } else {
+                toastr.success(data.message, 'Success!');
+            }
+        })
+        .catch(error => {
+            // console.error('Detailed Error:', error);
+            toastr.error('An unexpected error occurred', 'Error!');
+        });
     }
 
     // Function to update the file name display
@@ -285,6 +380,9 @@
             document.getElementById('file-name').textContent = '';
         }
     });
+
+    
+
 </script>
 
 @endsection
