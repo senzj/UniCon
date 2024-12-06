@@ -85,6 +85,7 @@ Route::get('/teacher', [TeacherController::class, 'index'])
     Route::post('/addgroupmember', [TeacherController::class, 'addMember'])
     ->name('teacher.addMember');
 
+    
 //student page
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
@@ -96,7 +97,6 @@ Route::get('/student', [StudentController::class, 'index'])
 
     Route::post('/send-message/{groupId}', [StudentController::class, 'sendMessage'])
     ->name('send.Message');
-
 
 
 // file download route

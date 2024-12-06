@@ -110,8 +110,11 @@
                 </div>
 
                 <div class="card-body chat-body" style="height: 400px; overflow-y: auto;">
-                    @if($messages->isEmpty())
-                        <p class="text-center text-muted">No messages available.</p>
+                    
+                    @if(!isset($groupChat) || !$groupChat)
+                        <p class="text-center text-muted">Please select a group chat to view messages.</p>
+                    @elseif(!isset($messages) || $messages->isEmpty())
+                        <p class="text-center text-muted">No messages in this group chat yet. Start the conversation!</p>
                     @else
                         @foreach($messages as $message)
                         <div class="flex w-full mb-3 
@@ -162,9 +165,9 @@
                                     <div class="flex flex-col items-start">
                                         <div class="flex items-center mb-1">
                                             <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
-                                                 alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
-                                                 class="rounded-circle message-profile mr-2" 
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                                alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
+                                                class="rounded-circle message-profile mr-2" 
+                                                style="width: 40px; height: 40px; object-fit: cover;">
                                             <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
                                         </div>
                                         <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
@@ -200,6 +203,7 @@
                         </div>
                         @endforeach
                     @endif
+
                 </div>
                 
                 <!-- Message Input -->
@@ -320,38 +324,29 @@
         // Get the email from the input field
         const email = document.getElementById('email').value;
 
-        // Dynamically fetch the groupchat ID from the current URL
-        const CURRENT_GROUP_ID = window.location.pathname.split('/').pop();
-
         // Send the POST request to add the member
-        fetch(`/groupchats/${CURRENT_GROUP_ID}/add-member`, {
+        fetch('/addgroupmember', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ 
+                email: email,
+                group_id: window.location.pathname.split('/').pop() // Assuming group ID is the last segment
+            }),
         })
         .then(response => {
-            // Log full response for debugging
-            // console.log('Full Response:', response);
-            // console.log('Response Status:', response.status);
             return response.json();
         })
-        // Uses toastr to display a alert messages to the user
         .then(data => {
-            // Log parsed data
-            // console.log('Parsed Data:', data);
-
             if (data.status === 'error') {
                 toastr.error(data.message, 'Error!');
-
             } else {
                 toastr.success(data.message, 'Success!');
             }
         })
         .catch(error => {
-            // console.error('Detailed Error:', error);
             toastr.error('An unexpected error occurred', 'Error!');
         });
     }

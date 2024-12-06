@@ -31,6 +31,49 @@ class TeacherController extends Controller
         // for debugging use
         // return response()->json($groupChats);
     }
+
+    // teacher dashboard view
+    // public function index()
+    // {
+    //     // Fetch all group chats for the current user
+    //     $groupChats = GetGroupChat::forCurrentUser();
+
+    //     // Check if there are any group chats
+    //     if ($groupChats->isNotEmpty()) {
+    //         // Get the first group chat by default
+    //         $firstGroupChat = $groupChats->first();
+
+    //         // Fetch messages for the first group chat
+    //         $messages = Message::where('group_id', $firstGroupChat->id)
+    //             ->with('user')
+    //             ->orderBy('created_at', 'asc')
+    //             ->get();
+
+    //         // Fetch members of the first group chat
+    //         $members = $firstGroupChat->members()->select(
+    //             'users.id', 
+    //             'users.picture', 
+    //             'users.first_name', 
+    //             'users.last_name', 
+    //             'users.email'
+    //         )->get();
+
+    //         return view('teacher.home', [
+    //             'groupChats' => $groupChats,
+    //             'groupChat' => $firstGroupChat,
+    //             'messages' => $messages,
+    //             'members' => $members
+    //         ]);
+    //     }
+
+    //     // If no group chats exist
+    //     return view('teacher.home', [
+    //         'groupChats' => $groupChats,
+    //         'groupChat' => null,
+    //         'messages' => collect(),
+    //         'members' => collect()
+    //     ]);
+    // }
     
 
     // creates groupchat
@@ -99,14 +142,18 @@ class TeacherController extends Controller
 
     public function getMessage($groupChatId)
     {
+        Log::info('Group Chat ID: ' . $groupChatId);
+
         // Fetch the specific group chat to ensure it exists
         $groupChat = Groupchat::findOrFail($groupChatId);
+        Log::info('Group Chat: ' . $groupChat);
 
         // Fetch messages for the specific group chat
         $messages = Message::where('group_id', $groupChatId)
             ->with('user')
             ->orderBy('created_at', 'asc')
             ->get();
+        Log::info('Messages: ' . $messages);
 
         // Fetch ALL group chats for the current user
         $user = Auth::user();
@@ -135,6 +182,7 @@ class TeacherController extends Controller
 
         // for debugging use
         // $data = [
+        //     'groupChatId' => $groupChatId,
         //     'groupChat' => $groupChat,
         //     'messages' => $messages,
         //     'groupChats' => $groupChats,
@@ -185,7 +233,7 @@ class TeacherController extends Controller
         ];
 
         // Pass the data to the model
-        $message = Message::create($data);
+        $messages = Message::create($data);
 
         // get user id
 
@@ -196,28 +244,20 @@ class TeacherController extends Controller
         // return response()->json($message);
     }
 
-    // add member to group chat
-    public function addMember(Request $request, $groupId)
+    public function addMember(Request $request)
     {
         try {
             // Validate the request
             $validatedData = $request->validate([
                 'email' => 'required|email|exists:users,email',
+                'group_id' => 'required|exists:groupchat,id'
             ]);
 
             // Retrieve the user by their email
             $user = User::where('email', $request->input('email'))->first();
 
-            // Check if user exists
-            if (!$user) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'User not found!'
-                ], 404);
-            }
-
             // Retrieve the group chat
-            $group = Groupchat::findOrFail($groupId);
+            $group = Groupchat::findOrFail($request->input('group_id'));
 
             // Check if the user is already a member of the group
             if ($group->members()->where('user_id', $user->id)->exists()) {
@@ -228,10 +268,7 @@ class TeacherController extends Controller
             }
 
             // Save to groupmembers table
-            $group->members()->attach($user->id, [
-                'groupchat_id' => $groupId, 
-                'user_id' => $user->id,
-            ]);
+            $group->members()->attach($user->id);
 
             // Return success response
             return response()->json([
