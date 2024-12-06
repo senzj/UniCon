@@ -44,9 +44,8 @@ class Groupchat extends Model
             'groupchat_id',        // Foreign key of current model
             'user_id'              // Foreign key of related model
         )
-        ->withPivot(['role', 'joined_at']) // Optional: Add additional pivot table columns
+        // ->withPivot(['role', 'joined_at']) // Optional: Add additional pivot table columns
         ->withTimestamps();        // Automatically manage created_at and updated_at in pivot table
-        
     }
 
     public function users()

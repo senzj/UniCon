@@ -33,7 +33,17 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // /**
+    // get the group members
+    public function groupChats()
+{
+    return $this->belongsToMany(
+        GroupChat::class, 
+        'groupmembers', 
+        'user_id', 
+        'groupchat_id'
+    );
+}
+     // /**
     //  * Get the attributes that should be cast.
     //  *
     //  * @return array<string, string>
@@ -45,6 +55,7 @@ class User extends Authenticatable
     //         'password' => 'hashed',
     //     ];
     // }
+<<<<<<< Updated upstream
 
     // get the group members
     public function groupChats()
@@ -52,4 +63,6 @@ class User extends Authenticatable
     return $this->belongsToMany(GroupChat::class, 'groupmembers', 'user_id', 'groupchat_id', 'group_id');
 }
     
+=======
+>>>>>>> Stashed changes
 }

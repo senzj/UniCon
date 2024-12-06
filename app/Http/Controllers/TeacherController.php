@@ -112,7 +112,14 @@ class TeacherController extends Controller
         $user = Auth::user();
         $groupChats = $user->groupChats; // This should now return the user's group chats
 
-        // Debugging
+        // Fetch all members of the selected group chat
+        // Access members directly
+        // $members = $groupChat->members;
+
+        // If you want specific fields
+        $members = $groupChat->members()->select('users.id', 'users.picture', 'users.first_name', 'users.last_name', 'users.email')->get();
+
+        // Logging for debugging
         Log::info('Group Chat ID: ' . $groupChatId);
         Log::info('Messages count: ' . $messages->count());
         Log::info('Group Chats count: ' . $groupChats->count());
@@ -122,14 +129,16 @@ class TeacherController extends Controller
         return view('teacher.home', [
             'groupChat' => $groupChat, // Pass the specific group chat
             'messages' => $messages,
-            'groupChats' => $groupChats // Pass all group chats
+            'groupChats' => $groupChats, // Pass all group chats
+            'members' => $members
         ]);
 
         // for debugging use
         // $data = [
         //     'groupChat' => $groupChat,
         //     'messages' => $messages,
-        //     'groupChats' => $groupChats
+        //     'groupChats' => $groupChats,
+        //     'members' => $members
         // ];
 
         // return response()->json($data);

@@ -80,19 +80,18 @@
                     <ul class="list-group">
                         @if($groupChats && $groupChats->count() > 0)
                             @foreach ($groupChats as $group)
-                                <li class="list-group-item d-flex align-items-center 
-                                    {{ request()->route('id') == $group->id ? 'active' : '' }}">
-                                    @if($group->logo)
-                                        <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
-                                             alt="{{ $group->name }} logo" 
-                                             class="mr-3" 
-                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                    @endif
-                                    <a href="{{ route('get.message', ['id' => $group->id]) }}"
-                                       class="{{ request()->route('id') == $group->id ? 'text-white' : '' }}">
-                                        {{ $group->name }}
-                                    </a>
-                                </li>
+                            <li class="list-group-item d-flex align-items-center list-group-logo
+                                        {{ request()->route('id') == $group->id ? 'active' : '' }}"
+                                onclick="window.location.href='{{ route('get.message', ['id' => $group->id]) }}'">
+                                @if($group->logo)
+                                    <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
+                                        alt="{{ $group->name }} logo" 
+                                        class="mr-3 group-lists-img">
+                                @endif
+                                <span class="group-lists {{ request()->route('id') == $group->id ? 'text-white' : '' }}">
+                                    {{ $group->name }}
+                                </span>
+                            </li>
                             @endforeach
                         @else
                             <li class="list-group-item">No group chats available.</li>
@@ -169,8 +168,7 @@
                             @csrf
                             <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">
                             <div class="input-group">
-                                <input type="text" name="content" class="form-control" 
-                                    placeholder="Type your message..." required>
+                                <input type="text" name="content" class="form-control" placeholder="Type your message..." required>
                                 
                                 <!-- Hidden File Upload Input -->
                                 <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf" onchange="updateFileName()">
@@ -209,23 +207,58 @@
                             <button type="submit">Add</button>
                         </form>
 
-                        <h5>Members:</h5>
-                        <ul class="list-group mb-3">
-                            @if(isset($members) && $members->count() > 0)
-                                @foreach ($members as $member)
-                                    <li class="list-group-item">{{ $member->first_name }} {{ $member->last_name }}</li>
-                                @endforeach
-                            @else
-                                <li class="list-group-item">No members found.</li>
-                            @endif
-                        </ul>
-
                         <meta name="csrf-token" content="{{ csrf_token() }}">
 
                         <h5>Progress:</h5>
                         <div class="progress mb-3">
                             <div class="progress-bar" role="progressbar" style="width: {{ isset($groupChat) ? $groupChat->progress : 0 }}%;" aria-valuenow="{{ isset($groupChat) ? $groupChat->progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
                                 {{ isset($groupChat) ? $groupChat->progress : 0 }}%
+                            </div>
+                        </div>
+
+                        <h5>Tasks:</h5>
+                        <ul>
+                        </ul>
+
+                        <h5>Members:</h5>
+                        <div class="card">
+                            <div class="card-header" id="membersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#membersList" aria-expanded="false" aria-controls="membersList" style="cursor: pointer;">
+                                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                    Members ({{ isset($members) ? $members->count() : 0 }})
+                                    <i class="fas fa-chevron-down toggle-icon"></i>
+                                </h5>
+                            </div>
+                        
+                            <div id="membersList" class="collapse" aria-labelledby="membersHeading">
+                                <div class="card-body">
+                                    @if(isset($members) && $members->count() > 0)
+                                        <ul class="list-group">
+                                            @foreach ($members as $member)
+                                                <li class="list-group-item d-flex align-items-center list-group-memebers">
+                                                    <img 
+                                                        src="{{ asset('storage/profile/' . $member->picture) }}" 
+                                                        alt="{{ $member->first_name .' ' . $member->last_name }}" 
+                                                        class="rounded-circle me-3" 
+                                                        style="width: 50px; height: 50px; object-fit: cover;"
+                                                    >
+                                                    <div class="d-flex flex-column align-items-start">
+                                                        <h6 class="mb-1">{{ $member->first_name . ' ' . $member->last_name }}</h6>
+                                                        {{-- <a href="mailto:{{ $member->email }}"  --}}
+                                                        <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{ $member->email }}" 
+                                                           class="text-muted small text-decoration-none" 
+                                                           title="Send email to {{ $member->first_name }}"
+                                                           target="_blank">
+                                                            {{ $member->email }}
+                                                            <i class="fas fa-envelope ms-2 text-primary" style="font-size: 0.8rem;"></i>
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <div class="alert alert-info">No members found.</div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
@@ -241,7 +274,6 @@
 
     // addMember to group chat script
     function addMember() {
-    
         // Get the email from the input field
         const email = document.getElementById('email').value;
 
@@ -257,15 +289,28 @@
             },
             body: JSON.stringify({ email }),
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error); // Show error message if something goes wrong
-                } else {
-                    alert(data.message); // Show success message
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        .then(response => {
+            // Log full response for debugging
+            // console.log('Full Response:', response);
+            // console.log('Response Status:', response.status);
+            return response.json();
+        })
+        // Uses toastr to display a alert messages to the user
+        .then(data => {
+            // Log parsed data
+            // console.log('Parsed Data:', data);
+
+            if (data.status === 'error') {
+                toastr.error(data.message, 'Error!');
+
+            } else {
+                toastr.success(data.message, 'Success!');
+            }
+        })
+        .catch(error => {
+            // console.error('Detailed Error:', error);
+            toastr.error('An unexpected error occurred', 'Error!');
+        });
     }
 
     // Function to update the file name display
@@ -293,30 +338,7 @@
         }
     });
 
-    // toastr notification
-    axios.post(`/add-member/${groupId}`, { email: email })
-        .then(response => {
-            // Check the status in the response
-            if (response.data.status === 'success') {
-                toastr.success(response.data.message);
-                // Additional success handling (e.g., refresh member list)
-            } else {
-                toastr.error(response.data.message);
-            }
-        })
-        .catch(error => {
-            // Handle network errors or validation errors
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                toastr.error(error.response.data.message || 'An error occurred');
-            } else if (error.request) {
-                // The request was made but no response was received
-                toastr.error('No response from server');
-            } else {
-                // Something happened in setting up the request
-                toastr.error('Error: ' + error.message);
-            }
-        });
+    
 
 </script>
 
