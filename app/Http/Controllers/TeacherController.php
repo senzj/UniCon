@@ -77,7 +77,7 @@ class TeacherController extends Controller
         ];
 
         // Pass the data to the model
-        $groupChatModel = Groupchat::create($data); // Ensure you are using the correct model name
+        $groupChatModel = Groupchat::create($data);
 
         // get user id
         if (Auth::check()) {
