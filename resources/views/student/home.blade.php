@@ -9,6 +9,59 @@
         <h1 class="text-center">Student Dashboard</h1>
     </header>
 
+    <!-- Progress report modal form -->
+    <div class="modal fade" id="createReportModal" tabindex="-1" aria-labelledby="createReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createReportModalLabel">Create Progress Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form action="#" method="POST" enctype="multipart/form-data" data-ajax="false">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Group Name -->
+                        <div class="mb-3">
+                            <label for="groupName" class="form-label">Group Name</label>
+                            <input type="text" class="form-control" id="groupName" name="group_name" required>
+                        </div>
+                
+                        <!-- Group Section -->
+                        <div class="mb-3">
+                            <label for="groupSection" class="form-label">Group Section</label>
+                            <input type="text" class="form-control" id="groupSection" name="group_section" required>
+                        </div>
+                
+                        <!-- Group Specialization -->
+                        <div class="mb-3">
+                            <label for="groupSpecialization" class="form-label">Group Specialization</label>
+                            <input type="text" class="form-control" id="groupSpecialization" name="group_specialization" required>
+                        </div>
+                
+                        <!-- Group Adviser -->
+                        <div class="mb-3">
+                            <label for="groupAdviser" class="form-label">Group Adviser</label>
+                            <input type="text" class="form-control" id="groupAdviser" name="group_adviser" required>
+                        </div>
+                
+                        <!-- Group Logo -->
+                        <div class="mb-3">
+                            <label for="groupLogo" class="form-label">Group Logo</label>
+                            <input type="file" class="form-control" id="groupLogo" name="group_logo" accept="image/*" required>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit Report</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Middle Section: Messages -->
         <div class="col-md-9"> <!-- Changed to col-md-9 -->
@@ -118,12 +171,19 @@
                             <div class="input-group">
                                 <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
                                 <input type="file" name="file" id="file-upload" class="form-control" style="display: none;" onchange="updateFileName()">
+                                
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createReportModal">
+                                    Create Report
+                                </button>
+
                                 <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">
                                     Upload File
                                 </button>
+
                                 <button type="submit" class="btn btn-primary">Send</button>
                             </div>
                         </form>
+                        
                         
                     @endif
                 </div>

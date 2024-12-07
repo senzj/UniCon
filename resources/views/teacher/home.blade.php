@@ -65,11 +65,11 @@
     </div>
 
     <!-- Modal for grade task -->
-    <div class="modal fade" id="gradingModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="gradingModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="gradingModalLabel">Grading Guide</h5>
+                    <h5 class="modal-title" id="gradingModalLabel">Grade Task</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -108,7 +108,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Submit Grades</button>
+                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Submit Progress</button>
+                </div>
+            </div>
+        </div>
+    </div> --}}
+
+    <!-- Modal for progress report -->
+    <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gradingModalLabel">Progress report: Week #</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="ProgressReportTable">
+                        table here na same lng progressreport na paper
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Mark as Complete</button>
                 </div>
             </div>
         </div>
@@ -239,8 +260,13 @@
                                                 </a>
 
                                                 {{-- grade task button --}}
-                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#gradingModal" style="margin-bottom:1rem">
+                                                {{-- <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#gradingModal" style="margin-bottom:1rem">
                                                     Grade
+                                                </button> --}}
+
+                                                {{-- check progress report --}}
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                                    View Progress Report
                                                 </button>
                                             </div>
                                         @endif
