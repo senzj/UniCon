@@ -63,6 +63,56 @@
         </div>
     </div>
 
+    <!-- Modal for grade task -->
+    <div class="modal fade" id="gradingModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gradingModalLabel">Grading Guide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="gradingForm">
+                        <div class="mb-3">
+                            <label for="chapter1" class="form-label">Chapter 1: Introduction</label>
+                            <span id="chapter1Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
+                            <input type="range" class="form-range" id="chapter1" min="0" max="100" value="0" oninput="updateScore('chapter1Score', this.value)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapter2" class="form-label">Chapter 2: Review of Related Literature</label>
+                            <span id="chapter2Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
+                            <input type="range" class="form-range" id="chapter2" min="0" max="100" value="0" oninput="updateScore('chapter2Score', this.value)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapter3" class="form-label">Chapter 3: Methodology</label>
+                            <span id="chapter3Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
+                            <input type="range" class="form-range" id="chapter3" min="0" max="100" value="0" oninput="updateScore('chapter3Score', this.value)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapter4" class="form-label">Chapter 4: Results and Discussion</label>
+                            <span id="chapter4Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
+                            <input type="range" class="form-range" id="chapter4" min="0" max="100" value="0" oninput="updateScore('chapter4Score', this.value)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapter5" class="form-label">Chapter 5: Conclusion</label>
+                            <span id="chapter5Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
+                            <input type="range" class="form-range" id="chapter5" min="0" max="100" value="0" oninput="updateScore('chapter5Score', this.value)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapter6" class="form-label">Chapter 6: Recommendation</label>
+                            <span id="chapter6Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
+                            <input type="range" class="form-range" id="chapter6" min="0" max="100" value="0" oninput="updateScore('chapter6Score', this.value)">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Submit Grades</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Left Section: Group Chats -->
         <div class="col-md-3">
@@ -186,10 +236,10 @@
                                                 class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
                                                     <i class=""></i> Download
                                                 </a>
-                                            
+
                                                 {{-- grade task button --}}
-                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" style="margin-bottom: 1rem;">
-                                                    <i></i> Grade
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#gradingModal" style="margin-bottom:1rem">
+                                                    Grade
                                                 </button>
                                             </div>
                                         @endif
@@ -318,6 +368,67 @@
 
 {{-- Script to put file info --}}
 <script>
+
+    function updateScore(scoreId, value) {
+        document.getElementById(scoreId).innerText = value + '%';
+    }
+
+    function submitGrades() {
+        const chapter1Score = document.getElementById('chapter1').value;
+        const chapter2Score = document.getElementById('chapter2').value;
+        const chapter3Score = document.getElementById('chapter3').value;
+        const chapter4Score = document.getElementById('chapter4').value;
+        const chapter5Score = document.getElementById('chapter5').value;
+        const chapter6Score = document.getElementById('chapter6').value;
+
+        // Prepare data to send for single data
+        const data = {
+            'chapter1': chapter1Score,
+            'chapter2': chapter2Score,
+            'chapter3': chapter3Score,
+            'chapter4': chapter4Score,
+            'chapter5': chapter5Score,
+            'chapter6': chapter6Score,
+        };
+
+        // Prepare data to send for multiple data
+        // const data = {
+        //     chapter1: { overall_score: chapter1Score },
+        //     chapter2: { overall_score: chapter2Score },
+        //     chapter3: { overall_score: chapter3Score },
+        //     chapter4: { overall_score: chapter4Score },
+        //     chapter5: { overall_score: chapter5Score },
+        //     chapter6: { overall_score: chapter6Score },
+        // };
+
+        // Get the group ID (you may need to adjust this based on your implementation)
+        const groupId = window.location.pathname.split('/').pop();
+
+        // logs
+        console.log(data);
+        console.log(groupId);
+
+        // Send data to the server
+        fetch(`/teacher/grade/${groupId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token for Laravel
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            toastr.success(data.message, 'Success!');
+            // Optionally, close the modal after submission
+            $('#gradingModal').modal('hide');
+        })
+        .catch((error) => {
+            toastr.error('An unexpected error occurred', 'Error!');
+            console.error('Error:', error);
+        });
+    }
 
     // addMember to group chat script
     function addMember() {

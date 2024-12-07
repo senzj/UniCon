@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GroupChat; // Ensure this class exists
-use App\Models\Submission; // Ensure this class exists
-use App\Models\GetGroupChat; // Ensure this class exists
-use App\Models\Message; // Ensure this class exists
+use App\Models\GroupChat;
+use App\Models\Submission;
+use App\Models\GetGroupChat;
+use App\Models\Message;
 use App\Models\User;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -284,9 +285,8 @@ class TeacherController extends Controller
                 'message' => 'An unexpected error occurred: ' . $e->getMessage()
             ], 500);
         }
-    }
-    
-// For debugging use
+        
+        // For debugging use
         // $data = [
         //     'user' => $user,
         //     'groupId' => $groupId,
@@ -295,4 +295,31 @@ class TeacherController extends Controller
         // ];
 
         // return response()->json($data);
+    }
+    
+    public function grade(Request $request, $groupId)
+    {
+        // Validate incoming request
+        $request->validate([
+            'chapter1' => 'required|numeric',
+            'chapter2' => 'required|numeric',
+            'chapter3' => 'required|numeric',
+            'chapter4' => 'required|numeric',
+            'chapter5' => 'required|numeric',
+            'chapter6' => 'required|numeric',
+        ]);
+
+        // Find or create the task for the group
+        $task = Task::firstOrCreate(['group_id' => $groupId]);
+
+        // Update chapter grades directly
+        $task->updateChapterGrades('chapter1', $request->chapter1);
+        $task->updateChapterGrades('chapter2', $request->chapter2);
+        $task->updateChapterGrades('chapter3', $request->chapter3);
+        $task->updateChapterGrades('chapter4', $request->chapter4);
+        $task->updateChapterGrades('chapter5', $request->chapter5);
+        $task->updateChapterGrades('chapter6', $request->chapter6);
+
+        return response()->json(['message' => 'Grades submitted successfully!']);
+    }
 }

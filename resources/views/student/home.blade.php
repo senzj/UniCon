@@ -111,24 +111,21 @@
                     {{-- file input text display--}}
                     <span id="file-name" class="ml-2 text-muted"></span>
                 
-                    <form action="{{ route('send.Message', $groupChat->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="group_id" value="{{ $groupChat->id }}">
-                        <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
+                    @if ($groupChat)
+                        <form action="{{ route('send.Message', $groupChat->id) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="group_chat_id" value="{{ $groupChat->id }}">
+                            <div class="input-group">
+                                <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
+                                <input type="file" name="file" id="file-upload" class="form-control" style="display: none;" onchange="updateFileName()">
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">
+                                    Upload File
+                                </button>
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </form>
                         
-                        <div class="d-flex justify-content-end mt-2">
-                            <!-- Hidden File Upload Input -->
-                            <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" onchange="updateFileName()">
-                            
-                            <!-- Custom File Upload Button -->
-                            <label for="file-upload" class="btn btn-secondary mr-2" style="cursor: pointer;">
-                                Upload File
-                            </label>
-                    
-                            <!-- Send Button -->
-                            <button type="submit" class="btn btn-primary" {{ isset($groupChat) ? '' : 'disabled' }}>Send</button>
-                        </div>
-                    </form>
+                    @endif
                 </div>
 
             </div>
