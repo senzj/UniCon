@@ -29,12 +29,12 @@ class StudentController extends Controller
 
         // Prepare progress data
         $progresses = [
-            'chapter1' => $task ? ($task->chapter1['overall_score'] ?? 0) : 0,
-            'chapter2' => $task ? ($task->chapter2['overall_score'] ?? 0) : 0,
-            'chapter3' => $task ? ($task->chapter3['overall_score'] ?? 0) : 0,
-            'chapter4' => $task ? ($task->chapter4['overall_score'] ?? 0) : 0,
-            'chapter5' => $task ? ($task->chapter5['overall_score'] ?? 0) : 0,
-            'chapter6' => $task ? ($task->chapter6['overall_score'] ?? 0) : 0,
+            'chapter1' => $task ? $task->chapter1 : 0,
+            'chapter2' => $task ? $task->chapter2 : 0,
+            'chapter3' => $task ? $task->chapter3 : 0,
+            'chapter4' => $task ? $task->chapter4 : 0,
+            'chapter5' => $task ? $task->chapter5 : 0,
+            'chapter6' => $task ? $task->chapter6 : 0,
         ];
 
         return view('student.home', [

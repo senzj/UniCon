@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('task', function (Blueprint $table) {
-            $table->id(); // This creates an auto-incrementing primary key named 'id'
-            $table->unsignedBigInteger('group_id'); // Use unsignedBigInteger for foreign key
+            $table->id();
+            $table->unsignedBigInteger('group_id');
             $table->string('chapter1')->nullable();
             $table->string('chapter2')->nullable();
             $table->string('chapter3')->nullable();
@@ -22,8 +22,21 @@ return new class extends Migration
             $table->string('chapter6')->nullable();
             $table->string('total_score')->nullable();
             $table->timestamps();
-            
         });
+
+        // for array
+        // Schema::create('task', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('group_id');
+        //     $table->json('chapter1')->nullable();
+        //     $table->json('chapter2')->nullable();
+        //     $table->json('chapter3')->nullable();
+        //     $table->json('chapter4')->nullable();
+        //     $table->json('chapter5')->nullable();
+        //     $table->json('chapter6')->nullable();
+        //     $table->string('total_score')->nullable();
+        //     $table->timestamps();
+        // });
     }
 
     /**

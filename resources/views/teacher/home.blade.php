@@ -1,7 +1,8 @@
-<!DOCTYPE html>
 @extends('templates.main')
 @section('title', 'Teachers Dashboard')
 @section('content')
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div class="container mt-4">
 
@@ -76,32 +77,32 @@
                         <div class="mb-3">
                             <label for="chapter1" class="form-label">Chapter 1: Introduction</label>
                             <span id="chapter1Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter1" min="0" max="100" value="0" oninput="updateScore('chapter1Score', this.value)">
+                            <input type="range" class="form-range" id="chapter1" min="0" max="100" value="0" oninput="updateScore('chapter1Score', this.value, '1')">
                         </div>
                         <div class="mb-3">
                             <label for="chapter2" class="form-label">Chapter 2: Review of Related Literature</label>
                             <span id="chapter2Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter2" min="0" max="100" value="0" oninput="updateScore('chapter2Score', this.value)">
+                            <input type="range" class="form-range" id="chapter2" min="0" max="100" value="0" oninput="updateScore('chapter2Score', this.value, '2')">
                         </div>
                         <div class="mb-3">
                             <label for="chapter3" class="form-label">Chapter 3: Methodology</label>
                             <span id="chapter3Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter3" min="0" max="100" value="0" oninput="updateScore('chapter3Score', this.value)">
+                            <input type="range" class="form-range" id="chapter3" min="0" max="100" value="0" oninput="updateScore('chapter3Score', this.value, '3')">
                         </div>
                         <div class="mb-3">
                             <label for="chapter4" class="form-label">Chapter 4: Results and Discussion</label>
                             <span id="chapter4Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter4" min="0" max="100" value="0" oninput="updateScore('chapter4Score', this.value)">
+                            <input type="range" class="form-range" id="chapter4" min="0" max="100" value="0" oninput="updateScore('chapter4Score', this.value, '4')">
                         </div>
                         <div class="mb-3">
                             <label for="chapter5" class="form-label">Chapter 5: Conclusion</label>
                             <span id="chapter5Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter5" min="0" max="100" value="0" oninput="updateScore('chapter5Score', this.value)">
+                            <input type="range" class="form-range" id="chapter5" min="0" max="100" value="0" oninput="updateScore('chapter5Score', this.value, '5')">
                         </div>
                         <div class="mb-3">
                             <label for="chapter6" class="form-label">Chapter 6: Recommendation</label>
                             <span id="chapter6Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter6" min="0" max="100" value="0" oninput="updateScore('chapter6Score', this.value)">
+                            <input type="range" class="form-range" id="chapter6" min="0" max="100" value="0" oninput="updateScore('chapter6Score', this.value, '6')">
                         </div>
                     </form>
                 </div>
@@ -451,51 +452,61 @@
         }
     }
 
+
     // Function to update the score display
     function updateScore(scoreId, value, chapterNumber) {
         document.getElementById(scoreId).innerText = value + '%';
         updateChapterProgress(value, chapterNumber); // Update the progress bar
+        console.log(chapterNumber);
     }
 
     // Function to submit the grades
     function submitGrades() {
-        const chapters = {};
+        // Create an object to hold the chapter values
+        const chapterValues = {};
+        
+        // Collect only the numeric values for each chapter
         for (let i = 1; i <= 6; i++) {
-            chapters[`chapter${i}`] = document.getElementById(`chapter${i}`).value;
+            chapterValues[`chapter${i}`] = parseInt(document.getElementById(`chapter${i}`).value, 10);
         }
 
+        console.log('Chapter Values:', chapterValues); // Log the chapter values
+
         const groupId = window.location.pathname.split('/').pop();
+        console.log('Group ID:', groupId); // Log the group ID
 
         fetch(`/teacher/grade/${groupId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             },
-            body: JSON.stringify(chapters)
+            body: JSON.stringify(chapterValues), // Directly send the chapter values
         })
-        .then(response => response.json())
-        .then(data => {
-            // Update progress bars
-            for (let i = 1; i <= 6; i++) {
-                const progressBar = document.getElementById(`progressBar${i}`);
-                const score = chapters[`chapter${i}`];
-                
-                progressBar.style.width = `${score}%`;
-                progressBar.setAttribute('aria-valuenow', score);
-                progressBar.textContent = `${score}%`;
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-
-            // Update overall progress
-            updateOverallProgressFromServer();
-
-            toastr.success(data.message, 'Success!');
-            $('#gradingModal').modal('hide');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data:', data); // Log the data received from the server
+            
+            // Optional: Show success message
+            toastr.success('Grades submitted successfully', 'Success!');
         })
         .catch((error) => {
             toastr.error('An unexpected error occurred', 'Error!');
             console.error('Error:', error);
         });
+
+        // Close the modal after submitting the grades
+        const gradingModal = new bootstrap.Modal(document.getElementById('gradingModal'));
+        gradingModal.hide();
+
+        // reload the page
+        location.reload();
+        
     }
 
     // Function to update the score display
@@ -505,18 +516,27 @@
         progressBar.setAttribute('aria-valuenow', value);
         progressBar.textContent = value + '%';
 
-        updateOverallProgress(); // Update overall progress whenever a chapter slider changes
+        updateOverallProgressFromServer(); // Update overall progress whenever a chapter slider changes
     }
 
-    // script for updating the overall progress
+    // Script for updating the initial progress
     document.addEventListener('DOMContentLoaded', function() {
-    @for ($i = 1; $i <= 6; $i++)
-        document.getElementById('chapter{{ $i }}').value = {{ $progress['chapter'.$i] ?? 0 }};
-        document.getElementById('chapter{{ $i }}Score').innerText = '{{ $progress['chapter'.$i] ?? 0 }}%';
-    @endfor
+        @for ($i = 1; $i <= 6; $i++)
+            document.getElementById('chapter{{ $i }}').value = {{ $progress['chapter'.$i] ?? 0 }};
+            document.getElementById('chapter{{ $i }}Score').innerText = '{{ $progress['chapter'.$i] ?? 0 }}%';
+            
+            // Also update the progress bars initially
+            const progressBar{{ $i }} = document.getElementById('progressBar{{ $i }}');
+            progressBar{{ $i }}.style.width = '{{ $progress['chapter'.$i] ?? 0 }}%';
+            progressBar{{ $i }}.setAttribute('aria-valuenow', '{{ $progress['chapter'.$i] ?? 0 }}');
+            progressBar{{ $i }}.textContent = '{{ $progress['chapter'.$i] ?? 0 }}%';
+        @endfor
+
+        // Update overall progress
+        updateOverallProgressFromServer();
     });
 
-    // Add this function to your existing script
+    // Function to calculate and update overall progress
     function updateOverallProgressFromServer() {
         let total = 0;
         for (let i = 1; i <= 6; i++) {
@@ -531,11 +551,6 @@
         overallProgressBar.textContent = average.toFixed(0) + '%';
     }
 
-    // Call this function when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        updateOverallProgressFromServer();
-    });
-
     // Optional: Clear the file input when the label is clicked again
     document.getElementById('file-upload').addEventListener('change', function() {
         if (this.files.length === 0) {
@@ -543,8 +558,6 @@
             document.getElementById('file-name').textContent = '';
         }
     });
-
-    
 
 </script>
 
