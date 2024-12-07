@@ -136,11 +136,90 @@
             <div class="card mb-4 text-center">
 
                 <div class="card-body">
-                    <div class="avatar bg-secondary rounded-circle mx-auto mb-3" style="width: 100px; height: 100px;"></div>
-                    <h6>Overall Progress</h6>
+                    {{-- group picture --}}
+                    <div class="avatar bg-secondary rounded-circle mx-auto mb-3" style="width: 100px; height: 100px;">
+                        <img src="{{ asset('storage/group_logos/' . basename($groupChat->logo)) }}" 
+                             alt="{{ $groupChat->name }}" 
+                             class="w-100 h-100 rounded-circle" 
+                             style="object-fit: cover;">
+                    </div>
+                    <small>{{ $groupChat->name }}</small>
+
+                    {{-- group progress --}}
+                    <h5>Overall Progress:</h5>
                     <div class="progress mb-3">
-                        <div class="progress-bar bg-primary" style="width: {{ isset($progress) ? $progress : 0 }}%;" aria-valuenow="{{ isset($progress) ? $progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
-                            {{ isset($progress) ? $progress : 0 }}%
+                        <div 
+                            class="progress-bar bg-success" 
+                            id="overallProgressBar" 
+                            role="progressbar" 
+                            style="width: {{ 
+                                number_format(
+                                    (($progress['chapter1'] ?? 0) + 
+                                    ($progress['chapter2'] ?? 0) + 
+                                    ($progress['chapter3'] ?? 0) + 
+                                    ($progress['chapter4'] ?? 0) + 
+                                    ($progress['chapter5'] ?? 0) + 
+                                    ($progress['chapter6'] ?? 0)) / 6, 
+                                    0
+                                ) 
+                            }}%;" 
+                            aria-valuenow="{{ 
+                                number_format(
+                                    (($progress['chapter1'] ?? 0) + 
+                                    ($progress['chapter2'] ?? 0) + 
+                                    ($progress['chapter3'] ?? 0) + 
+                                    ($progress['chapter4'] ?? 0) + 
+                                    ($progress['chapter5'] ?? 0) + 
+                                    ($progress['chapter6'] ?? 0)) / 6, 
+                                    0
+                                ) 
+                            }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">
+                            {{ 
+                                number_format(
+                                    (($progress['chapter1'] ?? 0) + 
+                                    ($progress['chapter2'] ?? 0) + 
+                                    ($progress['chapter3'] ?? 0) + 
+                                    ($progress['chapter4'] ?? 0) + 
+                                    ($progress['chapter5'] ?? 0) + 
+                                    ($progress['chapter6'] ?? 0)) / 6, 
+                                    0
+                                ) 
+                            }}%
+                        </div>
+                    </div>
+
+                    <!-- Chapters Accordion -->
+                    <div class="card">
+                        <div class="card-header" id="chaptersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#chaptersAccordion" aria-expanded="false" aria-controls="chaptersAccordion" style="cursor: pointer;">
+                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                Chapter Progress
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </h5>
+                        </div>
+
+                        {{-- chapter progress --}}
+                        <div id="chaptersAccordion" class="collapse" aria-labelledby="chaptersHeading">
+                            <div class="card-body">
+                                @for ($i = 1; $i <= 6; $i++)
+                                    <div class="mb-4">
+                                        <h5>Chapter {{ $i }}</h5>
+                                        <div class="progress">
+                                            <div 
+                                                class="progress-bar" 
+                                                id="progressBar{{ $i }}" 
+                                                role="progressbar" 
+                                                style="width: {{ $progress['chapter'.$i] ?? 0 }}%;" 
+                                                aria-valuenow="{{ $progress['chapter'.$i] ?? 0 }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                {{ $progress['chapter'.$i] ?? 0 }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endfor
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,6 +289,54 @@
             fileNameDisplay.textContent = '';
         }
     }
+
+    // script to add progress to progress bar
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateOverallProgress() {
+            const progressBars = document.querySelectorAll('[id^="progressBar"]');
+            let total = 0;
+
+            progressBars.forEach(bar => {
+                total += parseInt(bar.getAttribute('aria-valuenow'), 10);
+            });
+
+            const average = total / progressBars.length;
+            const overallProgressBar = document.getElementById('overallProgressBar');
+
+            if (overallProgressBar) {
+                overallProgressBar.style.width = `${average}%`;
+                overallProgressBar.setAttribute('aria-valuenow', average);
+                overallProgressBar.textContent = `${Math.round(average)}%`;
+            }
+        }
+
+        // You can keep both methods if you want
+        updateOverallProgress();
+    });
+
+    // Optional: If you need a separate method for server-side updates
+    function updateOverallProgressFromServer() {
+        const chapterCount = 6;
+        let total = 0;
+
+        for (let i = 1; i <= chapterCount; i++) {
+            const progressBar = document.getElementById(`progressBar${i}`);
+            if (progressBar) {
+                const progressValue = parseInt(progressBar.getAttribute('aria-valuenow'), 10);
+                total += progressValue;
+            }
+        }
+
+        const average = total / chapterCount;
+        const overallProgressBar = document.getElementById('overallProgressBar');
+
+        if (overallProgressBar) {
+            overallProgressBar.style.width = `${average}%`;
+            overallProgressBar.setAttribute('aria-valuenow', average);
+            overallProgressBar.textContent = `${Math.round(average)}%`;
+        }
+    }
+
 </script>
 
 @endsection

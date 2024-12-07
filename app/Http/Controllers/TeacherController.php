@@ -141,12 +141,13 @@ class TeacherController extends Controller
         // dd($data);
     }
 
+    // fetch messages for a group chat
     public function getMessage($groupChatId)
     {
         Log::info('Group Chat ID: ' . $groupChatId);
 
         // Fetch the specific group chat to ensure it exists
-        $groupChat = Groupchat::findOrFail($groupChatId);
+        $groupChat = Groupchat::with('task')->findOrFail($groupChatId);
         Log::info('Group Chat: ' . $groupChat);
 
         // Fetch messages for the specific group chat
@@ -161,33 +162,40 @@ class TeacherController extends Controller
         $groupChats = $user->groupChats; // This should now return the user's group chats
 
         // Fetch all members of the selected group chat
-        // Access members directly
-        // $members = $groupChat->members;
-
-        // If you want specific fields
         $members = $groupChat->members()->select('users.id', 'users.picture', 'users.first_name', 'users.last_name', 'users.email')->get();
+
+        // Fetch the task progress for the group chat
+        $task = $groupChat->task; // Use the relationship instead of querying directly
+
+        // Prepare progress data
+        $progresses = [
+            'chapter1' => $task ? ($task->chapter1['overall_score'] ?? 0) : 0,
+            'chapter2' => $task ? ($task->chapter2['overall_score'] ?? 0) : 0,
+            'chapter3' => $task ? ($task->chapter3['overall_score'] ?? 0) : 0,
+            'chapter4' => $task ? ($task->chapter4['overall_score'] ?? 0) : 0,
+            'chapter5' => $task ? ($task->chapter5['overall_score'] ?? 0) : 0,
+            'chapter6' => $task ? ($task->chapter6['overall_score'] ?? 0) : 0,
+        ];
 
         // Logging for debugging
         Log::info('Group Chat ID: ' . $groupChatId);
         Log::info('Messages count: ' . $messages->count());
         Log::info('Group Chats count: ' . $groupChats->count());
-        
 
         // Render the view with all necessary data
         return view('teacher.home', [
             'groupChat' => $groupChat, // Pass the specific group chat
             'messages' => $messages,
             'groupChats' => $groupChats, // Pass all group chats
-            'members' => $members
+            'members' => $members,
+            'progress' => $progresses // Pass the progress data
         ]);
-
-        // for debugging use
         // $data = [
-        //     'groupChatId' => $groupChatId,
         //     'groupChat' => $groupChat,
         //     'messages' => $messages,
         //     'groupChats' => $groupChats,
-        //     'members' => $members
+        //     'members' => $members,
+        //     'progress' => $progresses
         // ];
 
         // return response()->json($data);
@@ -313,13 +321,15 @@ class TeacherController extends Controller
         $task = Task::firstOrCreate(['group_id' => $groupId]);
 
         // Update chapter grades directly
-        $task->updateChapterGrades('chapter1', $request->chapter1);
-        $task->updateChapterGrades('chapter2', $request->chapter2);
-        $task->updateChapterGrades('chapter3', $request->chapter3);
-        $task->updateChapterGrades('chapter4', $request->chapter4);
-        $task->updateChapterGrades('chapter5', $request->chapter5);
-        $task->updateChapterGrades('chapter6', $request->chapter6);
+        $task->updateChapterGrades('chapter1', ['overall_score' => $request->chapter1]);
+        $task->updateChapterGrades('chapter2', ['overall_score' => $request->chapter2]);
+        $task->updateChapterGrades('chapter3', ['overall_score' => $request->chapter3]);
+        $task->updateChapterGrades('chapter4', ['overall_score' => $request->chapter4]);
+        $task->updateChapterGrades('chapter5', ['overall_score' => $request->chapter5]);
+        $task->updateChapterGrades('chapter6', ['overall_score' => $request->chapter6]);
 
         return response()->json(['message' => 'Grades submitted successfully!']);
     }
+
+
 }

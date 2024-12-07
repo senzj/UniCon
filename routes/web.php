@@ -89,6 +89,10 @@ Route::get('/teacher', [TeacherController::class, 'index'])
     Route::post('/teacher/grade/{Id}', [TeacherController::class, 'grade'])
     ->name('teacher.grade');
 
+    // gets the grades of a group
+    Route::post('/group-chat/{id}/update-progress', [TeacherController::class, 'updateProgress'])
+    ->name('updateProgress');
+
     
 //student page
 Route::get('/student', [Controller::class, 'student'])
@@ -101,8 +105,9 @@ Route::get('/student', [StudentController::class, 'index'])
 
     Route::post('/send-message/{groupId}', [StudentController::class, 'sendMessage'])
     ->name('send.Message');
-
     
+
+
 
 
 

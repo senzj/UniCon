@@ -301,8 +301,6 @@
                         <button type="submit">Add</button>
                     </form>
     
-                    <meta name="csrf-token" content="{{ csrf_token() }}">
-    
                     <h5>Overall Progress:</h5>
                     <div class="progress mb-3">
                         <div 
@@ -326,36 +324,29 @@
                             </h5>
                         </div>
     
+                        {{-- chapter progress --}}
                         <div id="chaptersAccordion" class="collapse" aria-labelledby="chaptersHeading">
                             <div class="card-body">
                                 @for ($i = 1; $i <= 6; $i++)
                                     <div class="mb-4">
                                         <h5>Chapter {{ $i }}</h5>
-                                        <input 
-                                            type="range" 
-                                            id="progressSlider{{ $i }}" 
-                                            class="form-range mb-2" 
-                                            min="0" 
-                                            max="100" 
-                                            value="{{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}" 
-                                            oninput="updateChapterProgress(this.value, {{ $i }})"
-                                        >
                                         <div class="progress">
                                             <div 
                                                 class="progress-bar" 
                                                 id="progressBar{{ $i }}" 
                                                 role="progressbar" 
-                                                style="width: {{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}%;" 
-                                                aria-valuenow="{{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}" 
+                                                style="width: {{ $progress['chapter'.$i] ?? 0 }}%;" 
+                                                aria-valuenow="{{ $progress['chapter'.$i] ?? 0 }}" 
                                                 aria-valuemin="0" 
                                                 aria-valuemax="100">
-                                                {{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}%
+                                                {{ $progress['chapter'.$i] ?? 0 }}%
                                             </div>
                                         </div>
                                     </div>
                                 @endfor
                             </div>
                         </div>
+
                     </div>
     
                     <h5>Members:</h5>
@@ -411,67 +402,6 @@
 {{-- Script to put file info --}}
 <script>
 
-    function updateScore(scoreId, value) {
-        document.getElementById(scoreId).innerText = value + '%';
-    }
-
-    function submitGrades() {
-        const chapter1Score = document.getElementById('chapter1').value;
-        const chapter2Score = document.getElementById('chapter2').value;
-        const chapter3Score = document.getElementById('chapter3').value;
-        const chapter4Score = document.getElementById('chapter4').value;
-        const chapter5Score = document.getElementById('chapter5').value;
-        const chapter6Score = document.getElementById('chapter6').value;
-
-        // Prepare data to send for single data
-        const data = {
-            'chapter1': chapter1Score,
-            'chapter2': chapter2Score,
-            'chapter3': chapter3Score,
-            'chapter4': chapter4Score,
-            'chapter5': chapter5Score,
-            'chapter6': chapter6Score,
-        };
-
-        // Prepare data to send for multiple data
-        // const data = {
-        //     chapter1: { overall_score: chapter1Score },
-        //     chapter2: { overall_score: chapter2Score },
-        //     chapter3: { overall_score: chapter3Score },
-        //     chapter4: { overall_score: chapter4Score },
-        //     chapter5: { overall_score: chapter5Score },
-        //     chapter6: { overall_score: chapter6Score },
-        // };
-
-        // Get the group ID (you may need to adjust this based on your implementation)
-        const groupId = window.location.pathname.split('/').pop();
-
-        // logs
-        console.log(data);
-        console.log(groupId);
-
-        // Send data to the server
-        fetch(`/teacher/grade/${groupId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token for Laravel
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            toastr.success(data.message, 'Success!');
-            // Optionally, close the modal after submission
-            $('#gradingModal').modal('hide');
-        })
-        .catch((error) => {
-            toastr.error('An unexpected error occurred', 'Error!');
-            console.error('Error:', error);
-        });
-    }
-
     // addMember to group chat script
     function addMember() {
         // Get the email from the input field
@@ -520,6 +450,55 @@
             fileNameDisplay.textContent = '';
         }
     }
+
+    // Function to update the score display
+    function updateScore(scoreId, value, chapterNumber) {
+        document.getElementById(scoreId).innerText = value + '%';
+        updateChapterProgress(value, chapterNumber); // Update the progress bar
+    }
+
+    // Function to submit the grades
+    function submitGrades() {
+        const chapters = {};
+        for (let i = 1; i <= 6; i++) {
+            chapters[`chapter${i}`] = document.getElementById(`chapter${i}`).value;
+        }
+
+        const groupId = window.location.pathname.split('/').pop();
+
+        fetch(`/teacher/grade/${groupId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(chapters)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update progress bars
+            for (let i = 1; i <= 6; i++) {
+                const progressBar = document.getElementById(`progressBar${i}`);
+                const score = chapters[`chapter${i}`];
+                
+                progressBar.style.width = `${score}%`;
+                progressBar.setAttribute('aria-valuenow', score);
+                progressBar.textContent = `${score}%`;
+            }
+
+            // Update overall progress
+            updateOverallProgressFromServer();
+
+            toastr.success(data.message, 'Success!');
+            $('#gradingModal').modal('hide');
+        })
+        .catch((error) => {
+            toastr.error('An unexpected error occurred', 'Error!');
+            console.error('Error:', error);
+        });
+    }
+
+    // Function to update the score display
     function updateChapterProgress(value, chapterNumber) {
         const progressBar = document.getElementById(`progressBar${chapterNumber}`);
         progressBar.style.width = value + '%';
@@ -529,11 +508,20 @@
         updateOverallProgress(); // Update overall progress whenever a chapter slider changes
     }
 
-    function updateOverallProgress() {
+    // script for updating the overall progress
+    document.addEventListener('DOMContentLoaded', function() {
+    @for ($i = 1; $i <= 6; $i++)
+        document.getElementById('chapter{{ $i }}').value = {{ $progress['chapter'.$i] ?? 0 }};
+        document.getElementById('chapter{{ $i }}Score').innerText = '{{ $progress['chapter'.$i] ?? 0 }}%';
+    @endfor
+    });
+
+    // Add this function to your existing script
+    function updateOverallProgressFromServer() {
         let total = 0;
         for (let i = 1; i <= 6; i++) {
-            const slider = document.getElementById(`progressSlider${i}`);
-            total += parseInt(slider.value, 10);
+            const progressValue = parseInt(document.getElementById(`progressBar${i}`).getAttribute('aria-valuenow'), 10);
+            total += progressValue;
         }
         const average = total / 6;
 
@@ -543,6 +531,10 @@
         overallProgressBar.textContent = average.toFixed(0) + '%';
     }
 
+    // Call this function when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        updateOverallProgressFromServer();
+    });
 
     // Optional: Clear the file input when the label is clicked again
     document.getElementById('file-upload').addEventListener('change', function() {

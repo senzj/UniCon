@@ -60,10 +60,16 @@ class Groupchat extends Model
         return $this->hasMany(Submission::class);
     }
 
-    // In your Groupchat model
+    // Add relationship with messages
     public function messages()
     {
         return $this->hasMany(Message::class, 'group_id');
+    }
+
+    // Add relationship with task
+    public function task()
+    {
+        return $this->hasOne(Task::class, 'group_id');
     }
     
 }
