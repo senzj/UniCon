@@ -169,12 +169,12 @@ class TeacherController extends Controller
 
         // Prepare progress data
         $progresses = [
-            'chapter1' => $task ? ($task->chapter1['overall_score'] ?? 0) : 0,
-            'chapter2' => $task ? ($task->chapter2['overall_score'] ?? 0) : 0,
-            'chapter3' => $task ? ($task->chapter3['overall_score'] ?? 0) : 0,
-            'chapter4' => $task ? ($task->chapter4['overall_score'] ?? 0) : 0,
-            'chapter5' => $task ? ($task->chapter5['overall_score'] ?? 0) : 0,
-            'chapter6' => $task ? ($task->chapter6['overall_score'] ?? 0) : 0,
+            'chapter1' => $task ? $task->chapter1 : 0,
+            'chapter2' => $task ? $task->chapter2 : 0,
+            'chapter3' => $task ? $task->chapter3 : 0,
+            'chapter4' => $task ? $task->chapter4 : 0,
+            'chapter5' => $task ? $task->chapter5 : 0,
+            'chapter6' => $task ? $task->chapter6 : 0,
         ];
 
         // Logging for debugging
@@ -190,11 +190,12 @@ class TeacherController extends Controller
             'members' => $members,
             'progress' => $progresses // Pass the progress data
         ]);
+
         // $data = [
-        //     'groupChat' => $groupChat,
-        //     'messages' => $messages,
-        //     'groupChats' => $groupChats,
-        //     'members' => $members,
+        //     // 'groupChat' => $groupChat,
+        //     // 'messages' => $messages,
+        //     // 'groupChats' => $groupChats,
+        //     // 'members' => $members,
         //     'progress' => $progresses
         // ];
 
@@ -305,10 +306,11 @@ class TeacherController extends Controller
         // return response()->json($data);
     }
     
+    // add grade for progress
     public function grade(Request $request, $groupId)
     {
         // Validate incoming request
-        $request->validate([
+        $validated = $request->validate([
             'chapter1' => 'required|numeric',
             'chapter2' => 'required|numeric',
             'chapter3' => 'required|numeric',
@@ -320,13 +322,15 @@ class TeacherController extends Controller
         // Find or create the task for the group
         $task = Task::firstOrCreate(['group_id' => $groupId]);
 
-        // Update chapter grades directly
-        $task->updateChapterGrades('chapter1', ['overall_score' => $request->chapter1]);
-        $task->updateChapterGrades('chapter2', ['overall_score' => $request->chapter2]);
-        $task->updateChapterGrades('chapter3', ['overall_score' => $request->chapter3]);
-        $task->updateChapterGrades('chapter4', ['overall_score' => $request->chapter4]);
-        $task->updateChapterGrades('chapter5', ['overall_score' => $request->chapter5]);
-        $task->updateChapterGrades('chapter6', ['overall_score' => $request->chapter6]);
+        // Update each chapter directly
+        $task->update([
+            'chapter1' => $validated['chapter1'],
+            'chapter2' => $validated['chapter2'],
+            'chapter3' => $validated['chapter3'],
+            'chapter4' => $validated['chapter4'],
+            'chapter5' => $validated['chapter5'],
+            'chapter6' => $validated['chapter6'],
+        ]);
 
         return response()->json(['message' => 'Grades submitted successfully!']);
     }

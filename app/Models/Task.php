@@ -20,14 +20,14 @@ class Task extends Model
     ];
 
     // Cast JSON columns
-    protected $casts = [
-        'chapter1' => 'array',
-        'chapter2' => 'array',
-        'chapter3' => 'array',
-        'chapter4' => 'array',
-        'chapter5' => 'array',
-        'chapter6' => 'array',
-    ];
+    // protected $casts = [
+    //     'chapter1' => 'array',
+    //     'chapter2' => 'array',
+    //     'chapter3' => 'array',
+    //     'chapter4' => 'array',
+    //     'chapter5' => 'array',
+    //     'chapter6' => 'array',
+    // ];
 
     // Relationship with group
     public function group()
