@@ -85,6 +85,15 @@ Route::get('/teacher', [TeacherController::class, 'index'])
     Route::post('/addgroupmember', [TeacherController::class, 'addMember'])
     ->name('teacher.addMember');
 
+    // for grading
+    Route::post('/teacher/grade/{Id}', [TeacherController::class, 'grade'])
+    ->name('teacher.grade');
+
+    // gets the grades of a group
+    Route::post('/group-chat/{id}/update-progress', [TeacherController::class, 'updateProgress'])
+    ->name('updateProgress');
+
+    
 //student page
 Route::get('/student', [Controller::class, 'student'])
     ->name('student')
@@ -96,6 +105,10 @@ Route::get('/student', [StudentController::class, 'index'])
 
     Route::post('/send-message/{groupId}', [StudentController::class, 'sendMessage'])
     ->name('send.Message');
+    
+
+
+
 
 
 
@@ -103,6 +116,7 @@ Route::get('/student', [StudentController::class, 'index'])
 Route::get('/download/file/{filename}', [FileDownloadController::class, 'download'])
     ->where('filename', '.*')  // Allow full path with slashes
     ->name('file.download');
+
 
     
 //file upload page

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GroupChat; // Ensure this class exists
-use App\Models\Submission; // Ensure this class exists
-use App\Models\GetGroupChat; // Ensure this class exists
-use App\Models\Message; // Ensure this class exists
+use App\Models\GroupChat;
+use App\Models\Submission;
+use App\Models\GetGroupChat;
+use App\Models\Message;
 use App\Models\User;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -31,6 +32,49 @@ class TeacherController extends Controller
         // for debugging use
         // return response()->json($groupChats);
     }
+
+    // teacher dashboard view
+    // public function index()
+    // {
+    //     // Fetch all group chats for the current user
+    //     $groupChats = GetGroupChat::forCurrentUser();
+
+    //     // Check if there are any group chats
+    //     if ($groupChats->isNotEmpty()) {
+    //         // Get the first group chat by default
+    //         $firstGroupChat = $groupChats->first();
+
+    //         // Fetch messages for the first group chat
+    //         $messages = Message::where('group_id', $firstGroupChat->id)
+    //             ->with('user')
+    //             ->orderBy('created_at', 'asc')
+    //             ->get();
+
+    //         // Fetch members of the first group chat
+    //         $members = $firstGroupChat->members()->select(
+    //             'users.id', 
+    //             'users.picture', 
+    //             'users.first_name', 
+    //             'users.last_name', 
+    //             'users.email'
+    //         )->get();
+
+    //         return view('teacher.home', [
+    //             'groupChats' => $groupChats,
+    //             'groupChat' => $firstGroupChat,
+    //             'messages' => $messages,
+    //             'members' => $members
+    //         ]);
+    //     }
+
+    //     // If no group chats exist
+    //     return view('teacher.home', [
+    //         'groupChats' => $groupChats,
+    //         'groupChat' => null,
+    //         'messages' => collect(),
+    //         'members' => collect()
+    //     ]);
+    // }
     
 
     // creates groupchat
@@ -97,48 +141,61 @@ class TeacherController extends Controller
         // dd($data);
     }
 
+    // fetch messages for a group chat
     public function getMessage($groupChatId)
     {
+        Log::info('Group Chat ID: ' . $groupChatId);
+
         // Fetch the specific group chat to ensure it exists
-        $groupChat = Groupchat::findOrFail($groupChatId);
+        $groupChat = Groupchat::with('task')->findOrFail($groupChatId);
+        Log::info('Group Chat: ' . $groupChat);
 
         // Fetch messages for the specific group chat
         $messages = Message::where('group_id', $groupChatId)
             ->with('user')
             ->orderBy('created_at', 'asc')
             ->get();
+        Log::info('Messages: ' . $messages);
 
         // Fetch ALL group chats for the current user
         $user = Auth::user();
         $groupChats = $user->groupChats; // This should now return the user's group chats
 
         // Fetch all members of the selected group chat
-        // Access members directly
-        // $members = $groupChat->members;
-
-        // If you want specific fields
         $members = $groupChat->members()->select('users.id', 'users.picture', 'users.first_name', 'users.last_name', 'users.email')->get();
+
+        // Fetch the task progress for the group chat
+        $task = $groupChat->task; // Use the relationship instead of querying directly
+
+        // Prepare progress data
+        $progresses = [
+            'chapter1' => $task ? ($task->chapter1['overall_score'] ?? 0) : 0,
+            'chapter2' => $task ? ($task->chapter2['overall_score'] ?? 0) : 0,
+            'chapter3' => $task ? ($task->chapter3['overall_score'] ?? 0) : 0,
+            'chapter4' => $task ? ($task->chapter4['overall_score'] ?? 0) : 0,
+            'chapter5' => $task ? ($task->chapter5['overall_score'] ?? 0) : 0,
+            'chapter6' => $task ? ($task->chapter6['overall_score'] ?? 0) : 0,
+        ];
 
         // Logging for debugging
         Log::info('Group Chat ID: ' . $groupChatId);
         Log::info('Messages count: ' . $messages->count());
         Log::info('Group Chats count: ' . $groupChats->count());
-        
 
         // Render the view with all necessary data
         return view('teacher.home', [
             'groupChat' => $groupChat, // Pass the specific group chat
             'messages' => $messages,
             'groupChats' => $groupChats, // Pass all group chats
-            'members' => $members
+            'members' => $members,
+            'progress' => $progresses // Pass the progress data
         ]);
-
-        // for debugging use
         // $data = [
         //     'groupChat' => $groupChat,
         //     'messages' => $messages,
         //     'groupChats' => $groupChats,
-        //     'members' => $members
+        //     'members' => $members,
+        //     'progress' => $progresses
         // ];
 
         // return response()->json($data);
@@ -185,7 +242,7 @@ class TeacherController extends Controller
         ];
 
         // Pass the data to the model
-        $message = Message::create($data);
+        $messages = Message::create($data);
 
         // get user id
 
@@ -196,28 +253,20 @@ class TeacherController extends Controller
         // return response()->json($message);
     }
 
-    // add member to group chat
-    public function addMember(Request $request, $groupId)
+    public function addMember(Request $request)
     {
         try {
             // Validate the request
             $validatedData = $request->validate([
                 'email' => 'required|email|exists:users,email',
+                'group_id' => 'required|exists:groupchat,id'
             ]);
 
             // Retrieve the user by their email
             $user = User::where('email', $request->input('email'))->first();
 
-            // Check if user exists
-            if (!$user) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'User not found!'
-                ], 404);
-            }
-
             // Retrieve the group chat
-            $group = Groupchat::findOrFail($groupId);
+            $group = Groupchat::findOrFail($request->input('group_id'));
 
             // Check if the user is already a member of the group
             if ($group->members()->where('user_id', $user->id)->exists()) {
@@ -228,10 +277,7 @@ class TeacherController extends Controller
             }
 
             // Save to groupmembers table
-            $group->members()->attach($user->id, [
-                'groupchat_id' => $groupId, 
-                'user_id' => $user->id,
-            ]);
+            $group->members()->attach($user->id);
 
             // Return success response
             return response()->json([
@@ -247,9 +293,8 @@ class TeacherController extends Controller
                 'message' => 'An unexpected error occurred: ' . $e->getMessage()
             ], 500);
         }
-    }
-    
-// For debugging use
+        
+        // For debugging use
         // $data = [
         //     'user' => $user,
         //     'groupId' => $groupId,
@@ -258,4 +303,33 @@ class TeacherController extends Controller
         // ];
 
         // return response()->json($data);
+    }
+    
+    public function grade(Request $request, $groupId)
+    {
+        // Validate incoming request
+        $request->validate([
+            'chapter1' => 'required|numeric',
+            'chapter2' => 'required|numeric',
+            'chapter3' => 'required|numeric',
+            'chapter4' => 'required|numeric',
+            'chapter5' => 'required|numeric',
+            'chapter6' => 'required|numeric',
+        ]);
+
+        // Find or create the task for the group
+        $task = Task::firstOrCreate(['group_id' => $groupId]);
+
+        // Update chapter grades directly
+        $task->updateChapterGrades('chapter1', ['overall_score' => $request->chapter1]);
+        $task->updateChapterGrades('chapter2', ['overall_score' => $request->chapter2]);
+        $task->updateChapterGrades('chapter3', ['overall_score' => $request->chapter3]);
+        $task->updateChapterGrades('chapter4', ['overall_score' => $request->chapter4]);
+        $task->updateChapterGrades('chapter5', ['overall_score' => $request->chapter5]);
+        $task->updateChapterGrades('chapter6', ['overall_score' => $request->chapter6]);
+
+        return response()->json(['message' => 'Grades submitted successfully!']);
+    }
+
+
 }
