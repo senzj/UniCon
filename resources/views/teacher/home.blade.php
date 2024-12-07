@@ -240,81 +240,123 @@
 
         <!-- Right Section: Group Info -->
         @if (request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
-            <div class="col-md-3">
-                <div class="card mb-4">
-
-                    <div class="card-header">
-                        <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+                </div>
+                <div class="card-body">
+                    <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
+                        <input type="email" id="email" placeholder="Enter student email" required>
+                        <button type="submit">Add</button>
+                    </form>
+    
+                    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+                    <h5>Overall Progress:</h5>
+                    <div class="progress mb-3">
+                        <div 
+                            class="progress-bar bg-success" 
+                            id="overallProgressBar" 
+                            role="progressbar" 
+                            style="width: 0%;" 
+                            aria-valuenow="0" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">
+                            0%
+                        </div>
                     </div>
-
-                    <div class="card-body">
-
-                        <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
-                            <input type="email" id="email" placeholder="Enter student email" required>
-                            <button type="submit">Add</button>
-                        </form>
-
-                        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-                        <h5>Progress:</h5>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" role="progressbar" style="width: {{ isset($groupChat) ? $groupChat->progress : 0 }}%;" aria-valuenow="{{ isset($groupChat) ? $groupChat->progress : 0 }}" aria-valuemin="0" aria-valuemax="100">
-                                {{ isset($groupChat) ? $groupChat->progress : 0 }}%
+    
+                    <!-- Chapters Accordion -->
+                    <div class="card">
+                        <div class="card-header" id="chaptersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#chaptersAccordion" aria-expanded="false" aria-controls="chaptersAccordion" style="cursor: pointer;">
+                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                Chapter Progress
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </h5>
+                        </div>
+    
+                        <div id="chaptersAccordion" class="collapse" aria-labelledby="chaptersHeading">
+                            <div class="card-body">
+                                @for ($i = 1; $i <= 6; $i++)
+                                    <div class="mb-4">
+                                        <h5>Chapter {{ $i }}</h5>
+                                        <input 
+                                            type="range" 
+                                            id="progressSlider{{ $i }}" 
+                                            class="form-range mb-2" 
+                                            min="0" 
+                                            max="100" 
+                                            value="{{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}" 
+                                            oninput="updateChapterProgress(this.value, {{ $i }})"
+                                        >
+                                        <div class="progress">
+                                            <div 
+                                                class="progress-bar" 
+                                                id="progressBar{{ $i }}" 
+                                                role="progressbar" 
+                                                style="width: {{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}%;" 
+                                                aria-valuenow="{{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                {{ isset($groupChat) && isset($groupChat->progresses[$i - 1]) ? $groupChat->progresses[$i - 1] : 0 }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endfor
                             </div>
                         </div>
-
-                        <h5>Tasks:</h5>
-                        <ul>
-                        </ul>
-
-                        <h5>Members:</h5>
-                        <div class="card">
-                            <div class="card-header" id="membersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#membersList" aria-expanded="false" aria-controls="membersList" style="cursor: pointer;">
-                                <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                    Members ({{ isset($members) ? $members->count() : 0 }})
-                                    <i class="fas fa-chevron-down toggle-icon"></i>
-                                </h5>
-                            </div>
-                        
-                            <div id="membersList" class="collapse" aria-labelledby="membersHeading">
-                                <div class="card-body">
-                                    @if(isset($members) && $members->count() > 0)
-                                        <ul class="list-group">
-                                            @foreach ($members as $member)
-                                                <li class="list-group-item d-flex align-items-center list-group-memebers">
-                                                    <img 
-                                                        src="{{ asset('storage/profile/' . $member->picture) }}" 
-                                                        alt="{{ $member->first_name .' ' . $member->last_name }}" 
-                                                        class="rounded-circle me-3" 
-                                                        style="width: 50px; height: 50px; object-fit: cover;"
-                                                    >
-                                                    <div class="d-flex flex-column align-items-start">
-                                                        <h6 class="mb-1">{{ $member->first_name . ' ' . $member->last_name }}</h6>
-                                                        {{-- <a href="mailto:{{ $member->email }}"  --}}
-                                                        <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{ $member->email }}" 
-                                                           class="text-muted small text-decoration-none" 
-                                                           title="Send email to {{ $member->first_name }}"
-                                                           target="_blank">
-                                                            {{ $member->email }}
-                                                            <i class="fas fa-envelope ms-2 text-primary" style="font-size: 0.8rem;"></i>
-                                                        </a>
-                                                    </div>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        <div class="alert alert-info">No members found.</div>
-                                    @endif
-                                </div>
+                    </div>
+    
+                    <h5>Members:</h5>
+                    <div class="card">
+                        <div class="card-header" id="membersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#membersList" aria-expanded="false" aria-controls="membersList" style="cursor: pointer;">
+                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                Members ({{ isset($members) ? $members->count() : 0 }})
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </h5>
+                        </div>
+    
+                        <div id="membersList" class="collapse" aria-labelledby="membersHeading">
+                            <div class="card-body">
+                                @if(isset($members) && $members->count() > 0)
+                                    <ul class="list-group">
+                                        @foreach ($members as $member)
+                                            <li class="list-group-item d-flex align-items-center list-group-memebers">
+                                                <img 
+                                                    src="{{ asset('storage/profile/' . $member->picture) }}" 
+                                                    alt="{{ $member->first_name .' ' . $member->last_name }}" 
+                                                    class="rounded-circle me-3" 
+                                                    style="width: 50px; height: 50px; object-fit: cover;"
+                                                >
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <h6 class="mb-1">{{ $member->first_name . ' ' . $member->last_name }}</h6>
+                                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{ $member->email }}" 
+                                                       class="text-muted small text-decoration-none" 
+                                                       title="Send email to {{ $member->first_name }}"
+                                                       target="_blank">
+                                                        {{ $member->email }}
+                                                        <i class="fas fa-envelope ms-2 text-primary" style="font-size: 0.8rem;"></i>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <div class="alert alert-info">No members found.</div>
+                                @endif
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
-        @endif
-    </div>
-</div>
+        </div>
+    @endif
+    
+
+
+
+
 
 {{-- Script to put file info --}}
 <script>
@@ -367,6 +409,29 @@
             fileNameDisplay.textContent = '';
         }
     }
+    function updateChapterProgress(value, chapterNumber) {
+        const progressBar = document.getElementById(`progressBar${chapterNumber}`);
+        progressBar.style.width = value + '%';
+        progressBar.setAttribute('aria-valuenow', value);
+        progressBar.textContent = value + '%';
+
+        updateOverallProgress(); // Update overall progress whenever a chapter slider changes
+    }
+
+    function updateOverallProgress() {
+        let total = 0;
+        for (let i = 1; i <= 6; i++) {
+            const slider = document.getElementById(`progressSlider${i}`);
+            total += parseInt(slider.value, 10);
+        }
+        const average = total / 6;
+
+        const overallProgressBar = document.getElementById('overallProgressBar');
+        overallProgressBar.style.width = average + '%';
+        overallProgressBar.setAttribute('aria-valuenow', average);
+        overallProgressBar.textContent = average.toFixed(0) + '%';
+    }
+
 
     // Optional: Clear the file input when the label is clicked again
     document.getElementById('file-upload').addEventListener('change', function() {
