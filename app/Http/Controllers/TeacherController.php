@@ -173,7 +173,7 @@ class TeacherController extends Controller
 
         // Validate the request
         $validatedData = $request->validate([
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx'
         ]);
 

@@ -120,7 +120,7 @@
                                 {{ $message->user_id == Auth::id() ? 'bg-primary text-white sender-message' : 'bg-light receiver-message' }} 
                                 p-2 rounded">
 
-                                {{-- if message is from the user --}}
+                                {{-- if message is sent from the current user --}}
                                 @if($message->user_id == Auth::id())
                                     <div class="d-flex flex-column align-items-end w-100">
                                         <div class="d-flex align-items-center justify-content-end mb-1 w-100">
@@ -151,13 +151,13 @@
                                         @endif
                                     
                                         <div class="d-flex justify-content-end w-100">
-                                            <small class="text-muted">
+                                            <small class="text-white">
                                                 {{ $message->created_at->format('F d, Y h:i A') }}
                                             </small>
                                         </div>
                                     </div>
 
-                                {{-- if message is from other users --}}
+                                {{-- if message is sent from other users --}}
                                 @else
                                     <div class="flex flex-col items-start">
                                         <div class="flex items-center mb-1">
@@ -208,7 +208,7 @@
                             @csrf
                             <input type="hidden" name="group_chat_id" value="{{ $groupChat->id }}">
                             <div class="input-group">
-                                <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
+                                <input type="text" name="message" class="form-control" placeholder="Type your message here...">
                                 <input type="file" name="file" id="file-upload" class="form-control" style="display: none;" onchange="updateFileName()">
                                 
                                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createReportModal">
