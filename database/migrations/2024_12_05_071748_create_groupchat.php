@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('section');
             $table->string('title');
+            $table->string('term');
+            $table->string('academic_year');
+            $table->string('mentoring_day');
+            $table->string('mentoring_time');
             $table->string('specialization');
             $table->string('adviser');
             $table->string('logo')->default(asset('assets/images/default_logo.png'));
