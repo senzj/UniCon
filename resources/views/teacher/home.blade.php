@@ -321,8 +321,24 @@
                         <h4>{{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
                     </div>
                 
-                
+                    <div class="avatar bg-secondary rounded-circle mx-auto mb-3" style="width: 100px; height: 100px;">
+                        @if ($groupChat && $groupChat->group_logo)
+
+                            <img src="{{ asset('storage/group_logos/' . basename($groupChat->group_logo)) }}" 
+                                alt="{{ $groupChat->name }}" 
+                                class="w-100 h-100 rounded-circle" 
+                                style="object-fit: cover;">
+                        @else
+
+                            <img src="{{ asset('storage/group_logos/default_logo.png') }}" 
+                                alt="{{ $groupChat->name ?? 'Default Group Name' }}" 
+                                class="w-100 h-100 rounded-circle" 
+                                style="object-fit: cover;">
+
+                        @endif
+                    </div>
                     @if(isset($groupChat))
+                    
                         <div id="groupChatDetails" class="collapse" aria-labelledby="groupChatDetailsHeading">
                             <div class="card-body">
                                 <p class="mb-1"><strong>Section:</strong> {{ $groupChat->section }}</p>
