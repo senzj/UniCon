@@ -220,6 +220,20 @@
                     @endif
 
                     {{-- group progress --}}
+                    <!-- Group Chat Details -->
+                    <div class="card-body">
+                        @if(isset($groupChat))
+                            <p class="mb-1"><strong>Section:</strong> {{ $groupChat->section }}</p>
+                            <p class="mb-1"><strong>Specialization:</strong> {{ $groupChat->specialization }}</p>
+                            <p class="mb-1"><strong>Adviser:</strong> {{ $groupChat->adviser }}</p>
+                            <p class="mb-1"><strong>Term:</strong> {{ $groupChat->term }}</p>
+                            <p class="mb-1"><strong>Academic Year:</strong> {{ $groupChat->academic_year }}</p>
+                            <p class="mb-1"><strong>Mentoring Day:</strong> {{ $groupChat->mentoring_day }}</p>
+                            <p class="mb-1"><strong>Mentoring Time:</strong> {{ $groupChat->mentoring_time }}</p>
+                        @else
+                            <p>No Group Selected</p>
+                        @endif
+                    </div>
                     <h5>Overall Progress:</h5>
                     <div class="progress mb-3">
                         <div 
