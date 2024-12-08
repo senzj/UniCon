@@ -453,6 +453,8 @@
                 toastr.error(data.message, 'Error!');
             } else {
                 toastr.success(data.message, 'Success!');
+                // reloads page
+                location.reload();
             }
         })
         .catch(error => {
