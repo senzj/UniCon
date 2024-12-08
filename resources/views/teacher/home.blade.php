@@ -56,7 +56,12 @@
                         <!-- Term -->
                         <div class="mb-3">
                             <label for="term" class="form-label">Term</label>
-                            <input type="text" class="form-control" id="term" name="term" required>
+                            <select class="form-select" id="term" name="term" required>
+                                <option value="" disabled selected>Select a term</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
                         </div>
 
                         <!-- Academic Year -->
@@ -303,8 +308,18 @@
         @if (request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
         <div class="col-md-3">
             <div class="card mb-4">
+                <!-- Group Chat Details -->
                 <div class="card-header">
-                    <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+                    <h4>{{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+                    @if(isset($groupChat))
+                        <p class="mb-1"><strong>Section:</strong> {{ $groupChat->section }}</p>
+                        <p class="mb-1"><strong>Specialization:</strong> {{ $groupChat->specialization }}</p>
+                        <p class="mb-1"><strong>Adviser:</strong> {{ $groupChat->adviser }}</p>
+                        <p class="mb-1"><strong>Term:</strong> {{ $groupChat->term }}</p>
+                        <p class="mb-1"><strong>Academic Year:</strong> {{ $groupChat->academic_year }}</p>
+                        <p class="mb-1"><strong>Mentoring Day:</strong> {{ $groupChat->mentoring_day }}</p>
+                        <p class="mb-1"><strong>Mentoring Time:</strong> {{ \Carbon\Carbon::createFromFormat('H:i:s', $groupChat->mentoring_time)->format('h:i A') }}</p>
+                    @endif
                 </div>
                 <div class="card-body">
                     <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
