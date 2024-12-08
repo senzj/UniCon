@@ -24,18 +24,6 @@
                         <!-- Basic Report Information -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="groupName" class="form-label">Group Name</label>
-                                <input type="text" class="form-control" id="groupName" name="group_name" required>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="reportingDate" class="form-label">Reporting Date</label>
-                                <input type="date" class="form-control" id="reportingDate" name="reporting_date" required>
-                            </div>
-                        </div>
-    
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
                                 <label for="reportingWeek" class="form-label">Reporting Week</label>
                                 <select class="form-select" id="reportingWeek" name="reporting_week" required>
                                     <option value="">Select Week</option>
@@ -47,13 +35,21 @@
                                     <option value="6">Week 6</option>
                                     <option value="7">Week 7</option>
                                     <option value="8">Week 8</option>
+                                    <option value="8">Week 9</option>
+                                    <option value="8">Week 10</option>
+                                    <option value="8">Week 11</option>
+                                    <option value="8">Week 12</option>
+                                    <option value="8">Week 13</option>
+                                    <option value="8">Week 14</option>
+                                    <option value="8">Week 15</option>
                                 </select>
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
-                                <label for="projectTitle" class="form-label">Project Title</label>
-                                <input type="text" class="form-control" id="projectTitle" name="project_title" required>
+                                <label for="reportingDate" class="form-label">Reporting Date</label>
+                                <input type="date" class="form-control" id="reportingDate" name="reporting_date" required>
                             </div>
+                        
                         </div>
     
                         <!-- Chapters and Activities -->
