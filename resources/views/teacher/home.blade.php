@@ -50,7 +50,12 @@
                         <!-- Term -->
                         <div class="mb-3">
                             <label for="term" class="form-label">Term</label>
-                            <input type="text" class="form-control" id="term" name="term" required>
+                            <select class="form-select" id="term" name="term" required>
+                                <option value="" disabled selected>Select a term</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
                         </div>
 
                         <!-- Academic Year -->
