@@ -70,6 +70,11 @@ class StudentController extends Controller
     public function sendMessage(Request $request, $groupId)
     {
 
+        // // check if one of the input input is empty
+        // if (empty($request->input('message')) || empty($request->input('user_id'))) {
+        //     return response()->json(['error' => 'Message or User ID is empty'], 400);
+        // }
+
         // Validate the incoming request
         $validated = $request->validate([
             'message' => 'nullable|string',

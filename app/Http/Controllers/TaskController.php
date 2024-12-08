@@ -15,10 +15,10 @@ class TaskController extends Controller
     {   
         // Validate the input
         $validatedData = $request->validate([
-            'group_name' => 'required|string|max:255',
+            'group_name' => 'required|string',
             'reporting_date' => 'required|date',
-            'reporting_week' => 'required|integer|between:1,8',
-            'project_title' => 'required|string|max:255',
+            'reporting_week' => 'required|integer|between:1,7',
+            'project_title' => 'required|string',
             // ... other validations
         ]);
 
@@ -53,6 +53,7 @@ class TaskController extends Controller
             $taskData = [
                 'group_id' => $group->id,
                 'message_id' => $messageId,
+                'project_title' => $request->input('project_title'),
                 'reporting_date' => $request->input('reporting_date'),
                 'reporting_week' => $request->input('reporting_week'),
                 'day1_date' => $request->input('chapter_1_date'),
@@ -85,5 +86,13 @@ class TaskController extends Controller
             
             return back()->with('error', 'Failed to submit progress report: ' . $e->getMessage());
         }
+
+        // $data = [
+        //     // 'message' => $message,
+        //     'request' => $request->all(),
+        //     'validated' => $validatedData,
+        // ];
+        // Log::info('Progress report submitted', $data);
+        // return response()->json($data);
     }
 }

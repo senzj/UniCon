@@ -162,14 +162,12 @@ class TeacherController extends Controller
 
         // Prepare the response data
         // $data = [
-        //     'groupChats' => $groupChats, // Pass all group chats
-        //     'groupChat' => $groupChat, // Pass the specific group chat
-        //     'messages' => $messages,
-        //     'members' => $members,
+        //     // 'groupChats' => $groupChats, // Pass all group chats
+        //     // 'groupChat' => $groupChat, // Pass the specific group chat
+        //     // 'messages' => $messages,
+        //     // 'members' => $members,
         //     'tasks' => $tasks,
         // ];
-
-        // return back(compact($data))->with('success', 'Group chat created successfully!');
 
         // return response()->json($data);
     }
@@ -180,6 +178,11 @@ class TeacherController extends Controller
     {
         // Debugging: Log the request data
         // Log::info('Request Data: ', $request->all());
+
+        // check if one of the input input is empty
+        // if (empty($request->input('message')) || empty($request->input('user_id'))) {
+        //     return response()->json(['error' => 'Message or User ID is empty'], 400);
+        // }
 
         // Validate the request
         $validatedData = $request->validate([

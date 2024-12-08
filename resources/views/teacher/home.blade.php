@@ -246,7 +246,7 @@
                                         {{-- if user has attached file --}}
                                         @if($message->file_path)
                                             <div class="col-12">
-                                                
+
                                                 <!-- File Path -->
                                                 <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
 

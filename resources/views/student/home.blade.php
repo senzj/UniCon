@@ -25,7 +25,7 @@
                         <div class="row">
 
                             <!-- invisible form for project title -->
-                            <input type="hidden" name="project_title" value="{{ $groupChat->name }}">
+                            <input type="hidden" name="project_title" value="{{ $groupChat->title }}">
 
                             <!-- invisible form for group name -->
                             <input type="hidden" name="group_name" value="{{ $groupChat->name }}">
@@ -115,7 +115,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Mark as Complete</button>
                 </div>
             </div>
         </div>
@@ -170,11 +169,12 @@
 
                                             </div>
 
-                                        @elseif ($tasks)
-                                            <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
-                                            class="btn btn-success btn-sm" style="margin-bottom: 1rem;">
+                                        {{-- if user has progress report form --}}
+                                        @elseif ($tasks->isNotEmpty())
+                                            {{-- check progress report --}}
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
                                                 View Progress Report
-                                            </a>
+                                            </button>
                                         @endif
                                     
                                         <div class="d-flex justify-content-end w-100">
@@ -195,32 +195,34 @@
                                             <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
                                         </div>
                                         <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
-
-                                        {{-- if user has attached file --}}
-                                        @if($message->file_path)
                                             <div class="col-12">
-                                                <!-- File Path -->
-                                                <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
 
-                                                {{-- download file button --}}
-                                                <div class="text-right">
-                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
-                                                </div>
-                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
-                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
-                                                    Download
-                                                </a>
+                                                {{-- if user has attached file --}}
+                                                @if($message->file_path)
+
+                                                    <!-- File Path -->
+                                                    <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
+
+                                                    {{-- download file button --}}
+                                                    <div class="text-right">
+                                                        <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                    </div>
+                                                    <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                                    class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
+                                                        Download
+                                                    </a>
+
+                                                {{-- If user has progress report form --}}
+                                                @elseif ($tasks->isNotEmpty())
+
+                                                    {{-- check progress report --}}
+                                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                                        View Progress Report
+                                                    </button>
+
+                                                @endif
 
                                             </div>
-
-                                        @elseif ($tasks)
-
-                                            {{-- check progress report --}}
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
-                                                View Progress Report
-                                            </button>
-
-                                        @endif
 
                                         <small class="text-muted">
                                             {{ $message->created_at->format('F d, Y h:i A') }}
