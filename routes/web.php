@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\FileDownloadController;
-
+use App\Http\Controllers\TaskController;
 //  ================================================================| Notes |===========================================================================
 // name serve as identifier for the route like ID
 //Route::get('URI', [ControllerName::class, 'MethodName'])->name('routeName that serves as identifier'); (routing to controller format)
@@ -105,6 +105,8 @@ Route::get('/student', [StudentController::class, 'index'])
 
     Route::post('/send-message/{groupId}', [StudentController::class, 'sendMessage'])
     ->name('send.Message');
+    Route::get('/student/home', [TaskController::class, 'index'])->name('student.home');
+
     
 
 
@@ -118,7 +120,9 @@ Route::get('/download/file/{filename}', [FileDownloadController::class, 'downloa
     ->name('file.download');
 
 
-    
+
+Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');

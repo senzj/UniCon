@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('section');
+            $table->string('title');
             $table->string('specialization');
             $table->string('adviser');
             $table->string('logo')->default(asset('assets/images/default_logo.png'));

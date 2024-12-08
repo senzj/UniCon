@@ -88,7 +88,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Group</button>
+                        <button type="submit" class="btn btn-primary">Create Group</button>
                     </div>
                 </form>
                 
@@ -96,7 +96,7 @@
         </div>
     </div>
 
-    <!-- Modal for progress report -->
+    <!-- Modal for viewing progress report form -->
     <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
