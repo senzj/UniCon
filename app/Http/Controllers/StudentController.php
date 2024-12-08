@@ -12,40 +12,58 @@ use App\Models\Task;
 class StudentController extends Controller
 {
     public function index()
-{
-    // Get the group chat(s) the current user belongs to
-    $userGroupChats = Auth::user()->groupChats;
+    {
+        // Ensure the user is authenticated
+        if (!Auth::check()) {
+            // Handle the case where the user is not authenticated
+            return redirect()->route('login'); // Redirect to login or handle as needed
+        }
 
-    // Or if you prefer to get the first group chat
-    $groupChat = Auth::user()->groupChats->first();
+        // Get the group chat(s) the current user belongs to
+        $userGroupChats = Auth::user()->groupChats;
 
-    // Fetch messages for the group chat
-    $messages = $groupChat ? $groupChat->messages : collect();
+        // Check if the user has any group chats
+        if ($userGroupChats->isEmpty()) {
+            // Handle the case where the user has no group chats
+            return view('student.home', [
+                'groupChat' => null,
+                'messages' => collect(),
+                'members' => collect(),
+                'tasks' => collect(), // Return an empty collection for tasks
+            ]);
+        }
 
-    // Fetch users who are part of the group chat
-    $groupChatUsers = $groupChat ? $groupChat->users : collect();
+        // Get the first group chat
+        $groupChat = $userGroupChats->first();
 
-    // Fetch the tasks for the current user
-    $tasks = Task::where('user_id', auth()->id())->get();
+        // Fetch messages for the group chat
+        $messages = $groupChat->messages ?? collect(); // Use null coalescing operator
 
-    return view('student.home', [
-        'groupChat' => $groupChat,
-        'messages' => $messages,
-        'members' => $groupChatUsers,
-        'tasks' => $tasks, // Include tasks in the view data
-    ]);
+        // Fetch users who are part of the group chat
+        $groupChatUsers = $groupChat->users ?? collect(); // Use null coalescing operator
 
-    // For debugging use
-    // $data = [
-    //     'members' => $groupChatUsers,
-    //     'userGroupChats' => $userGroupChats,
-    //     'groupChat' => $groupChat,
-    //     'messages' => $messages,
-    //     'tasks' => $tasks, // Add tasks to debug output
-    // ];
-    // return response()->json($data);
-    // dd($data);
-}
+        // Fetch the tasks for the current group chat
+        $tasks = Task::where('group_id', $groupChat->id)->get();
+
+        return view('student.home', [
+            'groupChat' => $groupChat,
+            'messages' => $messages,
+            'members' => $groupChatUsers,
+            'tasks' => $tasks, // Include tasks in the view data
+        ]);
+
+         // For debugging use
+        // $data = [
+        //     // 'members' => $groupChatUsers,
+        //     // 'userGroupChats' => $userGroupChats,
+        //     // 'groupChat' => $groupChat,
+        //     // 'messages' => $messages,
+        //     'tasks' => $tasks,
+        // ];
+        // return response()->json($data);
+        // dd($data);
+    }
+
 
 
     // Send message to group chat

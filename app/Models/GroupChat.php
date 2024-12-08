@@ -16,6 +16,7 @@ class Groupchat extends Model
     // Define fillable fields
     protected $fillable = [
         'name',            // Updated to match your previous code
+        'title',
         'section',         // Added field for group section
         'specialization',  // Added field for group specialization
         'adviser',         // Added field for group adviser
