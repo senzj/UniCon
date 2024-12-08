@@ -21,6 +21,7 @@ class TeacherController extends Controller
 {
 
     // teacher dashboard view
+    // teacher dashboard view
     public function index()
     {
         // Fetch all group chats for the current user
@@ -31,77 +32,37 @@ class TeacherController extends Controller
         // for debugging use
         // return response()->json($groupChats);
     }
-
-    // teacher dashboard view
-    // public function index()
-    // {
-    //     // Fetch all group chats for the current user
-    //     $groupChats = GetGroupChat::forCurrentUser();
-
-    //     // Check if there are any group chats
-    //     if ($groupChats->isNotEmpty()) {
-    //         // Get the first group chat by default
-    //         $firstGroupChat = $groupChats->first();
-
-    //         // Fetch messages for the first group chat
-    //         $messages = Message::where('group_id', $firstGroupChat->id)
-    //             ->with('user')
-    //             ->orderBy('created_at', 'asc')
-    //             ->get();
-
-    //         // Fetch members of the first group chat
-    //         $members = $firstGroupChat->members()->select(
-    //             'users.id', 
-    //             'users.picture', 
-    //             'users.first_name', 
-    //             'users.last_name', 
-    //             'users.email'
-    //         )->get();
-
-    //         return view('teacher.home', [
-    //             'groupChats' => $groupChats,
-    //             'groupChat' => $firstGroupChat,
-    //             'messages' => $messages,
-    //             'members' => $members
-    //         ]);
-    //     }
-
-    //     // If no group chats exist
-    //     return view('teacher.home', [
-    //         'groupChats' => $groupChats,
-    //         'groupChat' => null,
-    //         'messages' => collect(),
-    //         'members' => collect()
-    //     ]);
-    // }
     
 
     // creates groupchat
     public function createGroupChat(Request $request)
     {
+
         // Validate the request
         $request->validate([
-            'group_name' => 'required|string|max:255', // Ensure the group name is unique
-            'group_section' => 'required|string|max:255',
-            'group_specialization' => 'required|string|max:255',
-            'group_adviser' => 'required|string|max:255',
-            'group_logo' => 'image|mimes:jpeg,png,jpg,gif,svg', // File validation
+            'group_name' => 'required|string|max:255',
+            'group_title' => 'required|string|max:255',
             'term' => 'required|string|max:50', // Term validation
             'academic_year' => 'required|string|max:50', // Academic Year validation
             'mentoring_day' => 'required|string|max:20', // Mentoring Day validation
             'mentoring_time' => 'required|date_format:H:i', // Mentoring Time validation
+            'group_specialization' => 'required|string|max:255',
+            'group_section' => 'required|string|max:255',
+            'group_adviser' => 'required|string|max:255',
+            'group_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // File validation
         ]);
 
         // Get the validated data excluding the file
         $groupChatDetails = $request->only([
             'group_name', 
-            'group_section', 
-            'group_specialization', 
-            'group_adviser',
+            'group_title',
             'term',
             'academic_year',
             'mentoring_day',
-            'mentoring_time'
+            'mentoring_time',
+            'group_specialization', 
+            'group_section', 
+            'group_adviser',
         ]);
 
         // Handle the file upload
@@ -126,14 +87,15 @@ class TeacherController extends Controller
         // Prepare the data for the model
         $data = [
             'name' => $groupChatDetails['group_name'],
-            'section' => $groupChatDetails['group_section'],
-            'specialization' => $groupChatDetails['group_specialization'],
-            'adviser' => $groupChatDetails['group_adviser'],
-            'logo' => $groupChatDetails['group_logo_path'] ?? '', // Use null if not set
+            'title' => $groupChatDetails['group_title'],
             'term' => $groupChatDetails['term'],
             'academic_year' => $groupChatDetails['academic_year'],
             'mentoring_day' => $groupChatDetails['mentoring_day'],
             'mentoring_time' => $groupChatDetails['mentoring_time'],
+            'specialization' => $groupChatDetails['group_specialization'],
+            'section' => $groupChatDetails['group_section'],
+            'adviser' => $groupChatDetails['group_adviser'],
+            'logo' => $groupChatDetails['group_logo_path'] ?? '', // If no logo, set to empty string (default_logo.png)
         ];
 
         // Pass the data to the model
@@ -153,7 +115,7 @@ class TeacherController extends Controller
         return back()->with('success', 'Group chat created successfully!');
 
         // for debugging use
-        // return response()->json($request);
+        // return response()->json($groupChatDetails);
         // dd($data);
     }
 
@@ -178,7 +140,7 @@ class TeacherController extends Controller
         $groupChats = $user->groupChats; // This should now return the user's group chats
 
         // Fetch all members of the selected group chat
-        $members = $groupChat->members()->select('users.id', 'users.picture', 'users.first_name', 'users.last_name', 'users.email')->get();
+        $members = $groupChat->members()->get();
 
         // Logging for debugging
         Log::info('Group Chat ID: ' . $groupChatId);
@@ -194,10 +156,9 @@ class TeacherController extends Controller
         ]);
 
         // $data = [
-        //     // 'groupChat' => $groupChat,
-        //     // 'messages' => $messages,
-        //     // 'groupChats' => $groupChats,
-        //     // 'members' => $members,
+        //     'groupChat' => $groupChat,
+        //     'messages' => $messages,
+        //     'members' => $members,
         // ];
 
         // return response()->json($data);

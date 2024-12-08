@@ -318,7 +318,7 @@
                         <p class="mb-1"><strong>Term:</strong> {{ $groupChat->term }}</p>
                         <p class="mb-1"><strong>Academic Year:</strong> {{ $groupChat->academic_year }}</p>
                         <p class="mb-1"><strong>Mentoring Day:</strong> {{ $groupChat->mentoring_day }}</p>
-                        <p class="mb-1"><strong>Mentoring Time:</strong> {{ \Carbon\Carbon::createFromFormat('H:i:s', $groupChat->mentoring_time)->format('h:i A') }}</p>
+                        <p class="mb-1"><strong>Mentoring Time:</strong> {{  $groupChat->mentoring_time }}</p>
                     @endif
                 </div>
                 <div class="card-body">

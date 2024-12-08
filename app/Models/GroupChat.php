@@ -36,7 +36,7 @@ class Groupchat extends Model
             'user_id', 
             'groupchat_id'
         )
-        ->withPivot(['role', 'joined_at'])
+        // ->withPivot(['role', 'joined_at'])
         ->withTimestamps();
     }
 
