@@ -24,25 +24,11 @@ class StudentController extends Controller
         // fetch user who are part of the group chat
         $groupChatUsers = $groupChat ? $groupChat->users : collect();
 
-        // Fetch the task progress for the group chat
-        $task = $groupChat->task; // Use the relationship instead of querying directly
-
-        // Prepare progress data
-        $progresses = [
-            'chapter1' => $task ? $task->chapter1 : 0,
-            'chapter2' => $task ? $task->chapter2 : 0,
-            'chapter3' => $task ? $task->chapter3 : 0,
-            'chapter4' => $task ? $task->chapter4 : 0,
-            'chapter5' => $task ? $task->chapter5 : 0,
-            'chapter6' => $task ? $task->chapter6 : 0,
-        ];
-
         return view('student.home', [
             // 'userGroupChats' => $userGroupChats,
             'groupChat' => $groupChat,
             'messages' => $messages,
             'members' => $groupChatUsers,
-            'progress' => $progresses,
         ]);
 
         // // for debugging use
@@ -106,11 +92,11 @@ class StudentController extends Controller
         }
 
         // for debugging use
-        $data = [
-            'message' => $message,
-            // 'request' => $request,
-            // 'validated' => $validated,
-        ];
-        return response()->json($data);
+        // $data = [
+        //     'message' => $message,
+        //     // 'request' => $request,
+        //     // 'validated' => $validated,
+        // ];
+        // return response()->json($data);
     }
 }

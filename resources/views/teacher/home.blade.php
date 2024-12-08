@@ -64,56 +64,6 @@
         </div>
     </div>
 
-    <!-- Modal for grade task -->
-    {{-- <div class="modal fade" id="gradingModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="gradingModalLabel">Grade Task</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="gradingForm">
-                        <div class="mb-3">
-                            <label for="chapter1" class="form-label">Chapter 1: Introduction</label>
-                            <span id="chapter1Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter1" min="0" max="100" value="0" oninput="updateScore('chapter1Score', this.value, '1')">
-                        </div>
-                        <div class="mb-3">
-                            <label for="chapter2" class="form-label">Chapter 2: Review of Related Literature</label>
-                            <span id="chapter2Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter2" min="0" max="100" value="0" oninput="updateScore('chapter2Score', this.value, '2')">
-                        </div>
-                        <div class="mb-3">
-                            <label for="chapter3" class="form-label">Chapter 3: Methodology</label>
-                            <span id="chapter3Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter3" min="0" max="100" value="0" oninput="updateScore('chapter3Score', this.value, '3')">
-                        </div>
-                        <div class="mb-3">
-                            <label for="chapter4" class="form-label">Chapter 4: Results and Discussion</label>
-                            <span id="chapter4Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter4" min="0" max="100" value="0" oninput="updateScore('chapter4Score', this.value, '4')">
-                        </div>
-                        <div class="mb-3">
-                            <label for="chapter5" class="form-label">Chapter 5: Conclusion</label>
-                            <span id="chapter5Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter5" min="0" max="100" value="0" oninput="updateScore('chapter5Score', this.value, '5')">
-                        </div>
-                        <div class="mb-3">
-                            <label for="chapter6" class="form-label">Chapter 6: Recommendation</label>
-                            <span id="chapter6Score" style="margin-left: 1rem; font-weight:bold;">0%</span>
-                            <input type="range" class="form-range" id="chapter6" min="0" max="100" value="0" oninput="updateScore('chapter6Score', this.value, '6')">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Submit Progress</button>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
     <!-- Modal for progress report -->
     <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -258,11 +208,6 @@
                                                 class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
                                                     <i class=""></i> Download
                                                 </a>
-
-                                                {{-- grade task button --}}
-                                                {{-- <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#gradingModal" style="margin-bottom:1rem">
-                                                    Grade
-                                                </button> --}}
 
                                                 {{-- check progress report --}}
                                                 <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">

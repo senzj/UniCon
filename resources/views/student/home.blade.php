@@ -198,12 +198,26 @@
                 <div class="card-body">
                     {{-- group picture --}}
                     <div class="avatar bg-secondary rounded-circle mx-auto mb-3" style="width: 100px; height: 100px;">
-                        <img src="{{ asset('storage/group_logos/' . basename($groupChat->logo)) }}" 
-                             alt="{{ $groupChat->name }}" 
-                             class="w-100 h-100 rounded-circle" 
-                             style="object-fit: cover;">
+                        @if ($groupChat && $groupChat->group_logo)
+
+                            <img src="{{ asset('storage/group_logos/' . basename($groupChat->group_logo)) }}" 
+                                alt="{{ $groupChat->name }}" 
+                                class="w-100 h-100 rounded-circle" 
+                                style="object-fit: cover;">
+                        @else
+
+                            <img src="{{ asset('storage/group_logos/default_logo.png') }}" 
+                                alt="{{ $groupChat->name ?? 'Default Group Name' }}" 
+                                class="w-100 h-100 rounded-circle" 
+                                style="object-fit: cover;">
+
+                        @endif
                     </div>
-                    <small>{{ $groupChat->name }}</small>
+                    @if ($groupChat && $groupChat->name)
+                        <small>{{ $groupChat->name }}</small>
+                    @else
+                        <small>No Group Selected</small>
+                    @endif
 
                     {{-- group progress --}}
                     <h5>Overall Progress:</h5>
@@ -254,7 +268,7 @@
                     <div class="card">
                         <div class="card-header" id="chaptersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#chaptersAccordion" aria-expanded="false" aria-controls="chaptersAccordion" style="cursor: pointer;">
                             <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                Chapter Progress
+                                Weekly Progress
                                 <i class="fas fa-chevron-down toggle-icon"></i>
                             </h5>
                         </div>
@@ -264,7 +278,7 @@
                             <div class="card-body">
                                 @for ($i = 1; $i <= 6; $i++)
                                     <div class="mb-4">
-                                        <h5>Chapter {{ $i }}</h5>
+                                        <h5>Week {{ $i }}</h5>
                                         <div class="progress">
                                             <div 
                                                 class="progress-bar" 
