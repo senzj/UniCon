@@ -144,20 +144,24 @@
                 <div class="card-body">
                     <ul class="list-group">
                         @if($groupChats && $groupChats->count() > 0)
+
                             @foreach ($groupChats as $group)
                             <li class="list-group-item d-flex align-items-center list-group-logo
-                                        {{ request()->route('id') == $group->id ? 'active' : '' }}"
+                                {{ request()->route('id') == $group->id ? 'active' : '' }}"
                                 onclick="window.location.href='{{ route('get.message', ['id' => $group->id]) }}'">
+
                                 @if($group->logo)
                                     <img src="{{ asset('storage/group_logos/' . basename($group->logo)) }}" 
                                         alt="{{ $group->name }} logo" 
                                         class="mr-3 group-lists-img">
                                 @endif
+
                                 <span class="group-lists {{ request()->route('id') == $group->id ? 'text-white' : '' }}">
                                     {{ $group->name }}
                                 </span>
                             </li>
                             @endforeach
+
                         @else
                             <li class="list-group-item">No group chats available.</li>
                         @endif
@@ -192,13 +196,16 @@
                                 {{-- if message is from the user --}}
                                 @if($message->user_id == Auth::id())
                                     <div class="d-flex flex-column align-items-end w-100">
+
                                         <div class="d-flex align-items-center justify-content-end mb-1 w-100">
                                             <strong class="mr-2" style="margin-right: 0.5rem">{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
+                                            
                                             <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
                                                 alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
                                                 class="rounded-circle message-profile" 
                                                 style="width: 40px; height: 40px; object-fit: cover;">
                                         </div>
+
                                         <div class="d-flex justify-content-end w-100 mb-1">
                                             <p class="text-right" style="margin-right: 3.5rem">{{ $message->message }}</p>
                                         </div>
@@ -220,7 +227,7 @@
                                         @endif
                                     
                                         <div class="d-flex justify-content-end w-100">
-                                            <small class="text-muted">
+                                            <small class="text-white">
                                                 {{ $message->created_at->format('F d, Y h:i A') }}
                                             </small>
                                         </div>
@@ -308,54 +315,63 @@
         @if (request()->segment(3)) <!-- Check if the third segment (group chat ID) is present -->
         <div class="col-md-3">
             <div class="card mb-4">
-                <!-- Group Chat Details -->
-                <div class="card-header">
-                    <h4>{{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
-                    @if(isset($groupChat))
-                        <p class="mb-1"><strong>Section:</strong> {{ $groupChat->section }}</p>
-                        <p class="mb-1"><strong>Specialization:</strong> {{ $groupChat->specialization }}</p>
-                        <p class="mb-1"><strong>Adviser:</strong> {{ $groupChat->adviser }}</p>
-                        <p class="mb-1"><strong>Term:</strong> {{ $groupChat->term }}</p>
-                        <p class="mb-1"><strong>Academic Year:</strong> {{ $groupChat->academic_year }}</p>
-                        <p class="mb-1"><strong>Mentoring Day:</strong> {{ $groupChat->mentoring_day }}</p>
-                        <p class="mb-1"><strong>Mentoring Time:</strong> {{  $groupChat->mentoring_time }}</p>
-                    @endif
-                </div>
-                <div class="card-body">
-                    <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
-                        <input type="email" id="email" placeholder="Enter student email" required>
-                        <button type="submit">Add</button>
-                    </form>
-    
-                    <h5>Overall Progress:</h5>
-                    <div class="progress mb-3">
-                        <div 
-                            class="progress-bar bg-success" 
-                            id="overallProgressBar" 
-                            role="progressbar" 
-                            style="width: 0%;" 
-                            aria-valuenow="0" 
-                            aria-valuemin="0" 
-                            aria-valuemax="100">
-                            0%
-                        </div>
+                <!-- Group Chat header -->
+                <div class="card mb-4">
+                    <div class="card-header" id="groupChatDetailsHeading" role="button" data-bs-toggle="collapse" data-bs-target="#groupChatDetails" aria-expanded="false" aria-controls="groupChatDetails" style="cursor: pointer;">
+                        <h4>{{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
                     </div>
-    
-                    <!-- Chapters Accordion -->
+                
+                
+                    @if(isset($groupChat))
+                        <div id="groupChatDetails" class="collapse" aria-labelledby="groupChatDetailsHeading">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Section:</strong> {{ $groupChat->section }}</p>
+                                <p class="mb-1"><strong>Specialization:</strong> {{ $groupChat->specialization }}</p>
+                                <p class="mb-1"><strong>Adviser:</strong> {{ $groupChat->adviser }}</p>
+                                <p class="mb-1"><strong>Term:</strong> {{ $groupChat->term }}</p>
+                                <p class="mb-1"><strong>Academic Year:</strong> {{ $groupChat->academic_year }}</p>
+                                <p class="mb-1"><strong>Mentoring Day:</strong> {{ $groupChat->mentoring_day }}</p>
+                                <p class="mb-1"><strong>Mentoring Time:</strong> {{ $groupChat->mentoring_time }}</p>
+                            </div>
+                        </div>
+                    @endif
+                
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Report Progress -->
                     <div class="card">
                         <div class="card-header" id="chaptersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#chaptersAccordion" aria-expanded="false" aria-controls="chaptersAccordion" style="cursor: pointer;">
                             <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                Chapter Progress
+                                Report Progress
                                 <i class="fas fa-chevron-down toggle-icon"></i>
                             </h5>
                         </div>
-    
-                        {{-- chapter progress --}}
+
+                        <!-- Over all Progress Bar -->
+                        <center>
+                            <h5>Overall Progress:</h5>
+                            <div class="progress mb-3">
+                                <div 
+                                    class="progress-bar bg-success" 
+                                    id="overallProgressBar" 
+                                    role="progressbar" 
+                                    style="width: 0%;" 
+                                    aria-valuenow="0" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                    0%
+                                </div>
+                            </div>
+                        </center>
+
+                        <!-- chapter progress -->
                         <div id="chaptersAccordion" class="collapse" aria-labelledby="chaptersHeading">
-                            <div class="card-body">
-                                @for ($i = 1; $i <= 6; $i++)
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                @for ($i = 1; $i <= 15; $i++)
                                     <div class="mb-4">
-                                        <h5>Chapter {{ $i }}</h5>
+                                        <h5>Week {{ $i }}</h5>
                                         <div class="progress">
                                             <div 
                                                 class="progress-bar" 
@@ -372,24 +388,35 @@
                                 @endfor
                             </div>
                         </div>
-
                     </div>
     
-                    <h5>Members:</h5>
-                    <div class="card">
+                    <!-- Members section -->
+                    <div class="card mb-4" style="margin-top: 1rem;">
+                        <!-- Members Header -->
                         <div class="card-header" id="membersHeading" role="button" data-bs-toggle="collapse" data-bs-target="#membersList" aria-expanded="false" aria-controls="membersList" style="cursor: pointer;">
                             <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                Members ({{ isset($members) ? $members->count() : 0 }})
+                                Members: ({{ isset($members) ? $members->count() : 0 }})
                                 <i class="fas fa-chevron-down toggle-icon"></i>
                             </h5>
                         </div>
-    
+
+                        <!-- Add member -->
+                        <div class="card-body">
+                            <form id="add-member-form" onsubmit="event.preventDefault(); addMember();">
+                                <div class="input-group mb-3">
+                                    <input type="email" id="email" class="form-control" placeholder="Enter student email" required>
+                                    <button type="submit" class="btn btn-success">Add</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Members List -->
                         <div id="membersList" class="collapse" aria-labelledby="membersHeading">
                             <div class="card-body">
                                 @if(isset($members) && $members->count() > 0)
                                     <ul class="list-group">
                                         @foreach ($members as $member)
-                                            <li class="list-group-item d-flex align-items-center list-group-memebers">
+                                            <li class="list-group-item d-flex align-items-center list-group-members">
                                                 <img 
                                                     src="{{ asset('storage/profile/' . $member->picture) }}" 
                                                     alt="{{ $member->first_name .' ' . $member->last_name }}" 
@@ -399,9 +426,9 @@
                                                 <div class="d-flex flex-column align-items-start">
                                                     <h6 class="mb-1">{{ $member->first_name . ' ' . $member->last_name }}</h6>
                                                     <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{ $member->email }}" 
-                                                       class="text-muted small text-decoration-none" 
-                                                       title="Send email to {{ $member->first_name }}"
-                                                       target="_blank">
+                                                    class="text-muted small text-decoration-none" 
+                                                    title="Send email to {{ $member->first_name }}"
+                                                    target="_blank">
                                                         {{ $member->email }}
                                                         <i class="fas fa-envelope ms-2 text-primary" style="font-size: 0.8rem;"></i>
                                                     </a>
@@ -415,6 +442,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

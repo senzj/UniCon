@@ -52,7 +52,7 @@ class StudentController extends Controller
             'tasks' => $tasks, // Include tasks in the view data
         ]);
 
-         // For debugging use
+        // For debugging use
         // $data = [
         //     // 'members' => $groupChatUsers,
         //     // 'userGroupChats' => $userGroupChats,
