@@ -65,11 +65,5 @@ class Groupchat extends Model
     {
         return $this->hasMany(Message::class, 'group_id');
     }
-
-    // Add relationship with task
-    public function task()
-    {
-        return $this->hasOne(Task::class, 'group_id');
-    }
     
 }

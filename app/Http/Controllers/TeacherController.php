@@ -7,7 +7,6 @@ use App\Models\Submission;
 use App\Models\GetGroupChat;
 use App\Models\Message;
 use App\Models\User;
-use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -147,7 +146,7 @@ class TeacherController extends Controller
         Log::info('Group Chat ID: ' . $groupChatId);
 
         // Fetch the specific group chat to ensure it exists
-        $groupChat = Groupchat::with('task')->findOrFail($groupChatId);
+        $groupChat = Groupchat::findOrFail($groupChatId);
         Log::info('Group Chat: ' . $groupChat);
 
         // Fetch messages for the specific group chat
@@ -164,19 +163,6 @@ class TeacherController extends Controller
         // Fetch all members of the selected group chat
         $members = $groupChat->members()->select('users.id', 'users.picture', 'users.first_name', 'users.last_name', 'users.email')->get();
 
-        // Fetch the task progress for the group chat
-        $task = $groupChat->task; // Use the relationship instead of querying directly
-
-        // Prepare progress data
-        $progresses = [
-            'chapter1' => $task ? $task->chapter1 : 0,
-            'chapter2' => $task ? $task->chapter2 : 0,
-            'chapter3' => $task ? $task->chapter3 : 0,
-            'chapter4' => $task ? $task->chapter4 : 0,
-            'chapter5' => $task ? $task->chapter5 : 0,
-            'chapter6' => $task ? $task->chapter6 : 0,
-        ];
-
         // Logging for debugging
         Log::info('Group Chat ID: ' . $groupChatId);
         Log::info('Messages count: ' . $messages->count());
@@ -188,7 +174,6 @@ class TeacherController extends Controller
             'messages' => $messages,
             'groupChats' => $groupChats, // Pass all group chats
             'members' => $members,
-            'progress' => $progresses // Pass the progress data
         ]);
 
         // $data = [
@@ -196,7 +181,6 @@ class TeacherController extends Controller
         //     // 'messages' => $messages,
         //     // 'groupChats' => $groupChats,
         //     // 'members' => $members,
-        //     'progress' => $progresses
         // ];
 
         // return response()->json($data);
@@ -305,35 +289,7 @@ class TeacherController extends Controller
 
         // return response()->json($data);
     }
-    
-    // add grade for progress
-    public function grade(Request $request, $groupId)
-    {
-        // Validate incoming request
-        $validated = $request->validate([
-            'chapter1' => 'required|numeric',
-            'chapter2' => 'required|numeric',
-            'chapter3' => 'required|numeric',
-            'chapter4' => 'required|numeric',
-            'chapter5' => 'required|numeric',
-            'chapter6' => 'required|numeric',
-        ]);
 
-        // Find or create the task for the group
-        $task = Task::firstOrCreate(['group_id' => $groupId]);
-
-        // Update each chapter directly
-        $task->update([
-            'chapter1' => $validated['chapter1'],
-            'chapter2' => $validated['chapter2'],
-            'chapter3' => $validated['chapter3'],
-            'chapter4' => $validated['chapter4'],
-            'chapter5' => $validated['chapter5'],
-            'chapter6' => $validated['chapter6'],
-        ]);
-
-        return response()->json(['message' => 'Grades submitted successfully!']);
-    }
 
 
 }
