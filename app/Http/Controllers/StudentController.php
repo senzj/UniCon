@@ -57,8 +57,8 @@ class StudentController extends Controller
         //     // 'members' => $groupChatUsers,
         //     // 'userGroupChats' => $userGroupChats,
         //     // 'groupChat' => $groupChat,
-        //     // 'messages' => $messages,
-        //     'tasks' => $tasks,
+        //     'messages' => $messages,
+        //     // 'tasks' => $tasks,
         // ];
         // return response()->json($data);
         // dd($data);
@@ -69,13 +69,16 @@ class StudentController extends Controller
     // Send message to group chat
     public function sendMessage(Request $request, $groupId)
     {
+
         // Validate the incoming request
         $validated = $request->validate([
-            'message' => 'required|string|max:500',
-            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240'
+            'message' => 'nullable|string',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx',
+
         ]);
 
         try {
+
             // Find the group chat
             $groupChat = GroupChat::findOrFail($groupId);
 
@@ -102,11 +105,12 @@ class StudentController extends Controller
             $message = Message::create([
                 'group_id' => $groupChat->id,
                 'user_id' => Auth::id(),
-                'message' => $validated['message'],
+                'message' => $validated['message'] ?? null, // Set to null if not provided
                 'file_path' => $filePath, // Store the file path in the database
             ]);
 
             return redirect()->back()->with('success', 'Message sent successfully!');
+
         } catch (\Exception $e) {
             // Log the error
             Log::error('Message sending failed: ' . $e->getMessage());
@@ -116,10 +120,12 @@ class StudentController extends Controller
 
         // for debugging use
         // $data = [
-        //     'message' => $message,
-        //     // 'request' => $request,
-        //     // 'validated' => $validated,
+        // 'message' => $message,
+        // 'request' => $request->all(),
+        //     'validated' => $validated,
         // ];
+        
         // return response()->json($data);
+
     }
 }

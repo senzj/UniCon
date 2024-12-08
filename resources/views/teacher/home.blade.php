@@ -193,7 +193,7 @@
                                 {{ $message->user_id == Auth::id() ? 'bg-primary text-white sender-message' : 'bg-light receiver-message' }} 
                                 p-2 rounded">
 
-                                {{-- if message is from the user --}}
+                                {{-- if message is sent from the current user --}}
                                 @if($message->user_id == Auth::id())
                                     <div class="d-flex flex-column align-items-end w-100">
 
@@ -233,7 +233,7 @@
                                         </div>
                                     </div>
 
-                                {{-- if message is from other users --}}
+                                {{-- if message is sent from other users --}}
                                 @else
                                     <div class="flex flex-col items-start">
                                         <div class="flex items-center mb-1">
@@ -289,7 +289,7 @@
                             @csrf
                             <input type="hidden" name="group_id" value="{{ request()->segment(3) }}">
                             <div class="input-group">
-                                <input type="text" name="content" class="form-control" placeholder="Type your message..." required>
+                                <input type="text" name="content" class="form-control" placeholder="Type your message...">
                                 
                                 <!-- Hidden File Upload Input -->
                                 <input type="file" name="file" id="file-upload" class="d-none" accept="image/*,application/pdf" onchange="updateFileName()">
