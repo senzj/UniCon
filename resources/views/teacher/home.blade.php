@@ -28,16 +28,22 @@
                             <label for="groupName" class="form-label">Group Name</label>
                             <input type="text" class="form-control" id="groupName" name="group_name" required>
                         </div>
+
+                        <!-- Group Project Title -->
+                        <div class="mb-3">
+                            <label for="groupTitle" class="form-label">Project Title</label>
+                            <input type="text" class="form-control" id="groupTtile" name="group_title" required>
+                        </div>
                 
                         <!-- Group Section -->
                         <div class="mb-3">
-                            <label for="groupSection" class="form-label">Group Section</label>
+                            <label for="groupSection" class="form-label">Section</label>
                             <input type="text" class="form-control" id="groupSection" name="group_section" required>
                         </div>
                 
                         <!-- Group Specialization -->
                         <div class="mb-3">
-                            <label for="groupSpecialization" class="form-label">Group Specialization</label>
+                            <label for="groupSpecialization" class="form-label">Specialization</label>
                             <input type="text" class="form-control" id="groupSpecialization" name="group_specialization" required>
                         </div>
                 
@@ -160,7 +166,8 @@
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h4>{{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+                    <h4>Group: {{ isset($groupChat) ? $groupChat->name : 'No group selected' }}</h4>
+                    <small>Title: {{ isset($groupChat) ? $groupChat->title : '' }}</small>
                 </div>
 
                 <div class="card-body chat-body" style="height: 400px; overflow-y: auto;">
