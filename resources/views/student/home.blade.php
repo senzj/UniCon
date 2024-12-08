@@ -10,57 +10,96 @@
     </header>
 
     <!-- Progress report modal form -->
+    <!-- Progress report modal form -->
     <div class="modal fade" id="createReportModal" tabindex="-1" aria-labelledby="createReportModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="createReportModalLabel">Create Progress Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <form action="#" method="POST" enctype="multipart/form-data" data-ajax="false">
+    
+                <form action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <!-- Group Name -->
-                        <div class="mb-3">
-                            <label for="groupName" class="form-label">Group Name</label>
-                            <input type="text" class="form-control" id="groupName" name="group_name" required>
+                        <!-- Basic Report Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="groupName" class="form-label">Group Name</label>
+                                <input type="text" class="form-control" id="groupName" name="group_name" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="reportingDate" class="form-label">Reporting Date</label>
+                                <input type="date" class="form-control" id="reportingDate" name="reporting_date" required>
+                            </div>
                         </div>
-                
-                        <!-- Group Section -->
-                        <div class="mb-3">
-                            <label for="groupSection" class="form-label">Group Section</label>
-                            <input type="text" class="form-control" id="groupSection" name="group_section" required>
+    
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="reportingWeek" class="form-label">Reporting Week</label>
+                                <select class="form-select" id="reportingWeek" name="reporting_week" required>
+                                    <option value="">Select Week</option>
+                                    <option value="1">Week 1</option>
+                                    <option value="2">Week 2</option>
+                                    <option value="3">Week 3</option>
+                                    <option value="4">Week 4</option>
+                                    <option value="5">Week 5</option>
+                                    <option value="6">Week 6</option>
+                                    <option value="7">Week 7</option>
+                                    <option value="8">Week 8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="projectTitle" class="form-label">Project Title</label>
+                                <input type="text" class="form-control" id="projectTitle" name="project_title" required>
+                            </div>
                         </div>
-                
-                        <!-- Group Specialization -->
-                        <div class="mb-3">
-                            <label for="groupSpecialization" class="form-label">Group Specialization</label>
-                            <input type="text" class="form-control" id="groupSpecialization" name="group_specialization" required>
-                        </div>
-                
-                        <!-- Group Adviser -->
-                        <div class="mb-3">
-                            <label for="groupAdviser" class="form-label">Group Adviser</label>
-                            <input type="text" class="form-control" id="groupAdviser" name="group_adviser" required>
-                        </div>
-                
-                        <!-- Group Logo -->
-                        <div class="mb-3">
-                            <label for="groupLogo" class="form-label">Group Logo</label>
-                            <input type="file" class="form-control" id="groupLogo" name="group_logo" accept="image/*" required>
-                        </div>
-                        
+    
+                        <!-- Chapters and Activities -->
+                        <h5 class="mt-4 mb-3">Chapter Activities</h5>
+                        @for ($i = 1; $i <= 6; $i++)
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6>Day {{ $i }} Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="chapter{{ $i }}Date" class="form-label">Date</label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="chapter{{ $i }}Date" 
+                                                   name="chapter_{{ $i }}_date">
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3">
+                                            <label for="chapter{{ $i }}Activity" class="form-label">Activities</label>
+                                            <textarea 
+                                                class="form-control" 
+                                                id="chapter{{ $i }}Activity" 
+                                                name="chapter_{{ $i }}_activities" 
+                                                rows="3" 
+                                                placeholder="Describe activities for Day {{ $i }}"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endfor
                     </div>
+                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit Report</button>
+                        <button type="submit" class="btn btn-primary">Submit Progress Report</button>
                     </div>
                 </form>
-                
             </div>
         </div>
     </div>
+
+
+
 
     <div class="row">
         <!-- Middle Section: Messages -->

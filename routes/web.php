@@ -123,6 +123,7 @@ Route::get('/download/file/{filename}', [FileDownloadController::class, 'downloa
 
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 
+Route::post('/tasks/store', [TaskController::class, 'store'])->name('tasks.store');
 //file upload page
 // Route::get('/upload',[FileController::class,'showUpload'])->name('upload')->middleware('auth');
 // Route::post('/upload',[FileController::class,'upload'])->name('upload@post')->middleware('auth');
