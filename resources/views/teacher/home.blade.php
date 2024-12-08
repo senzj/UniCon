@@ -46,6 +46,38 @@
                             <label for="groupAdviser" class="form-label">Group Adviser</label>
                             <input type="text" class="form-control" id="groupAdviser" name="group_adviser" required>
                         </div>
+
+                        <!-- Term -->
+                        <div class="mb-3">
+                            <label for="term" class="form-label">Term</label>
+                            <input type="text" class="form-control" id="term" name="term" required>
+                        </div>
+
+                        <!-- Academic Year -->
+                        <div class="mb-3">
+                            <label for="academicYear" class="form-label">Academic Year</label>
+                            <input type="text" class="form-control" id="academicYear" name="academic_year" required>
+                        </div>
+
+                        <!-- Mentoring Day -->
+                        <div class="mb-3">
+                            <label for="mentoringDay" class="form-label">Mentoring Day</label>
+                            <select class="form-select" id="mentoringDay" name="mentoring_day" required>
+                                <option value="" disabled selected>Select a day</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                        </div>
+
+                        <!-- Mentoring Time -->
+                        <div class="mb-3">
+                            <label for="mentoringTime" class="form-label">Mentoring Time</label>
+                            <input type="time" class="form-control" id="mentoringTime" name="mentoring_time" required>
+                        </div>
                 
                         <!-- Group Logo -->
                         <div class="mb-3">

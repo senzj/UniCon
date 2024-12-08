@@ -20,6 +20,10 @@ class Groupchat extends Model
         'specialization',  // Added field for group specialization
         'adviser',         // Added field for group adviser
         'logo',       // Added field for logo path
+        'term',
+        'academic_year',
+        'mentoring_day',
+        'mentoring_time',
     ];
 
     // get the group members

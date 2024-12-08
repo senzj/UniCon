@@ -78,67 +78,84 @@ class TeacherController extends Controller
 
     // creates groupchat
     public function createGroupChat(Request $request)
-    {
-        // Validate the request
-        $request->validate([
-            'group_name' => 'required|string|max:255', // Ensure the group name is unique
-            'group_section' => 'required|string|max:255',
-            'group_specialization' => 'required|string|max:255',
-            'group_adviser' => 'required|string|max:255',
-            'group_logo' => 'image|mimes:jpeg,png,jpg,gif,svg', // File validation
-        ]);
+{
+    // Validate the request
+    $request->validate([
+        'group_name' => 'required|string|max:255', // Ensure the group name is unique
+        'group_section' => 'required|string|max:255',
+        'group_specialization' => 'required|string|max:255',
+        'group_adviser' => 'required|string|max:255',
+        'group_logo' => 'image|mimes:jpeg,png,jpg,gif,svg', // File validation
+        'term' => 'required|string|max:50', // Term validation
+        'academic_year' => 'required|string|max:50', // Academic Year validation
+        'mentoring_day' => 'required|string|max:20', // Mentoring Day validation
+        'mentoring_time' => 'required|date_format:H:i', // Mentoring Time validation
+    ]);
 
-        // Get the validated data excluding the file
-        $groupChatDetails = $request->only(['group_name', 'group_section', 'group_specialization', 'group_adviser']);
+    // Get the validated data excluding the file
+    $groupChatDetails = $request->only([
+        'group_name', 
+        'group_section', 
+        'group_specialization', 
+        'group_adviser',
+        'term',
+        'academic_year',
+        'mentoring_day',
+        'mentoring_time'
+    ]);
 
-        // Handle the file upload
-        // Initialize group_logo_path to null
-        $groupChatDetails['group_logo_path'] = null;
+    // Handle the file upload
+    // Initialize group_logo_path to null
+    $groupChatDetails['group_logo_path'] = null;
 
-        // Handle the file upload
-        if ($request->hasFile('group_logo') && $request->file('group_logo')->isValid()) {
-            // Get the file extension
-            $fileExtension = $request->file('group_logo')->getClientOriginalExtension();
+    // Handle the file upload
+    if ($request->hasFile('group_logo') && $request->file('group_logo')->isValid()) {
+        // Get the file extension
+        $fileExtension = $request->file('group_logo')->getClientOriginalExtension();
 
-            // Create a custom filename based on group name
-            $fileName = strtolower(str_replace(' ', '_', $groupChatDetails['group_name'])) . '_logo.' . $fileExtension;
+        // Create a custom filename based on group name
+        $fileName = strtolower(str_replace(' ', '_', $groupChatDetails['group_name'])) . '_logo.' . $fileExtension;
 
-            // Store the file in the public folder (adjust path as needed)
-            $filePath = $request->file('group_logo')->storeAs('group_logos', $fileName, 'public');
+        // Store the file in the public folder (adjust path as needed)
+        $filePath = $request->file('group_logo')->storeAs('group_logos', $fileName, 'public');
 
-            // Add the file path to the group chat details
-            $groupChatDetails['group_logo_path'] = $filePath; // Store the path for later use
-        }
-
-        // Prepare the data for the model
-        $data = [
-            'name' => $groupChatDetails['group_name'],
-            'section' => $groupChatDetails['group_section'],
-            'specialization' => $groupChatDetails['group_specialization'],
-            'adviser' => $groupChatDetails['group_adviser'],
-            'logo' => $groupChatDetails['group_logo_path'] ?? '' // Use null if not set
-        ];
-
-        // Pass the data to the model
-        $groupChatModel = Groupchat::create($data);
-
-        // get user id
-        if (Auth::check()) {
-            $userId = Auth::id();
-        } else {
-            return response()->json(['error' => 'Not authenticated'], 401);
-        }
-
-        // Attach the user as the first member of the group chat
-        $groupChatModel->members()->attach($userId); // Use $groupChatModel instead of $groupChat
-
-        // Return a response (you can customize this as needed)
-        return back()->with('success', 'Group chat created successfully!');
-
-        // for debugging use
-        // return response()->json($request);
-        // dd($data);
+        // Add the file path to the group chat details
+        $groupChatDetails['group_logo_path'] = $filePath; // Store the path for later use
     }
+
+    // Prepare the data for the model
+    $data = [
+        'name' => $groupChatDetails['group_name'],
+        'section' => $groupChatDetails['group_section'],
+        'specialization' => $groupChatDetails['group_specialization'],
+        'adviser' => $groupChatDetails['group_adviser'],
+        'logo' => $groupChatDetails['group_logo_path'] ?? '', // Use null if not set
+        'term' => $groupChatDetails['term'],
+        'academic_year' => $groupChatDetails['academic_year'],
+        'mentoring_day' => $groupChatDetails['mentoring_day'],
+        'mentoring_time' => $groupChatDetails['mentoring_time'],
+    ];
+
+    // Pass the data to the model
+    $groupChatModel = Groupchat::create($data);
+
+    // get user id
+    if (Auth::check()) {
+        $userId = Auth::id();
+    } else {
+        return response()->json(['error' => 'Not authenticated'], 401);
+    }
+
+    // Attach the user as the first member of the group chat
+    $groupChatModel->members()->attach($userId); // Use $groupChatModel instead of $groupChat
+
+    // Return a response (you can customize this as needed)
+    return back()->with('success', 'Group chat created successfully!');
+
+    // for debugging use
+    // return response()->json($request);
+    // dd($data);
+}
 
     // fetch messages for a group chat
     public function getMessage($groupChatId)
