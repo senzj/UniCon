@@ -7,41 +7,46 @@ use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Groupchat;
 use Illuminate\Support\Facades\Log;
+use App\Models\Task;
 
 class StudentController extends Controller
 {
     public function index()
-    {
-        // Get the group chat(s) the current user belongs to
-        $userGroupChats = Auth::user()->groupChats;
+{
+    // Get the group chat(s) the current user belongs to
+    $userGroupChats = Auth::user()->groupChats;
 
-        // Or if you prefer to get the first group chat
-        $groupChat = Auth::user()->groupChats->first();
+    // Or if you prefer to get the first group chat
+    $groupChat = Auth::user()->groupChats->first();
 
-        // Fetch messages for the group chat
-        $messages = $groupChat ? $groupChat->messages : collect();
+    // Fetch messages for the group chat
+    $messages = $groupChat ? $groupChat->messages : collect();
 
-        // fetch user who are part of the group chat
-        $groupChatUsers = $groupChat ? $groupChat->users : collect();
+    // Fetch users who are part of the group chat
+    $groupChatUsers = $groupChat ? $groupChat->users : collect();
 
-        return view('student.home', [
-            // 'userGroupChats' => $userGroupChats,
-            'groupChat' => $groupChat,
-            'messages' => $messages,
-            'members' => $groupChatUsers,
-        ]);
+    // Fetch the tasks for the current user
+    $tasks = Task::where('user_id', auth()->id())->get();
 
-        // // for debugging use
-        // $data = [
-        //     'members' => $groupChatUsers,
-        //     'userGroupChats' => $userGroupChats,
-        //     'groupChat' => $groupChat,
-        //     'messages' => $messages,
-        //     'progress' => $progresses,
-        // ];
-        // return response()->json($data);
-        // dd($data);
-    }
+    return view('student.home', [
+        'groupChat' => $groupChat,
+        'messages' => $messages,
+        'members' => $groupChatUsers,
+        'tasks' => $tasks, // Include tasks in the view data
+    ]);
+
+    // For debugging use
+    // $data = [
+    //     'members' => $groupChatUsers,
+    //     'userGroupChats' => $userGroupChats,
+    //     'groupChat' => $groupChat,
+    //     'messages' => $messages,
+    //     'tasks' => $tasks, // Add tasks to debug output
+    // ];
+    // return response()->json($data);
+    // dd($data);
+}
+
 
     // Send message to group chat
     public function sendMessage(Request $request, $groupId)

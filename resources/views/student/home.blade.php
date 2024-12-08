@@ -18,7 +18,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
     
-                <form action="#" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('tasks.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <!-- Basic Report Information -->
@@ -92,139 +92,87 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Submit Progress Report</button>
                     </div>
+                    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
                 </form>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- Middle Section: Messages -->
-        <div class="col-md-9"> <!-- Changed to col-md-9 -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>{{ isset($groupChat) ? $groupChat->name : 'No Group Selected' }}</h4>
-                </div>
+        @section('content')
+<div class="container">
+    <h2>Student Dashboard</h2>
 
-                <div class="card-body chat-body" style="height: 400px; overflow-y: auto;">
-                    @if($messages->isEmpty())
-                        <p class="text-center text-muted">No messages available.</p>
-                    @else
-                        @foreach($messages as $message)
-                        <div class="flex w-full mb-3 
-                            {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
-                            <div class="message-content max-w-[40%] 
-                                {{ $message->user_id == Auth::id() ? 'bg-primary text-white sender-message' : 'bg-light receiver-message' }} 
-                                p-2 rounded">
+    <!-- Progress Report Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Progress Report</h5>
+        </div>
+        <div class="card-body">
+            @if($tasks->isNotEmpty())
+                <p class="text-success">A progress report has been sent.</p>
+                
+                <!-- Display all tasks -->
+                <ul class="list-group">
+                    @foreach($tasks as $task)
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>
+                                    <strong>Group Name:</strong> {{ $task->group_name }}<br>
+                                    <strong>Reporting Date:</strong> {{ $task->reporting_date }}<br>
+                                    <strong>Project Title:</strong> {{ $task->project_title }}
+                                </span>
+                                
+                                <!-- View Details Button -->
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal{{ $task->id }}">
+                                    View Details
+                                </button>
+                            </div>
+                        </li>
 
-                                {{-- if message is from the user --}}
-                                @if($message->user_id == Auth::id())
-                                    <div class="d-flex flex-column align-items-end w-100">
-                                        <div class="d-flex align-items-center justify-content-end mb-1 w-100">
-                                            <strong class="mr-2" style="margin-right: 0.5rem">{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
-                                            <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
-                                                alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
-                                                class="rounded-circle message-profile" 
-                                                style="width: 40px; height: 40px; object-fit: cover;">
-                                        </div>
-                                        <div class="d-flex justify-content-end w-100 mb-1">
-                                            <p class="text-right" style="margin-right: 3.5rem">{{ $message->message }}</p>
-                                        </div>
-                                    
-                                        {{-- if user has attached file --}}
-                                        @if($message->file_path)
-                                            <div class="d-flex flex-column align-items-end w-100">
-                                                
-                                                {{-- download file button --}}
-                                                <div class="text-right">
-                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
-                                                </div>
-                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
-                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
-                                                    <i class="fas fa-download me-1"></i> Download
-                                                </a>
-
-                                            </div>
-                                        @endif
-                                    
-                                        <div class="d-flex justify-content-end w-100">
-                                            <small class="text-muted">
-                                                {{ $message->created_at->format('F d, Y h:i A') }}
-                                            </small>
-                                        </div>
+                        <!-- Task Details Modal -->
+                        <div class="modal fade" id="taskModal{{ $task->id }}" tabindex="-1" aria-labelledby="taskModalLabel{{ $task->id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="taskModalLabel{{ $task->id }}">Progress Report Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-
-                                {{-- if message is from other users --}}
-                                @else
-                                    <div class="flex flex-col items-start">
-                                        <div class="flex items-center mb-1">
-                                            <img src="{{ asset('storage/profile/'. $message->user->picture) }}" 
-                                                 alt="{{ $message->user->first_name .' ' . $message->user->last_name }}" 
-                                                 class="rounded-circle message-profile mr-2" 
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
-                                            <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
-                                        </div>
-                                        <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
-
-                                        {{-- if user has attached file --}}
-                                        @if($message->file_path)
-                                            <div class="col-12">
-                                                <!-- File Path -->
-                                                <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
-
-                                                {{-- download file button --}}
-                                                <div class="text-right">
-                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
-                                                </div>
-                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
-                                                class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
-                                                    <i class="fas fa-download me-1"></i> Download
-                                                </a>
-
+                                    <div class="modal-body">
+                                        <p><strong>Group Name:</strong> {{ $task->group_name }}</p>
+                                        <p><strong>Reporting Date:</strong> {{ $task->reporting_date }}</p>
+                                        <p><strong>Reporting Week:</strong> {{ $task->reporting_week }}</p>
+                                        <p><strong>Project Title:</strong> {{ $task->project_title }}</p>
+                                        
+                                        <!-- Daily Activities -->
+                                        @for ($i = 1; $i <= 6; $i++)
+                                            <div class="mt-3">
+                                                <h6>Day {{ $i }}</h6>
+                                                <p><strong>Date:</strong> {{ $task->{'day'.$i.'_date'} ?? 'N/A' }}</p>
+                                                <p><strong>Activities:</strong> {{ $task->{'day'.$i.'_activities'} ?? 'N/A' }}</p>
                                             </div>
-                                        @endif
-
-                                        <small class="text-muted">
-                                            {{ $message->created_at->format('F d, Y h:i A') }}
-                                        </small>
+                                        @endfor
                                     </div>
-                                @endif
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        @endforeach
-                    @endif
-                </div>
-
-                <!-- Message Input -->
-                <div class="card-footer">
-                    {{-- file input text display--}}
-                    <span id="file-name" class="ml-2 text-muted"></span>
-                
-                    @if ($groupChat)
-                        <form action="{{ route('send.Message', $groupChat->id) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="group_chat_id" value="{{ $groupChat->id }}">
-                            <div class="input-group">
-                                <input type="text" name="message" class="form-control" placeholder="Type your message here..." required>
-                                <input type="file" name="file" id="file-upload" class="form-control" style="display: none;" onchange="updateFileName()">
-                                
-                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createReportModal">
-                                    Create Report
-                                </button>
-
-                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">
-                                    Upload File
-                                </button>
-
-                                <button type="submit" class="btn btn-primary">Send</button>
-                            </div>
-                        </form>
-                        
-                        
-                    @endif
-                </div>
-
-            </div>
+                    @endforeach
+                </ul>
+            @else
+                <p class="text-danger">No progress report has been sent yet.</p>
+            @endif
         </div>
+    </div>
+</div>
+@endsection
 
         <!-- Right Section: User Info and Progress -->
         <div class="col-md-3"> <!-- Right section remains col-md-3 -->
