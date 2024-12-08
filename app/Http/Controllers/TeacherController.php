@@ -7,6 +7,7 @@ use App\Models\Submission;
 use App\Models\GetGroupChat;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -126,14 +127,14 @@ class TeacherController extends Controller
 
         // Fetch the specific group chat to ensure it exists
         $groupChat = Groupchat::findOrFail($groupChatId);
-        Log::info('Group Chat: ' . $groupChat);
+        Log::info('Group Chat: ', $groupChat->toArray()); // Log as an array
 
         // Fetch messages for the specific group chat
         $messages = Message::where('group_id', $groupChatId)
             ->with('user')
             ->orderBy('created_at', 'asc')
             ->get();
-        Log::info('Messages: ' . $messages);
+        Log::info('Messages Count: ' . $messages->count()); // Log count instead of the object
 
         // Fetch ALL group chats for the current user
         $user = Auth::user();
@@ -142,10 +143,13 @@ class TeacherController extends Controller
         // Fetch all members of the selected group chat
         $members = $groupChat->members()->get();
 
+        // Get tasks
+        $tasks = Task::where('group_id', $groupChatId)->get();
+        Log::info('Tasks Count: ' . $tasks->count()); // Log count instead of the object
+
         // Logging for debugging
-        Log::info('Group Chat ID: ' . $groupChatId);
-        Log::info('Messages count: ' . $messages->count());
         Log::info('Group Chats count: ' . $groupChats->count());
+
 
         // Render the view with all necessary data
         return view('teacher.home', [
@@ -153,13 +157,19 @@ class TeacherController extends Controller
             'messages' => $messages,
             'groupChats' => $groupChats, // Pass all group chats
             'members' => $members,
+            'tasks' => $tasks, // Corrected syntax here
         ]);
 
+        // Prepare the response data
         // $data = [
-        //     'groupChat' => $groupChat,
+        //     'groupChats' => $groupChats, // Pass all group chats
+        //     'groupChat' => $groupChat, // Pass the specific group chat
         //     'messages' => $messages,
         //     'members' => $members,
+        //     'tasks' => $tasks,
         // ];
+
+        // return back(compact($data))->with('success', 'Group chat created successfully!');
 
         // return response()->json($data);
     }

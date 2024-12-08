@@ -213,7 +213,6 @@
                                         {{-- if user has attached file --}}
                                         @if($message->file_path)
                                             <div class="d-flex flex-column align-items-end w-100">
-                                                
                                                 {{-- download file button --}}
                                                 <div class="text-right">
                                                     <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
@@ -222,7 +221,6 @@
                                                 class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
                                                     <i class="fas fa-download me-1"></i> Download
                                                 </a>
-
                                             </div>
                                         @endif
                                     
@@ -248,6 +246,7 @@
                                         {{-- if user has attached file --}}
                                         @if($message->file_path)
                                             <div class="col-12">
+                                                
                                                 <!-- File Path -->
                                                 <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
 
@@ -260,11 +259,14 @@
                                                     <i class=""></i> Download
                                                 </a>
 
-                                                {{-- check progress report --}}
-                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
-                                                    View Progress Report
-                                                </button>
                                             </div>
+                                        @elseif ($tasks)
+
+                                            {{-- check progress report --}}
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                                View Progress Report
+                                            </button>
+
                                         @endif
 
                                         <small class="text-muted">

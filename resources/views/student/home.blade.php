@@ -10,7 +10,6 @@
     </header>
 
     <!-- Progress report modal form -->
-    <!-- Progress report modal form -->
     <div class="modal fade" id="createReportModal" tabindex="-1" aria-labelledby="createReportModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -24,18 +23,19 @@
                     <div class="modal-body">
                         <!-- Basic Report Information -->
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="groupName" class="form-label">Group Name</label>
-                                <input type="text" class="form-control" id="groupName" name="group_name" required>
-                            </div>
+
+                            <!-- invisible form for project title -->
+                            <input type="hidden" name="project_title" value="{{ $groupChat->name }}">
+
+                            <!-- invisible form for group name -->
+                            <input type="hidden" name="group_name" value="{{ $groupChat->name }}">
+                            
                             
                             <div class="col-md-6 mb-3">
                                 <label for="reportingDate" class="form-label">Reporting Date</label>
                                 <input type="date" class="form-control" id="reportingDate" name="reporting_date" required>
                             </div>
-                        </div>
-    
-                        <div class="row">
+
                             <div class="col-md-6 mb-3">
                                 <label for="reportingWeek" class="form-label">Reporting Week</label>
                                 <select class="form-select" id="reportingWeek" name="reporting_week" required>
@@ -48,12 +48,14 @@
                                     <option value="6">Week 6</option>
                                     <option value="7">Week 7</option>
                                     <option value="8">Week 8</option>
+                                    <option value="9">Week 9</option>
+                                    <option value="10">Week 10</option>
+                                    <option value="11">Week 11</option>
+                                    <option value="12">Week 12</option>
+                                    <option value="13">Week 13</option>
+                                    <option value="14">Week 14</option>
+                                    <option value="15">Week 15</option>
                                 </select>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="projectTitle" class="form-label">Project Title</label>
-                                <input type="text" class="form-control" id="projectTitle" name="project_title" required>
                             </div>
                         </div>
     
@@ -98,8 +100,26 @@
         </div>
     </div>
 
-
-
+    <!-- view Progress report modal form -->
+    <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gradingModalLabel">Progress report: Week #</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="ProgressReportTable">
+                        table here na same lng progressreport na paper
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Mark as Complete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <!-- Middle Section: Messages -->
@@ -144,10 +164,16 @@
                                                 </div>
                                                 <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
                                                 class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
-                                                    <i class="fas fa-download me-1"></i> Download
+                                                    Download
                                                 </a>
 
                                             </div>
+
+                                        @elseif ($tasks)
+                                            <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                            class="btn btn-success btn-sm" style="margin-bottom: 1rem;">
+                                                View Progress Report
+                                            </a>
                                         @endif
                                     
                                         <div class="d-flex justify-content-end w-100">
@@ -181,10 +207,18 @@
                                                 </div>
                                                 <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
                                                 class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
-                                                    <i class="fas fa-download me-1"></i> Download
+                                                    Download
                                                 </a>
 
                                             </div>
+
+                                        @elseif ($tasks)
+
+                                            {{-- check progress report --}}
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                                View Progress Report
+                                            </button>
+
                                         @endif
 
                                         <small class="text-muted">
