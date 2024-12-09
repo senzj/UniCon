@@ -142,7 +142,6 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Activity</th>
-                                    <th>Remarks</th>
                                 </tr>
                             </thead>
 
@@ -707,7 +706,7 @@
         }
     });
 
-    // Javascript to handle the progress report modal display
+    // JavaScript to handle the progress report modal display
     document.addEventListener('DOMContentLoaded', function () {
         // Get the modal element
         var progressReportModal = document.getElementById('progressreportModal');
@@ -727,21 +726,11 @@
             var mentoringTime = button.getAttribute('data-mentoring-time');
             var term = button.getAttribute('data-term');
             var academicYear = button.getAttribute('data-academic-year');
-            var members = button.getAttribute('data-members'); // Split into an array
-            var tasks = button.getAttribute('data-tasklist');
+            var members = button.getAttribute('data-members'); // JSON string
+            var tasks = button.getAttribute('data-tasklist'); // JSON string
 
-            //logging variables
-            console.log(taskId);
-            console.log(projectTitle);
-            console.log(groupName);
-            console.log(specialization);
-            console.log(reportingWeek);
-            console.log(mentoringDay);
-            console.log(mentoringTime);
-            console.log(term);
-            console.log(academicYear);
-            console.log(members);
-            console.log(tasks);
+            // Logging variables
+            console.log(taskId, projectTitle, groupName, specialization, reportingWeek, mentoringDay, mentoringTime, term, academicYear, members, tasks);
             
             // Update the modal's title
             var modalTitle = progressReportModal.querySelector('.modal-title');
@@ -756,27 +745,22 @@
                     <td style="font-weight: bold;">Group Name:</td>
                     <td>${groupName}</td>
                 </tr>
-
                 <tr>
                     <td style="font-weight: bold;">Program:</td>
                     <td>${specialization}</td>
                 </tr>
-
                 <tr>
                     <td style="font-weight: bold;">Term:</td>
                     <td>${term}</td>
                 </tr>
-                
                 <tr>
                     <td style="font-weight: bold;">Academic Year:</td>
                     <td>${academicYear}</td>
                 </tr>
-
                 <tr>
                     <td style="font-weight: bold;">Reporting Week:</td>
                     <td>${reportingWeek}</td>
                 </tr>
-
                 <tr>
                     <td style="font-weight: bold;">Member's Name:</td>
                     <td colspan="5">
@@ -784,18 +768,15 @@
                             <!-- Student names will be populated here -->
                         </ol>
                     </td>
-                </tr>   
-
+                </tr>
                 <tr>
                     <td style="font-weight: bold;">Mentoring Day:</td>
                     <td>${mentoringDay}</td>
                 </tr>
-
                 <tr>
                     <td style="font-weight: bold;">Mentoring Time:</td>
                     <td>${mentoringTime}</td>
                 </tr>
-
                 <tr>
                     <td style="font-weight: bold;">Title of the Project:</td>
                     <td>${projectTitle}</td>
@@ -818,27 +799,46 @@
                 studentList.appendChild(listItem);
             });
 
-            // Populate Part B (You can replace this with actual data)
-            var activities = [
-                { date: '2024-12-01', activity: 'Completed literature review', remarks: 'Approved' },
-                { date: '2024-12-03', activity: 'Data collection started', remarks: 'On schedule' },
-                { date: '2024-12-05', activity: 'Prepared survey questionnaires', remarks: 'Reviewed by adviser' }
-            ];
+            // Populate Part B: Activities
+            // Populate the activities table
+            // Parse the tasks JSON string into an array
+            var tasksArray = JSON.parse(tasks);
+            console.log(tasksArray);
+
+            // Find the task data by taskId
+            var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
+            console.log(taskData);
 
             // Clear previous activities
             var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
-            activitiesTableBody.innerHTML = ''; // Clear previous content
 
-            // Populate the activities table
-            activities.forEach(activity => {
-                activitiesTableBody.innerHTML += `
+            if (taskData) {
+                for (let i = 1; i <= 6; i++) {
+                    // let dayDate = taskData[`day${i}_date`];
+                    // let dayActivity = taskData[`day${i}_activities`];
+
+                    // console.log(dayDate, dayActivity);
+                    console.log(taskData[`day${i}_date`], taskData[`day${i}_activities`]);
+
+                    // Only add the row if there is a date and activity
+                    if (dayDate && dayActivity) {
+                        activitiesTableBody.innerHTML += `
+                            <tr>
+                                <td>${dayDate}</td>
+                                <td>${dayActivity}</td>
+                            </tr>
+                        `;
+                    }
+                }
+
+            } else {
+                activitiesTableBody.innerHTML = `
                     <tr>
-                        <td>${activity.date}</td>
-                        <td>${activity.activity}</td>
-                        <td>${activity.remarks}</td>
+                        <td colspan="2">No activities found for this task.</td>
                     </tr>
                 `;
-            });
+            }
+
         });
     });
 

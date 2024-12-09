@@ -135,7 +135,6 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Activity</th>
-                                    <th>Remarks</th>
                                 </tr>
                             </thead>
 
@@ -561,17 +560,17 @@
             var tasks = button.getAttribute('data-tasklist');
 
             //logging variables
-            console.log(taskId);
-            console.log(projectTitle);
-            console.log(groupName);
-            console.log(specialization);
-            console.log(reportingWeek);
-            console.log(mentoringDay);
-            console.log(mentoringTime);
-            console.log(term);
-            console.log(academicYear);
-            console.log(members);
-            console.log(tasks);
+            // console.log(taskId);
+            // console.log(projectTitle);
+            // console.log(groupName);
+            // console.log(specialization);
+            // console.log(reportingWeek);
+            // console.log(mentoringDay);
+            // console.log(mentoringTime);
+            // console.log(term);
+            // console.log(academicYear);
+            // console.log(members);
+            // console.log(tasks);
             
             // Update the modal's title
             var modalTitle = progressReportModal.querySelector('.modal-title');
@@ -649,11 +648,16 @@
             });
 
             // Populate Part B (You can replace this with actual data)
-            var activities = [
-                { date: '2024-12-01', activity: 'Completed literature review', remarks: 'Approved' },
-                { date: '2024-12-03', activity: 'Data collection started', remarks: 'On schedule' },
-                { date: '2024-12-05', activity: 'Prepared survey questionnaires', remarks: 'Reviewed by adviser' }
-            ];
+
+            // Parse the tasks JSON string into an array
+            var tasksArray = JSON.parse(tasks);
+            console.log("array",tasksArray);
+
+            // Find the task data by taskId
+            var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
+            console.log("data",taskData);
+
+            var activities = [];
 
             // Clear previous activities
             var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
@@ -665,7 +669,6 @@
                     <tr>
                         <td>${activity.date}</td>
                         <td>${activity.activity}</td>
-                        <td>${activity.remarks}</td>
                     </tr>
                 `;
             });
