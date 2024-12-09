@@ -17,19 +17,17 @@
                     <h5 class="modal-title" id="createReportModalLabel">Create Progress Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-    
+
                 <form action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <!-- Basic Report Information -->
                         <div class="row">
-
                             <!-- invisible form for project title -->
-                            <input type="hidden" name="project_title" value="{{ $groupChat->title }}">
+                            <input type="hidden" name="project_title" value="{{ $groupChat->title ?? '' }}">
 
                             <!-- invisible form for group name -->
-                            <input type="hidden" name="group_name" value="{{ $groupChat->name }}">
-                            
+                            <input type="hidden" name="group_name" value="{{ $groupChat->name ?? '' }}">
                             
                             <div class="col-md-6 mb-3">
                                 <label for="reportingDate" class="form-label">Reporting Date</label>
@@ -40,25 +38,13 @@
                                 <label for="reportingWeek" class="form-label">Reporting Week</label>
                                 <select class="form-select" id="reportingWeek" name="reporting_week" required>
                                     <option value="">Select Week</option>
-                                    <option value="1">Week 1</option>
-                                    <option value="2">Week 2</option>
-                                    <option value="3">Week 3</option>
-                                    <option value="4">Week 4</option>
-                                    <option value="5">Week 5</option>
-                                    <option value="6">Week 6</option>
-                                    <option value="7">Week 7</option>
-                                    <option value="8">Week 8</option>
-                                    <option value="9">Week 9</option>
-                                    <option value="10">Week 10</option>
-                                    <option value="11">Week 11</option>
-                                    <option value="12">Week 12</option>
-                                    <option value="13">Week 13</option>
-                                    <option value="14">Week 14</option>
-                                    <option value="15">Week 15</option>
+                                    @for ($week = 1; $week <= 15; $week++)
+                                        <option value="{{ $week }}">Week {{ $week }}</option>
+                                    @endfor
                                 </select>
                             </div>
                         </div>
-    
+
                         <!-- Chapters and Activities -->
                         <h5 class="mt-4 mb-3">Chapter Activities</h5>
                         @for ($i = 1; $i <= 6; $i++)
@@ -71,9 +57,9 @@
                                         <div class="col-md-6 mb-3">
                                             <label for="chapter{{ $i }}Date" class="form-label">Date</label>
                                             <input type="date" 
-                                                   class="form-control" 
-                                                   id="chapter{{ $i }}Date" 
-                                                   name="chapter_{{ $i }}_date">
+                                                class="form-control" 
+                                                id="chapter{{ $i }}Date" 
+                                                name="chapter_{{ $i }}_date">
                                         </div>
                                         
                                         <div class="col-md-6 mb-3">
