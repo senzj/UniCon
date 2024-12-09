@@ -157,7 +157,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="completePReport()">Mark as Complete</button>
+                    <button type="button" class="btn btn-primary" id="completeButton" onclick="completePReport()">Mark as Complete</button>
                 </div>
             </div>
         </div>
@@ -290,6 +290,8 @@
                                         </div>
                                     </div>
 
+
+
                                 {{-- if message is sent from other users --}}
                                 @else
                                     <div class="flex flex-col items-start">
@@ -301,6 +303,7 @@
                                             <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
                                         </div>
                                         <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
+
 
                                         {{-- if user has attached file --}}
                                         @if($message->file_path)
@@ -321,11 +324,13 @@
                                             </div>
                                         @endif
 
-                                            {{-- Check if there is a task associated with this message --}}
+                                        {{-- Check if there is a task associated with this message --}}
                                         @if($tasks->where('message_id', $message->id)->isNotEmpty())
                                             @php
                                                 $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
                                             @endphp
+
+                                            @if ($task->complete == 1)
                                                 <button type="button" class="btn btn-success btn-sm" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#progressreportModal" 
@@ -343,11 +348,32 @@
                                                         style="margin-bottom:1rem">
                                                     View Progress Report
                                                 </button>
+                                            @else
+                                                <button type="button" class="btn btn-success btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#progressreportModal" 
+                                                        data-task-id="{{ $task->id }}" 
+                                                        data-term="{{ $groupChat->term }}"
+                                                        data-members="{{ $members }}"
+                                                        data-academic-year="{{ $groupChat->academic_year }}"
+                                                        data-project-title="{{ $task->project_title }}" 
+                                                        data-group-name="{{ $groupChat->name }}"
+                                                        data-specialization="{{ $groupChat->specialization }}"
+                                                        data-reporting-week="{{ $task->reporting_week }}"
+                                                        data-mentoring-day = "{{ $groupChat->mentoring_day }}"
+                                                        data-mentoring-time = "{{ $groupChat->mentoring_time }}"
+                                                        data-tasklist = "{{ $tasks }}"
+                                                        style="margin-bottom:1rem">
+                                                    Check Progress Report
+                                                </button>
+                                            @endif
                                         @endif
 
-                                        <small class="text-muted">
-                                            {{ $message->created_at->format('F d, Y h:i A') }}
-                                        </small>
+                                        <div class="w-100">
+                                            <small class="text-muted">
+                                                {{ $message->created_at->format('F d, Y h:i A') }}
+                                            </small>
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -471,8 +497,8 @@
                                                 class="progress-bar" 
                                                 id="progressBar{{ $i }}" 
                                                 role="progressbar" 
-                                                style="width: {{ $progress['chapter'.$i] ?? 0 }}%;" 
-                                                aria-valuenow="{{ $progress['chapter'.$i] ?? 0 }}" 
+                                                style="width: {{ $progress['tasks'.$i] ?? 0 }}%;" 
+                                                aria-valuenow="{{ $progress['tasks'.$i] ?? 0 }}" 
                                                 aria-valuemin="0" 
                                                 aria-valuemax="100">
                                                 {{ $progress['chapter'.$i] ?? 0 }}%
@@ -584,6 +610,7 @@
         });
     }
 
+
     // Function to update the file name display
     function updateFileName() {
         const fileInput = document.getElementById('file-upload');
@@ -602,90 +629,107 @@
     }
 
 
-    // Function to update the score display
-    function updateScore(scoreId, value, chapterNumber) {
-        document.getElementById(scoreId).innerText = value + '%';
-        updateChapterProgress(value, chapterNumber); // Update the progress bar
-        console.log(chapterNumber);
-    }
-
+    // Function that makes the PReport complete
     function completePReport() {
-        // Use the actual task ID as a string
-        const taskId = {{ $task->id }};
-        console.log('Task ID:', taskId);
+        @if (isset($task))
+            // Use the actual task ID as a string
+            const taskId = {{ $task->id }};
+            // console.log('Task ID:', taskId);
 
-        fetch(`/teacher/complete/${taskId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            fetch(`/teacher/complete/${taskId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // console.log('Task Completed:', data);
+                
+                toastr.success('Progress Report Marked as Complete', 'Success!');
+                
+                const progressReportModal = bootstrap.Modal.getInstance(document.getElementById('progressreportModal'));
+                progressReportModal.hide();
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 5000); // 5000 milliseconds = 5 seconds
+            })
+            .catch((error) => {
+                toastr.error('An error occurred while marking the task complete', 'Error!');
+                console.error('Error:', error);
+            });
+        @else
+            toastr.error('No task found for this message', 'Error!');
+        @endif
+    }
+
+
+    // set the tasks to a global variable
+    window.tasks = <?php echo json_encode($tasks); ?>;
+    // console.log('Tasks:', window.tasks);
+
+    // Function to update the overall progress bar
+    function updateProgressBar() {
+        // Directly use the tasks from the existing data
+        const tasks = window.tasks; // Assuming you've passed tasks to a global variable
+        // console.log('Tasks:', tasks);
+
+        // Create an object to track completed tasks for each week
+        const weekCompletion = {};
+
+        // Iterate through tasks and mark week completion
+        tasks.forEach(task => {
+            const week = task.reporting_week;
+            const complete = task.complete;
+            
+            // console.log('Week:', week, 'Complete:', complete);
+            
+            // If the task is complete, mark the week as complete
+            if (complete === 1) {
+                weekCompletion[week] = 100;
+            } else if (!weekCompletion[week]) {
+                // If not complete and not already set, set to 0
+                weekCompletion[week] = 0;
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Task Completed:', data);
-            
-            toastr.success('Progress Report Marked as Complete', 'Success!');
-            
-            const progressReportModal = bootstrap.Modal.getInstance(document.getElementById('progressreportModal'));
-            progressReportModal.hide();
-            
-            setTimeout(() => {
-                location.reload();
-            }, 5000); // 5000 milliseconds = 5 seconds
-        })
-        .catch((error) => {
-            toastr.error('An error occurred while marking the task complete', 'Error!');
-            console.error('Error:', error);
         });
-    }
 
-    // Function to update the score display
-    function updateChapterProgress(value, chapterNumber) {
-        const progressBar = document.getElementById(`progressBar${chapterNumber}`);
-        progressBar.style.width = value + '%';
-        progressBar.setAttribute('aria-valuenow', value);
-        progressBar.textContent = value + '%';
+        // Update progress bars for each week
+        for (let i = 1; i <= 15; i++) {
+            const progressBar = document.getElementById(`progressBar${i}`);
 
-        updateOverallProgressFromServer(); // Update overall progress whenever a chapter slider changes
-    }
+            if (progressBar) {
+                // Get the completion status for this week
+                const weekProgress = weekCompletion[i] || 0;
 
-    // Script for updating the initial progress
-    document.addEventListener('DOMContentLoaded', function() {
-        @for ($i = 1; $i <= 6; $i++)
-            document.getElementById('chapter{{ $i }}').value = {{ $progress['chapter'.$i] ?? 0 }};
-            document.getElementById('chapter{{ $i }}Score').innerText = '{{ $progress['chapter'.$i] ?? 0 }}%';
-            
-            // Also update the progress bars initially
-            const progressBar{{ $i }} = document.getElementById('progressBar{{ $i }}');
-            progressBar{{ $i }}.style.width = '{{ $progress['chapter'.$i] ?? 0 }}%';
-            progressBar{{ $i }}.setAttribute('aria-valuenow', '{{ $progress['chapter'.$i] ?? 0 }}');
-            progressBar{{ $i }}.textContent = '{{ $progress['chapter'.$i] ?? 0 }}%';
-        @endfor
-
-        // Update overall progress
-        updateOverallProgressFromServer();
-    });
-
-    // Function to calculate and update overall progress
-    function updateOverallProgressFromServer() {
-        let total = 0;
-        for (let i = 1; i <= 6; i++) {
-            const progressValue = parseInt(document.getElementById(`progressBar${i}`).getAttribute('aria-valuenow'), 10);
-            total += progressValue;
+                // Update progress bar
+                progressBar.style.width = `${weekProgress}%`;
+                progressBar.setAttribute('aria-valuenow', weekProgress);
+                progressBar.textContent = `${weekProgress}%`;
+            }
         }
-        const average = total / 6;
 
+        // Calculate and update overall progress
+        const completedWeeks = Object.values(weekCompletion).filter(progress => progress === 100).length;
+        const overallProgress = Math.round((completedWeeks / 15) * 100);
         const overallProgressBar = document.getElementById('overallProgressBar');
-        overallProgressBar.style.width = average + '%';
-        overallProgressBar.setAttribute('aria-valuenow', average);
-        overallProgressBar.textContent = average.toFixed(0) + '%';
+
+        if (overallProgressBar) {
+            overallProgressBar.style.width = `${overallProgress}%`;
+            overallProgressBar.setAttribute('aria-valuenow', overallProgress);
+            overallProgressBar.textContent = `${overallProgress}%`;
+        }
     }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', updateProgressBar);
+    
 
     // Optional: Clear the file input when the label is clicked again
     document.getElementById('file-upload').addEventListener('change', function() {
@@ -696,145 +740,148 @@
     });
 
     // JavaScript to handle the progress report modal display
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get the modal element
-        var progressReportModal = document.getElementById('progressreportModal');
+    // JavaScript to handle the progress report modal display
+document.addEventListener('DOMContentLoaded', function () {
+    // Get the modal element
+    var progressReportModal = document.getElementById('progressreportModal');
 
-        // Add event listener for when the modal is shown
-        progressReportModal.addEventListener('show.bs.modal', function (event) {
-            // Get the button that triggered the modal
-            var button = event.relatedTarget;
+    // Add event listener for when the modal is shown
+    progressReportModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        var button = event.relatedTarget;
 
-            // Extract the data attributes from the button
-            var taskId = button.getAttribute('data-task-id');
-            var projectTitle = button.getAttribute('data-project-title');
-            var groupName = button.getAttribute('data-group-name');
-            var specialization = button.getAttribute('data-specialization');
-            var reportingWeek = button.getAttribute('data-reporting-week');
-            var mentoringDay = button.getAttribute('data-mentoring-day');
-            var mentoringTime = button.getAttribute('data-mentoring-time');
-            var term = button.getAttribute('data-term');
-            var academicYear = button.getAttribute('data-academic-year');
-            var members = button.getAttribute('data-members'); // JSON string
-            var tasks = button.getAttribute('data-tasklist'); // JSON string
+        // Extract the data attributes from the button
+        var taskId = button.getAttribute('data-task-id');
+        var projectTitle = button.getAttribute('data-project-title');
+        var groupName = button.getAttribute('data-group-name');
+        var specialization = button.getAttribute('data-specialization');
+        var reportingWeek = button.getAttribute('data-reporting-week');
+        var mentoringDay = button.getAttribute('data-mentoring-day');
+        var mentoringTime = button.getAttribute('data-mentoring-time');
+        var term = button.getAttribute('data-term');
+        var academicYear = button.getAttribute('data-academic-year');
+        var members = button.getAttribute('data-members'); // JSON string
+        var tasks = button.getAttribute('data-tasklist'); // JSON string
 
-            // Logging variables
-            // console.log(taskId, projectTitle, groupName, specialization, reportingWeek, mentoringDay, mentoringTime, term, academicYear, members, tasks);
-            
-            // Update the modal's title
-            var modalTitle = progressReportModal.querySelector('.modal-title');
-            modalTitle.textContent = 'Progress Report: Week ' + reportingWeek;
+        // Update the modal's title
+        var modalTitle = progressReportModal.querySelector('.modal-title');
+        modalTitle.textContent = 'Progress Report: Week ' + reportingWeek;
 
-            // Populate Part A
-            var modalBody = progressReportModal.querySelector('.table-responsive tbody');
-            modalBody.innerHTML = ''; // Clear previous content
+        // Populate Part A
+        var modalBody = progressReportModal.querySelector('.table-responsive tbody');
+        modalBody.innerHTML = ''; // Clear previous content
 
-            modalBody.innerHTML += `
+        modalBody.innerHTML += `
+            <!-- Group Information -->
+            <tr>
+                <td style="font-weight: bold;">Group Name:</td>
+                <td>${groupName}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Program:</td>
+                <td>${specialization}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Term:</td>
+                <td>${term}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Academic Year:</td>
+                <td>${academicYear}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Reporting Week:</td>
+                <td>${reportingWeek}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Member's Name:</td>
+                <td colspan="5">
+                    <ol id="student-list">
+                        <!-- Student names will be populated here -->
+                    </ol>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Mentoring Day:</td>
+                <td>${mentoringDay}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Mentoring Time:</td>
+                <td>${mentoringTime}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Title of the Project:</td>
+                <td>${projectTitle}</td>
+            </tr>
+        `;
 
-                <!-- Hidden Task ID -->
-                <input type="hidden" id="taskIdInput" data-task-id="${taskId}" value="${taskId}">
+        // Parse the members JSON string
+        var membersArray = JSON.parse(members);
 
-                <!-- Group Information -->
-                <tr>
-                    <td style="font-weight: bold;">Group Name:</td>
-                    <td>${groupName}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Program:</td>
-                    <td>${specialization}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Term:</td>
-                    <td>${term}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Academic Year:</td>
-                    <td>${academicYear}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Reporting Week:</td>
-                    <td>${reportingWeek}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Member's Name:</td>
-                    <td colspan="5">
-                        <ol id="student-list">
-                            <!-- Student names will be populated here -->
-                        </ol>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Mentoring Day:</td>
-                    <td>${mentoringDay}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Mentoring Time:</td>
-                    <td>${mentoringTime}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Title of the Project:</td>
-                    <td>${projectTitle}</td>
-                </tr>
-            `;
+        // Filter for students
+        var students = membersArray.filter(member => member.role === 'student');
 
-            // Parse the members JSON string
-            var membersArray = JSON.parse(members);
+        // Get the student list element
+        var studentList = document.getElementById('student-list');
 
-            // Filter for students
-            var students = membersArray.filter(member => member.role === 'student');
-
-            // Get the student list element
-            var studentList = document.getElementById('student-list');
-
-            // Populate the student list
-            students.forEach(student => {
-                var listItem = document.createElement('li');
-                listItem.textContent = `${student.first_name} ${student.last_name}`;
-                studentList.appendChild(listItem);
-            });
+        // Populate the student list
+        students.forEach(student => {
+            var listItem = document.createElement('li');
+            listItem.textContent = `${student.first_name} ${student.last_name}`;
+            studentList.appendChild(listItem);
+        });
 
             // Populate Part B: Activities
-            // Parse the tasks JSON string into an array
-            var tasksArray = JSON.parse(tasks);
-            console.log("array", tasksArray);
+           // Parse the tasks JSON string into an array
+           var tasksArray = JSON.parse(tasks);
 
-            // Find the task data by taskId
-            var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
-            console.log("data", taskData);
+           // Find the task data by taskId
+           var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
 
-            // Clear previous activities
-            var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
-            activitiesTableBody.innerHTML = ''; // Clear previous content
+           // Clear previous activities
+           var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
+           activitiesTableBody.innerHTML = ''; // Clear previous content
 
-            if (taskData) {
-                // Loop through day(number)_date and day(number)_activities
-                for (let i = 1; i <= 6; i++) {
-                    let date = taskData[`day${i}_date`];
-                    let activity = taskData[`day${i}_activities`];
+           if (taskData) {
+               // Loop through day(number)_date and day(number)_activities
+               for (let i = 1; i <= 6; i++) {
+                   let date = taskData[`day${i}_date`];
+                   let activity = taskData[`day${i}_activities`];
 
-                    console.log(`Day ${i} - Date: ${date}, Activity: ${activity}`);
+                   // Only add rows for non-null or valid entries
+                   if (date && activity) {
+                       activitiesTableBody.innerHTML += `
+                           <tr>
+                               <td>Day: ${i} <br> Date: ${date}</td>
+                               <td>${activity}</td>
+                           </tr>
+                       `;
+                   }
+               }
+           } else {
+               // Handle case where no task data is found
+               activitiesTableBody.innerHTML = `
+                   <tr>
+                       <td colspan="2">No activities found for this task.</td>
+                   </tr>
+               `;
+           }
 
-                    // Only add rows for non-null or valid entries
-                    if (date && activity) {
-                        activitiesTableBody.innerHTML += `
-                            <tr>
-                                <td>Day: ${i} <br> Date: ${date}</td>
-                                <td>${activity}</td>
-                            </tr>
-                        `;
-                    }
-                }
-            } else {
-                // Handle case where no task data is found
-                activitiesTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="2">No activities found for this task.</td>
-                    </tr>
-                `;
-            }
+           // Check if the selected week is complete
+           const isWeekComplete = taskData && taskData.complete === 1; // Assuming 'complete' is a property in taskData
+           console.log(taskData);
 
-        });
-    });
+           // Get the complete button
+           const completeButton = document.getElementById('completeButton');
+
+           // Hide or show the button based on the completion status
+           if (isWeekComplete) {
+               completeButton.style.display = 'none'; // Hide the button
+           } else {
+               completeButton.style.display = 'block'; // Show the button
+           }
+       });
+   });
 
 </script>
 

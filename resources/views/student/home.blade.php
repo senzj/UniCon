@@ -651,7 +651,7 @@
 
             // Parse the tasks JSON string into an array
             var tasksArray = JSON.parse(tasks);
-            console.log("array", tasksArray);
+            // console.log("array", tasksArray);
 
             // Find the task data by taskId
             var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
@@ -690,6 +690,119 @@
 
         });
     });
+
+
+     // set the tasks to a global variable
+     window.tasks = <?php echo json_encode($tasks); ?>;
+    console.log('Tasks:', window.tasks);
+
+    // Function to mark the progress report as complete
+    // Function to update the progress bar
+    function updateProgressBar() {
+        // Directly use the tasks from the existing data
+        const tasks = window.tasks; // Assuming you've passed tasks to a global variable
+        console.log('Tasks:', tasks);
+
+        // Create an object to track completed tasks for each week
+        const weekCompletion = {};
+
+        // Iterate through tasks and mark week completion
+        tasks.forEach(task => {
+            const week = task.reporting_week;
+            const complete = task.complete;
+            
+            console.log('Week:', week, 'Complete:', complete);
+            
+            // If the task is complete, mark the week as complete
+            if (complete === 1) {
+                weekCompletion[week] = 100;
+            } else if (!weekCompletion[week]) {
+                // If not complete and not already set, set to 0
+                weekCompletion[week] = 0;
+            }
+        });
+
+        // Update progress bars for each week
+        for (let i = 1; i <= 15; i++) {
+            const progressBar = document.getElementById(`progressBar${i}`);
+
+            if (progressBar) {
+                // Get the completion status for this week
+                const weekProgress = weekCompletion[i] || 0;
+
+                // Update progress bar
+                progressBar.style.width = `${weekProgress}%`;
+                progressBar.setAttribute('aria-valuenow', weekProgress);
+                progressBar.textContent = `${weekProgress}%`;
+            }
+        }
+
+        // Calculate and update overall progress
+        const completedWeeks = Object.values(weekCompletion).filter(progress => progress === 100).length;
+        const overallProgress = Math.round((completedWeeks / 15) * 100);
+        const overallProgressBar = document.getElementById('overallProgressBar');
+
+        if (overallProgressBar) {
+            overallProgressBar.style.width = `${overallProgress}%`;
+            overallProgressBar.setAttribute('aria-valuenow', overallProgress);
+            overallProgressBar.textContent = `${overallProgress}%`;
+        }
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', updateProgressBar);
+
+    // Function to update the progress bar
+    function updateProgressBar() {
+        // Directly use the tasks from the existing data
+        const task = window.tasks; // Assuming you've passed tasks to a global variable
+
+        // Create an object to track completed tasks for each week
+        const weekCompletion = {};
+
+        // Iterate through tasks and mark week completion
+        task.forEach(task => {
+            const week = task.reporting_week;
+            console.log('Task:', task, 'Week:', week);
+            
+            // If the task is complete, mark the week as complete
+            if (task.complete === 1) {
+                weekCompletion[week] = 100;
+            } else if (!weekCompletion[week]) {
+                // If not complete and not already set, set to 0
+                weekCompletion[week] = 0;
+            }
+        });
+
+        // Update progress bars for each week
+        for (let i = 1; i <= 15; i++) {
+            const progressBar = document.getElementById(`progressBar${i}`);
+
+            if (progressBar) {
+                // Get the completion status for this week
+                const weekProgress = weekCompletion[i] || 0;
+
+                // Update progress bar
+                progressBar.style.width = `${weekProgress}%`;
+                progressBar.setAttribute('aria-valuenow', weekProgress);
+                progressBar.textContent = `${weekProgress}%`;
+            }
+        }
+
+        // Calculate and update overall progress
+        const completedWeeks = Object.values(weekCompletion).filter(progress => progress === 100).length;
+        const overallProgress = Math.round((completedWeeks / 15) * 100);
+        const overallProgressBar = document.getElementById('overallProgressBar');
+
+        if (overallProgressBar) {
+            overallProgressBar.style.width = `${overallProgress}%`;
+            overallProgressBar.setAttribute('aria-valuenow', overallProgress);
+            overallProgressBar.textContent = `${overallProgress}%`;
+        }
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', updateProgressBar);
                        
 </script>
 
