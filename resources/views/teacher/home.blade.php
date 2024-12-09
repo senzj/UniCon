@@ -800,38 +800,38 @@
             });
 
             // Populate Part B: Activities
-            // Populate the activities table
             // Parse the tasks JSON string into an array
             var tasksArray = JSON.parse(tasks);
-            console.log(tasksArray);
+            console.log("array", tasksArray);
 
             // Find the task data by taskId
             var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
-            console.log(taskData);
+            console.log("data", taskData);
 
             // Clear previous activities
             var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
+            activitiesTableBody.innerHTML = ''; // Clear previous content
 
             if (taskData) {
+                // Loop through day(number)_date and day(number)_activities
                 for (let i = 1; i <= 6; i++) {
-                    // let dayDate = taskData[`day${i}_date`];
-                    // let dayActivity = taskData[`day${i}_activities`];
+                    let date = taskData[`day${i}_date`];
+                    let activity = taskData[`day${i}_activities`];
 
-                    // console.log(dayDate, dayActivity);
-                    console.log(taskData[`day${i}_date`], taskData[`day${i}_activities`]);
+                    console.log(`Day ${i} - Date: ${date}, Activity: ${activity}`);
 
-                    // Only add the row if there is a date and activity
-                    if (dayDate && dayActivity) {
+                    // Only add rows for non-null or valid entries
+                    if (date && activity) {
                         activitiesTableBody.innerHTML += `
                             <tr>
-                                <td>${dayDate}</td>
-                                <td>${dayActivity}</td>
+                                <td>Day: ${i} <br> Date: ${date}</td>
+                                <td>${activity}</td>
                             </tr>
                         `;
                     }
                 }
-
             } else {
+                // Handle case where no task data is found
                 activitiesTableBody.innerHTML = `
                     <tr>
                         <td colspan="2">No activities found for this task.</td>

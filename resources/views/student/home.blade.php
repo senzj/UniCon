@@ -651,27 +651,43 @@
 
             // Parse the tasks JSON string into an array
             var tasksArray = JSON.parse(tasks);
-            console.log("array",tasksArray);
+            console.log("array", tasksArray);
 
             // Find the task data by taskId
             var taskData = tasksArray.find(task => task.id === parseInt(taskId, 10));
-            console.log("data",taskData);
-
-            var activities = [];
+            console.log("data", taskData);
 
             // Clear previous activities
             var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
             activitiesTableBody.innerHTML = ''; // Clear previous content
 
-            // Populate the activities table
-            activities.forEach(activity => {
-                activitiesTableBody.innerHTML += `
+            if (taskData) {
+                // Loop through day(number)_date and day(number)_activities
+                for (let i = 1; i <= 6; i++) {
+                    let date = taskData[`day${i}_date`];
+                    let activity = taskData[`day${i}_activities`];
+
+                    console.log(`Day ${i} - Date: ${date}, Activity: ${activity}`);
+
+                    // Only add rows for non-null or valid entries
+                    if (date && activity) {
+                        activitiesTableBody.innerHTML += `
+                            <tr>
+                                <td>Day: ${i} <br> Date: ${date}</td>
+                                <td>${activity}</td>
+                            </tr>
+                        `;
+                    }
+                }
+            } else {
+                // Handle case where no task data is found
+                activitiesTableBody.innerHTML = `
                     <tr>
-                        <td>${activity.date}</td>
-                        <td>${activity.activity}</td>
+                        <td colspan="2">No activities found for this task.</td>
                     </tr>
                 `;
-            });
+            }
+
         });
     });
                        
