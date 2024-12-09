@@ -12,7 +12,7 @@
                 <li>Valena, Riin</li>
                 <li>Lee, Jesus Jansen</li>
                 <li>Sandoval, Vince Jerome</li>
-                <li>Sanguyo, Erica</li>
+                <li>Sanguyo, Erica Nerisse</li>
             </ul>
         </center>
     </div>
