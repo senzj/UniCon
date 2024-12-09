@@ -101,24 +101,95 @@
     </div>
 
     <!-- view Progress report modal form -->
-    <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="gradingModalLabel">Progress report: Week #</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="ProgressReportTable">
-                        table here na same lng progressreport na paper
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+    <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="progressReportLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="progressReportLabel">Progress Report: Week #</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <div class="table-responsive">
+                <!-- Progress Report Table -->
+                <table class="table table-bordered">
+                <thead>
+                    <tr>
+                    <th colspan="2">PART A: TO BE COMPLETED BY THE GROUP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>Group Name:</td>
+                    <td>Example Group Name</td>
+                    </tr>
+                    <tr>
+                    <td>Program:</td>
+                    <td>Bachelor of Science in Information Technology with specialization in Software Engineering</td>
+                    </tr>
+                    <tr>
+                    <td>Member's Name:</td>
+                    <td>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li>1. John Doe</li>
+                        <li>2. Jane Smith</li>
+                        <li>3. Alice Brown</li>
+                        <li>4. Bob White</li>
+                        <li>5. Charlie Black</li>
+                        </ul>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td>Mentoring Day:</td>
+                    <td>Monday</td>
+                    </tr>
+                    <tr>
+                    <td>Mentoring Time:</td>
+                    <td>10:00 AM</td>
+                    </tr>
+                    <tr>
+                    <td>Title of the Project:</td>
+                    <td>A Correlational Study Between the Level of Social Anxiety and Usage of TikTok on IT Students</td>
+                    </tr>
+                </tbody>
+                </table>
+                <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                    <th colspan="3">PART B: LIST OF ACTIVITIES DONE</th>
+                    </tr>
+                    <tr>
+                    <th>Date</th>
+                    <th>Activity</th>
+                    <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>2024-12-01</td>
+                    <td>Completed literature review</td>
+                    <td>Approved</td>
+                    </tr>
+                    <tr>
+                    <td>2024-12-03</td>
+                    <td>Data collection started</td>
+                    <td>On schedule</td>
+                    </tr>
+                    <tr>
+                    <td>2024-12-05</td>
+                    <td>Prepared survey questionnaires</td>
+                    <td>Reviewed by adviser</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
+        </div>
     </div>
+  
 
     <div class="row">
         <!-- Middle Section: Messages -->
@@ -139,7 +210,7 @@
                             <div class="message-content max-w-[40%] 
                                 {{ $message->user_id == Auth::id() ? 'bg-primary text-white sender-message' : 'bg-light receiver-message' }} 
                                 p-2 rounded">
-
+                
                                 {{-- if message is sent from the current user --}}
                                 @if($message->user_id == Auth::id())
                                     <div class="d-flex flex-column align-items-end w-100">
@@ -157,8 +228,6 @@
                                         {{-- if user has attached file --}}
                                         @if($message->file_path)
                                             <div class="d-flex flex-column align-items-end w-100">
-                                                
-                                                {{-- download file button --}}
                                                 <div class="text-right">
                                                     <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
                                                 </div>
@@ -166,24 +235,32 @@
                                                 class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
                                                     Download
                                                 </a>
-
                                             </div>
-
-                                        {{-- if user has progress report form --}}
-                                        @elseif ($tasks->isNotEmpty())
-                                            {{-- check progress report --}}
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
-                                                View Progress Report
-                                            </button>
                                         @endif
-                                    
+                
+                                        {{-- Check if there is a task associated with this message --}}
+                                        @if($tasks->where('message_id', $message->id)->isNotEmpty())
+                                        @php
+                                            $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
+                                        @endphp
+                                        <button type="button" class="btn btn-success btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#progressreportModal" 
+                                                data-task-id="{{ $task->id }}" 
+                                                data-project-title="{{ $task->project_title }}" 
+                                                data-reporting-week="{{ $task->reporting_week }}" 
+                                                style="margin-bottom:1rem">
+                                            View Progress Report
+                                        </button>
+                                        @endif
+                
                                         <div class="d-flex justify-content-end w-100">
                                             <small class="text-white">
                                                 {{ $message->created_at->format('F d, Y h:i A') }}
                                             </small>
                                         </div>
                                     </div>
-
+                
                                 {{-- if message is sent from other users --}}
                                 @else
                                     <div class="flex flex-col items-start">
@@ -195,45 +272,46 @@
                                             <strong>{{ $message->user->first_name }} {{ $message->user->last_name }}</strong>
                                         </div>
                                         <p class="mb-1" style="margin-left: 3.5rem">{{ $message->message }}</p>
-                                            <div class="col-12">
-
-                                                {{-- if user has attached file --}}
-                                                @if($message->file_path)
-
-                                                    <!-- File Path -->
-                                                    <?php $filepath = $groupChat->name .'/' . basename($message->file_path) ?>
-
-                                                    {{-- download file button --}}
-                                                    <div class="text-right">
-                                                        <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
-                                                    </div>
-                                                    <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
+                                        <div class="col-12">
+                
+                                            {{-- if user has attached file --}}
+                                            @if($message->file_path)
+                                                <div class="text-right">
+                                                    <small class="mb-1" style="font-size: 0.8rem;">File: {{ basename($message->file_path) }}</small>
+                                                </div>
+                                                <a href="{{ route('file.download', $groupChat->name .'/' . basename($message->file_path)) }}" 
                                                     class="btn btn-secondary btn-sm" style="margin-bottom: 1rem;">
-                                                        Download
-                                                    </a>
-
-                                                {{-- If user has progress report form --}}
-                                                @elseif ($tasks->isNotEmpty())
-
-                                                    {{-- check progress report --}}
-                                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
-                                                        View Progress Report
-                                                    </button>
-
-                                                @endif
-
-                                            </div>
-
-                                        <small class="text-muted">
-                                            {{ $message->created_at->format('F d, Y h:i A') }}
-                                        </small>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                        @endforeach
-                    @endif
-                </div>
+                                                     Download
+                                                 </a>
+                                             @endif
+                 
+                                             {{-- Check if there is a task associated with this message --}}
+                                            @if($tasks->where('message_id', $message->id)->isNotEmpty())
+                                            @php
+                                                $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
+                                            @endphp
+                                            <button type="button" class="btn btn-success btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#progressreportModal" 
+                                                    data-task-id="{{ $task->id }}" 
+                                                    data-project-title="{{ $task->project_title }}" 
+                                                    data-reporting-week="{{ $task->reporting_week }}" 
+                                                    style="margin-bottom:1rem">
+                                                View Progress Report
+                                            </button>
+                                            @endif
+                 
+                                             <small class="text-muted" style="margin-left: 3.5rem;">
+                                                 {{ $message->created_at->format('F d, Y h:i A') }}
+                                             </small>
+                                         </div>
+                                     </div>
+                                 @endif
+                             </div>
+                         </div>
+                         @endforeach
+                     @endif
+                 </div>
 
                 <!-- Message Input -->
                 <div class="card-footer">
@@ -477,6 +555,34 @@
         }
     }
 
+    // Javascript to handle the progress report modal display
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the modal element
+        var progressReportModal = document.getElementById('progressreportModal');
+
+        // Add event listener for when the modal is shown
+        progressReportModal.addEventListener('show.bs.modal', function (event) {
+            // Get the button that triggered the modal
+            var button = event.relatedTarget;
+
+            // Extract the data attributes from the button
+            var taskId = button.getAttribute('data-task-id');
+            var projectTitle = button.getAttribute('data-project-title');
+            var reportingWeek = button.getAttribute('data-reporting-week');
+
+            // Update the modal's content
+            var modalTitle = progressReportModal.querySelector('.modal-title');
+            modalTitle.textContent = 'Progress report: ' + projectTitle + ' (Week ' + reportingWeek + ')';
+
+            // Here you can also populate the table with the relevant data
+            var modalBody = progressReportModal.querySelector('.ProgressReportTable');
+            modalBody.innerHTML = ''; // Clear previous content
+
+            // You can fetch the progress report data using AJAX or populate it directly if available
+            // For example, you could use taskId to fetch data from the server
+            // Example: modalBody.innerHTML = '<p>Progress report data for task ID: ' + taskId + '</p>';
+        });
+    });
 </script>
 
 @endsection

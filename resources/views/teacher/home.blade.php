@@ -223,6 +223,13 @@
                                                 </a>
                                             </div>
                                         @endif
+
+                                        {{-- Check if there is a task associated with this message --}}
+                                        @if($tasks->where('message_id', $message->id)->isNotEmpty())
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                                View Progress Report
+                                            </button>
+                                        @endif
                                     
                                         <div class="d-flex justify-content-end w-100">
                                             <small class="text-white">
@@ -260,13 +267,14 @@
                                                 </a>
 
                                             </div>
-                                        @elseif ($tasks)
+                                        @endif
 
-                                            {{-- check progress report --}}
+                                            {{-- Check if there is a task associated with this message --}}
+                                            @if($tasks->where('message_id', $message->id)->isNotEmpty())
                                             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
                                                 View Progress Report
                                             </button>
-
+        
                                         @endif
 
                                         <small class="text-muted">

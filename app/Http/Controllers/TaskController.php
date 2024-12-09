@@ -17,7 +17,7 @@ class TaskController extends Controller
         $validatedData = $request->validate([
             'group_name' => 'required|string',
             'reporting_date' => 'required|date',
-            'reporting_week' => 'required|integer|between:1,7',
+            'reporting_week' => 'required|integer|between:1,15',
             'project_title' => 'required|string',
             // ... other validations
         ]);

@@ -57,21 +57,19 @@ class StudentController extends Controller
         //     // 'members' => $groupChatUsers,
         //     // 'userGroupChats' => $userGroupChats,
         //     // 'groupChat' => $groupChat,
-        //     // 'messages' => $messages,
-        //     // 'tasks' => $tasks,
+        //     'messages' => $messages,
+        //     'tasks' => $tasks,
         // ];
         // return response()->json($data);
         // dd($data);
     }
-
-
 
     // Send message to group chat
     public function sendMessage(Request $request, $groupId)
     {
 
         // // check if one of the input input is empty
-        // if (empty($request->input('message')) || empty($request->input('user_id'))) {
+        // if (empty($request->input('message')) || empty($request->input('user_id')) || empty($request)) {
         //     return response()->json(['error' => 'Message or User ID is empty'], 400);
         // }
 
@@ -79,7 +77,6 @@ class StudentController extends Controller
         $validated = $request->validate([
             'message' => 'nullable|string',
             'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,ppt,pptx',
-
         ]);
 
         try {
