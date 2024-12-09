@@ -764,7 +764,7 @@
                 <tr>
                     <td style="font-weight: bold;">Member's Name:</td>
                     <td colspan="5">
-                        <ol style="padding: 0; margin: 0;" id="student-list">
+                        <ol id="student-list">
                             <!-- Student names will be populated here -->
                         </ol>
                     </td>
