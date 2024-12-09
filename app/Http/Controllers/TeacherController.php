@@ -279,6 +279,30 @@ class TeacherController extends Controller
         // return response()->json($data);
     }
 
+    public function completeReport($taskId)
+    {
+        try {
+            // Find the task by its ID
+            $task = Task::findOrFail($taskId);
 
+            // Update the task status
+            $task->update([
+                'complete' => 1
+            ]);
+
+            // Return a response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Task marked as complete',
+                'task' => $task
+            ]);
+        } catch (\Exception $e) {
+            // Handle any errors
+            return response()->json([
+                'message' => 'Error marking task as complete',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 }

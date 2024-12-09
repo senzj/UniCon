@@ -123,6 +123,8 @@
                         <!-- Progress Report Table -->
                         <table class="table table-bordered">
                             <thead>
+                                {{-- hidden task id --}}
+                                
                                 <tr>
                                     <th colspan="2">PART A: TO BE COMPLETED BY THE GROUP</th>
                                 </tr>
@@ -155,7 +157,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitGrades()">Mark as Complete</button>
+                    <button type="button" class="btn btn-primary" onclick="completePReport()">Mark as Complete</button>
                 </div>
             </div>
         </div>
@@ -321,26 +323,26 @@
 
                                             {{-- Check if there is a task associated with this message --}}
                                         @if($tasks->where('message_id', $message->id)->isNotEmpty())
-                                        @php
-                                            $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
-                                        @endphp
-                                            <button type="button" class="btn btn-success btn-sm" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#progressreportModal" 
-                                                    data-task-id="{{ $task->id }}" 
-                                                    data-term="{{ $groupChat->term }}"
-                                                    data-members="{{ $members }}"
-                                                    data-academic-year="{{ $groupChat->academic_year }}"
-                                                    data-project-title="{{ $task->project_title }}" 
-                                                    data-group-name="{{ $groupChat->name }}"
-                                                    data-specialization="{{ $groupChat->specialization }}"
-                                                    data-reporting-week="{{ $task->reporting_week }}"
-                                                    data-mentoring-day = "{{ $groupChat->mentoring_day }}"
-                                                    data-mentoring-time = "{{ $groupChat->mentoring_time }}"
-                                                    data-tasklist = "{{ $tasks }}"
-                                                    style="margin-bottom:1rem">
-                                                View Progress Report
-                                            </button>
+                                            @php
+                                                $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
+                                            @endphp
+                                                <button type="button" class="btn btn-success btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#progressreportModal" 
+                                                        data-task-id="{{ $task->id }}" 
+                                                        data-term="{{ $groupChat->term }}"
+                                                        data-members="{{ $members }}"
+                                                        data-academic-year="{{ $groupChat->academic_year }}"
+                                                        data-project-title="{{ $task->project_title }}" 
+                                                        data-group-name="{{ $groupChat->name }}"
+                                                        data-specialization="{{ $groupChat->specialization }}"
+                                                        data-reporting-week="{{ $task->reporting_week }}"
+                                                        data-mentoring-day = "{{ $groupChat->mentoring_day }}"
+                                                        data-mentoring-time = "{{ $groupChat->mentoring_time }}"
+                                                        data-tasklist = "{{ $tasks }}"
+                                                        style="margin-bottom:1rem">
+                                                    View Progress Report
+                                                </button>
                                         @endif
 
                                         <small class="text-muted">
@@ -607,28 +609,17 @@
         console.log(chapterNumber);
     }
 
-    // Function to submit the grades
-    function submitGrades() {
-        // Create an object to hold the chapter values
-        const chapterValues = {};
-        
-        // Collect only the numeric values for each chapter
-        for (let i = 1; i <= 6; i++) {
-            chapterValues[`chapter${i}`] = parseInt(document.getElementById(`chapter${i}`).value, 10);
-        }
+    function completePReport() {
+        // Use the actual task ID as a string
+        const taskId = {{ $task->id }};
+        console.log('Task ID:', taskId);
 
-        console.log('Chapter Values:', chapterValues); // Log the chapter values
-
-        const groupId = window.location.pathname.split('/').pop();
-        console.log('Group ID:', groupId); // Log the group ID
-
-        fetch(`/teacher/grade/${groupId}`, {
+        fetch(`/teacher/complete/${taskId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             },
-            body: JSON.stringify(chapterValues), // Directly send the chapter values
         })
         .then(response => {
             if (!response.ok) {
@@ -637,23 +628,21 @@
             return response.json();
         })
         .then(data => {
-            console.log('Data:', data); // Log the data received from the server
+            console.log('Task Completed:', data);
             
-            // Optional: Show success message
-            toastr.success('Grades submitted successfully', 'Success!');
+            toastr.success('Progress Report Marked as Complete', 'Success!');
+            
+            const progressReportModal = bootstrap.Modal.getInstance(document.getElementById('progressreportModal'));
+            progressReportModal.hide();
+            
+            setTimeout(() => {
+                location.reload();
+            }, 5000); // 5000 milliseconds = 5 seconds
         })
         .catch((error) => {
-            toastr.error('An unexpected error occurred', 'Error!');
+            toastr.error('An error occurred while marking the task complete', 'Error!');
             console.error('Error:', error);
         });
-
-        // Close the modal after submitting the grades
-        const gradingModal = new bootstrap.Modal(document.getElementById('gradingModal'));
-        gradingModal.hide();
-
-        // reload the page
-        location.reload();
-        
     }
 
     // Function to update the score display
@@ -730,7 +719,7 @@
             var tasks = button.getAttribute('data-tasklist'); // JSON string
 
             // Logging variables
-            console.log(taskId, projectTitle, groupName, specialization, reportingWeek, mentoringDay, mentoringTime, term, academicYear, members, tasks);
+            // console.log(taskId, projectTitle, groupName, specialization, reportingWeek, mentoringDay, mentoringTime, term, academicYear, members, tasks);
             
             // Update the modal's title
             var modalTitle = progressReportModal.querySelector('.modal-title');
@@ -741,6 +730,11 @@
             modalBody.innerHTML = ''; // Clear previous content
 
             modalBody.innerHTML += `
+
+                <!-- Hidden Task ID -->
+                <input type="hidden" id="taskIdInput" data-task-id="${taskId}" value="${taskId}">
+
+                <!-- Group Information -->
                 <tr>
                     <td style="font-weight: bold;">Group Name:</td>
                     <td>${groupName}</td>

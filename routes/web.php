@@ -86,8 +86,8 @@ Route::get('/teacher', [TeacherController::class, 'index'])
     ->name('teacher.addMember');
 
     // for grading
-    Route::post('/teacher/grade/{Id}', [TeacherController::class, 'grade'])
-    ->name('teacher.grade');
+    Route::post('/teacher/complete/{Id}', [TeacherController::class, 'completeReport'])
+    ->name('teacher.complete');
 
     // gets the grades of a group
     Route::post('/group-chat/{id}/update-progress', [TeacherController::class, 'updateProgress'])

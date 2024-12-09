@@ -15,6 +15,7 @@ class Task extends Model
         'user_id', // Ensure this is included if you want to associate tasks with users
         'group_id', 
         'message_id',
+        'complete',
         'project_title',
         'reporting_date', 
         'reporting_week', 
