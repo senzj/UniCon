@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('group_id'); // Assuming group_id is a foreign key
             $table->unsignedBigInteger('message_id'); // Assuming message_id is a foreign key
             $table->string('project_title');
-            $table->integer('comeplete')->default(0); // Default to 0 (not complete)
+            $table->integer('complete')->default(0); // Default to 0 (not complete)
             $table->date('reporting_date');
             $table->tinyInteger('reporting_week');
 
