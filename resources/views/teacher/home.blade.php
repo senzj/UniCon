@@ -111,15 +111,49 @@
     <div class="modal fade" id="progressreportModal" tabindex="-1" aria-labelledby="gradingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+                
                 <div class="modal-header">
-                    <h5 class="modal-title" id="gradingModalLabel">Progress report: Week #</h5>
+                    <h5 class="modal-title" id="progressReportLabel">Progress Report: Week #</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <div class="ProgressReportTable">
-                        table here na same lng progressreport na paper
+                    <div class="table-responsive">
+
+                        <!-- Progress Report Table -->
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">PART A: TO BE COMPLETED BY THE GROUP</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- This will be populated dynamically -->
+                            </tbody>
+                        </table>
+
+                        <table class="table table-bordered mt-3">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">PART B: LIST OF ACTIVITIES DONE</th>
+                                </tr>
+
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- This will be populated dynamically -->
+                            </tbody>
+                        </table>
+
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onclick="submitGrades()">Mark as Complete</button>
@@ -226,7 +260,24 @@
 
                                         {{-- Check if there is a task associated with this message --}}
                                         @if($tasks->where('message_id', $message->id)->isNotEmpty())
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                            @php
+                                                $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
+                                            @endphp
+                                            <button type="button" class="btn btn-success btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#progressreportModal" 
+                                                    data-task-id="{{ $task->id }}" 
+                                                    data-term="{{ $groupChat->term }}"
+                                                    data-members="{{ $members }}"
+                                                    data-academic-year="{{ $groupChat->academic_year }}"
+                                                    data-project-title="{{ $task->project_title }}" 
+                                                    data-group-name="{{ $groupChat->name }}"
+                                                    data-specialization="{{ $groupChat->specialization }}"
+                                                    data-reporting-week="{{ $task->reporting_week }}"
+                                                    data-mentoring-day = "{{ $groupChat->mentoring_day }}"
+                                                    data-mentoring-time = "{{ $groupChat->mentoring_time }}"
+                                                    data-tasklist = "{{ $tasks }}"
+                                                    style="margin-bottom:1rem">
                                                 View Progress Report
                                             </button>
                                         @endif
@@ -270,11 +321,27 @@
                                         @endif
 
                                             {{-- Check if there is a task associated with this message --}}
-                                            @if($tasks->where('message_id', $message->id)->isNotEmpty())
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#progressreportModal" style="margin-bottom:1rem">
+                                        @if($tasks->where('message_id', $message->id)->isNotEmpty())
+                                        @php
+                                            $task = $tasks->where('message_id', $message->id)->first(); // Get the first task associated with the message
+                                        @endphp
+                                            <button type="button" class="btn btn-success btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#progressreportModal" 
+                                                    data-task-id="{{ $task->id }}" 
+                                                    data-term="{{ $groupChat->term }}"
+                                                    data-members="{{ $members }}"
+                                                    data-academic-year="{{ $groupChat->academic_year }}"
+                                                    data-project-title="{{ $task->project_title }}" 
+                                                    data-group-name="{{ $groupChat->name }}"
+                                                    data-specialization="{{ $groupChat->specialization }}"
+                                                    data-reporting-week="{{ $task->reporting_week }}"
+                                                    data-mentoring-day = "{{ $groupChat->mentoring_day }}"
+                                                    data-mentoring-time = "{{ $groupChat->mentoring_time }}"
+                                                    data-tasklist = "{{ $tasks }}"
+                                                    style="margin-bottom:1rem">
                                                 View Progress Report
                                             </button>
-        
                                         @endif
 
                                         <small class="text-muted">
@@ -638,6 +705,141 @@
             // If no file is selected, clear the file name display
             document.getElementById('file-name').textContent = '';
         }
+    });
+
+    // Javascript to handle the progress report modal display
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the modal element
+        var progressReportModal = document.getElementById('progressreportModal');
+
+        // Add event listener for when the modal is shown
+        progressReportModal.addEventListener('show.bs.modal', function (event) {
+            // Get the button that triggered the modal
+            var button = event.relatedTarget;
+
+            // Extract the data attributes from the button
+            var taskId = button.getAttribute('data-task-id');
+            var projectTitle = button.getAttribute('data-project-title');
+            var groupName = button.getAttribute('data-group-name');
+            var specialization = button.getAttribute('data-specialization');
+            var reportingWeek = button.getAttribute('data-reporting-week');
+            var mentoringDay = button.getAttribute('data-mentoring-day');
+            var mentoringTime = button.getAttribute('data-mentoring-time');
+            var term = button.getAttribute('data-term');
+            var academicYear = button.getAttribute('data-academic-year');
+            var members = button.getAttribute('data-members'); // Split into an array
+            var tasks = button.getAttribute('data-tasklist');
+
+            //logging variables
+            console.log(taskId);
+            console.log(projectTitle);
+            console.log(groupName);
+            console.log(specialization);
+            console.log(reportingWeek);
+            console.log(mentoringDay);
+            console.log(mentoringTime);
+            console.log(term);
+            console.log(academicYear);
+            console.log(members);
+            console.log(tasks);
+            
+            // Update the modal's title
+            var modalTitle = progressReportModal.querySelector('.modal-title');
+            modalTitle.textContent = 'Progress Report: Week ' + reportingWeek;
+
+            // Populate Part A
+            var modalBody = progressReportModal.querySelector('.table-responsive tbody');
+            modalBody.innerHTML = ''; // Clear previous content
+
+            modalBody.innerHTML += `
+                <tr>
+                    <td style="font-weight: bold;">Group Name:</td>
+                    <td>${groupName}</td>
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Program:</td>
+                    <td>${specialization}</td>
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Term:</td>
+                    <td>${term}</td>
+                </tr>
+                
+                <tr>
+                    <td style="font-weight: bold;">Academic Year:</td>
+                    <td>${academicYear}</td>
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Reporting Week:</td>
+                    <td>${reportingWeek}</td>
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Member's Name:</td>
+                    <td colspan="5">
+                        <ol style="padding: 0; margin: 0;" id="student-list">
+                            <!-- Student names will be populated here -->
+                        </ol>
+                    </td>
+                </tr>   
+
+                <tr>
+                    <td style="font-weight: bold;">Mentoring Day:</td>
+                    <td>${mentoringDay}</td>
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Mentoring Time:</td>
+                    <td>${mentoringTime}</td>
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Title of the Project:</td>
+                    <td>${projectTitle}</td>
+                </tr>
+            `;
+
+            // Parse the members JSON string
+            var membersArray = JSON.parse(members);
+
+            // Filter for students
+            var students = membersArray.filter(member => member.role === 'student');
+
+            // Get the student list element
+            var studentList = document.getElementById('student-list');
+
+            // Populate the student list
+            students.forEach(student => {
+                var listItem = document.createElement('li');
+                listItem.textContent = `${student.first_name} ${student.last_name}`;
+                studentList.appendChild(listItem);
+            });
+
+            // Populate Part B (You can replace this with actual data)
+            var activities = [
+                { date: '2024-12-01', activity: 'Completed literature review', remarks: 'Approved' },
+                { date: '2024-12-03', activity: 'Data collection started', remarks: 'On schedule' },
+                { date: '2024-12-05', activity: 'Prepared survey questionnaires', remarks: 'Reviewed by adviser' }
+            ];
+
+            // Clear previous activities
+            var activitiesTableBody = progressReportModal.querySelectorAll('.table-bordered')[1].querySelector('tbody');
+            activitiesTableBody.innerHTML = ''; // Clear previous content
+
+            // Populate the activities table
+            activities.forEach(activity => {
+                activitiesTableBody.innerHTML += `
+                    <tr>
+                        <td>${activity.date}</td>
+                        <td>${activity.activity}</td>
+                        <td>${activity.remarks}</td>
+                    </tr>
+                `;
+            });
+        });
     });
 
 </script>
