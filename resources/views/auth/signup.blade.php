@@ -46,7 +46,7 @@
                     <label class="form-check-label" for="remember">Remember Me</label>
                 </div>
         
-                <button type="submit" class="btn btn-primary">Sign In</button>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
                 <p><span>Already have an account? <a href="/login">Log In!</a></span></p>
             </div>
         </div>
